@@ -314,26 +314,20 @@ class CreateFrame extends TilePane {
 class VoiceInputFrame extends BorderPane {
 
     private Button pressToSpeak;
-    private Boolean clicked;
 
     public VoiceInputFrame(){
         pressToSpeak = new Button("Press to speak.");
         pressToSpeak.setPrefSize(200,200);
-        clicked = false;
 
         this.setCenter(pressToSpeak);
     }
 
-    public void setTitleAction(EventHandler<ActionEvent> eventHandler){
-        pressToSpeak.setOnAction(eventHandler);
+    public void setClicked(EventHandler<MouseEvent> eventHandler) {
+        pressToSpeak.setOnMousePressed(eventHandler);
     }
 
-    public boolean getClicked(){
-        return clicked;
-    }
-
-    public void setClicked(Boolean status){
-        clicked = status;
+    public void setReleased(EventHandler<MouseEvent> eventHandler){
+        pressToSpeak.setOnMouseReleased(eventHandler);
     }
 
     public Button getPressButton(){
