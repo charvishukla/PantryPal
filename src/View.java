@@ -3,15 +3,18 @@ package src;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.stage.Stage; // Might need to open new stage (new window)
 import javafx.scene.Scene;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField; // Might not need this
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -20,27 +23,34 @@ import javafx.scene.input.MouseEvent;
 
 
 public class View {
-    private AppFrame appframe;
+    private AppFrame appframe; //This is a scene
+    private CreateFrame createframe;
     private Stage mainStage;
     private Scene currentScene;
     // Add buttons here
 
     public View(Stage primaryStage) {
         this.appframe = new AppFrame();
+        this.createframe = new CreateFrame();
         this.mainStage = primaryStage;
         this.currentScene = new Scene(this.appframe, 1280, 720);
         mainStage.setScene(currentScene);    // this is the size of the home screen 
         mainStage.setTitle("PantryPal");
-        mainStage.setResizable(false);
+        mainStage.setResizable(true);
         mainStage.show();
     }
 
     public AppFrame getAppFrame() {
         return this.appframe;
     }
+
+    public CreateFrame getCreateFrame() {
+        return this.createframe;
+    }
     
-    public void switchScene(Scene scene) {
-        mainStage.setScene(scene);
+    public void switchScene(Parent node) {
+        this.currentScene = new Scene(node, 1280, 720);
+        mainStage.setScene(currentScene);
         mainStage.show();
     }
 }
@@ -58,10 +68,26 @@ class Header extends HBox {
 }
 
 class Footer extends HBox {  
+    private Button createButton;
     Footer() {
         this.setPrefSize(1280, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
+        String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
+
+        createButton = new Button("Create new recipe");
+        createButton.setStyle(defaultButtonStyle);
+
+        this.getChildren().addAll(createButton); // adding buttons to footer
+        this.setAlignment(Pos.CENTER); // aligning the buttons to center
+    }
+
+    public Button getCreateButton() {
+        return createButton;
+    }
+
+    public void setCreateButtonAction(EventHandler<ActionEvent> eventHandler) {
+        createButton.setOnAction(eventHandler);
     }
 }
 
@@ -253,5 +279,24 @@ class AppFrame extends BorderPane {
         this.setCenter(scroller);
         this.setBottom(detailFooter);
         return this;
+    }
+}
+
+
+class CreateFrame extends TilePane {
+    Button breakfastButton;
+    Button lunchButton;
+    Button dinnerButton;
+    
+    CreateFrame() {
+        this.setOrientation(Orientation.HORIZONTAL);
+        this.setHgap(30);
+        this.setPrefColumns(3);
+        Button breakfastButton = new Button("Breakfast");
+        Button lunchButton = new Button("Lunch");
+        Button dinnerButton = new Button("Dinner");
+
+        this.setAlignment(Pos.CENTER);
+        this.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
     }
 }

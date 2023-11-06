@@ -14,6 +14,7 @@ public class Controller{
 
         this.view.getAppFrame().geRecipeList().setAllTitleAction(this::handleTitleClick);
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+        this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
     }
 
     private void handleTitleClick(MouseEvent event) {
@@ -22,5 +23,9 @@ public class Controller{
 
     private void handleBackButtonClick(ActionEvent event) {
         this.view.getAppFrame().showList();
+    }
+
+    private void handleCreateButtonClick(ActionEvent event) {
+        this.view.switchScene(this.view.getCreateFrame());
     }
 }
