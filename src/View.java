@@ -1,5 +1,6 @@
 package src;
 
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -56,25 +57,45 @@ class Header extends HBox {
     }
 }
 
-class Footer extends HBox {
-
-    private Button addButton;
-    
+class Footer extends HBox {  
     Footer() {
+        this.setPrefSize(1280, 60);
+        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setSpacing(15);
+    }
+}
+
+class DetailFooter extends HBox {
+
+    private Button saveButton;
+    private Button backButton;
+    
+    DetailFooter() {
         this.setPrefSize(1280, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
         this.setSpacing(15);
         String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
 
-        addButton = new Button("Add Recipe");
-        addButton.setStyle(defaultButtonStyle);
+        backButton = new Button("Back");
+        backButton.setStyle(defaultButtonStyle);
 
-        this.getChildren().addAll(addButton); // adding buttons to footer
+        saveButton = new Button("Save");
+        saveButton.setStyle(defaultButtonStyle);
+
+        this.getChildren().addAll(backButton, saveButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
 
-    public Button getAddButton() {
-        return addButton;
+    public Button getBackButton() {
+        return backButton;
+    }
+
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public void setBackButtonAction(EventHandler<ActionEvent> eventHandler) {
+        backButton.setOnAction(eventHandler);
     }
 }
 
@@ -173,6 +194,7 @@ class AppFrame extends BorderPane {
     private RecipeList recipeList;
     private RecipeDetails recipeDetails;
     private Footer footer;
+    private DetailFooter detailFooter;
 
     AppFrame() {
         // Initialise the header Object
@@ -184,6 +206,7 @@ class AppFrame extends BorderPane {
         
         // Initialise the Footer Object
         footer = new Footer();
+        detailFooter = new DetailFooter();
 
         // TODO: Add a Scroller to the Recipe List
         ScrollPane scroller = new ScrollPane(recipeList); // Wrap the task list in a ScrollPane
@@ -210,11 +233,16 @@ class AppFrame extends BorderPane {
         return this.footer;
     }
 
+    public DetailFooter getDetailFooter(){
+        return this.detailFooter;
+    }
+
     public AppFrame showList(){
         ScrollPane scroller = new ScrollPane(recipeList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
         this.setCenter(scroller);
+        this.setBottom(footer);
         return this;
     }
 
@@ -223,6 +251,7 @@ class AppFrame extends BorderPane {
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
         this.setCenter(scroller);
+        this.setBottom(detailFooter);
         return this;
     }
 }
