@@ -15,6 +15,7 @@ public class Controller{
         this.view.getAppFrame().geRecipeList().setAllTitleAction(this::handleTitleClick);
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
+        this.view.getVoiceInputFrame().setTitleAction(this::handleVoiceInputButton);
     }
 
     private void handleTitleClick(MouseEvent event) {
@@ -27,5 +28,15 @@ public class Controller{
 
     private void handleCreateButtonClick(ActionEvent event) {
         this.view.switchScene(this.view.getCreateFrame());
+    }
+
+    private void handleVoiceInputButton(ActionEvent event) {
+        if( this.view.getVoiceInputFrame().getClicked() ){
+            this.view.getVoiceInputFrame().getPressButton().setText("Stoped.");
+        }
+        else{
+            this.view.getVoiceInputFrame().getPressButton().setText("Listeing.");
+            this.view.getVoiceInputFrame().setClicked(true);
+        }
     }
 }

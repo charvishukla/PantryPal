@@ -25,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 public class View {
     private AppFrame appframe; //This is a scene
     private CreateFrame createframe;
+    private VoiceInputFrame voiceInputFrame;
     private Stage mainStage;
     private Scene currentScene;
     // Add buttons here
@@ -32,8 +33,11 @@ public class View {
     public View(Stage primaryStage) {
         this.appframe = new AppFrame();
         this.createframe = new CreateFrame();
+        this.voiceInputFrame = new VoiceInputFrame();
+        
         this.mainStage = primaryStage;
-        this.currentScene = new Scene(this.appframe, 1280, 720);
+        this.currentScene = new Scene(this.voiceInputFrame, 1280, 720);
+
         mainStage.setScene(currentScene);    // this is the size of the home screen 
         mainStage.setTitle("PantryPal");
         mainStage.setResizable(true);
@@ -46,6 +50,10 @@ public class View {
 
     public CreateFrame getCreateFrame() {
         return this.createframe;
+    }
+
+    public VoiceInputFrame getVoiceInputFrame(){
+        return this.voiceInputFrame;
     }
     
     public void switchScene(Parent node) {
@@ -299,4 +307,37 @@ class CreateFrame extends TilePane {
         this.setAlignment(Pos.CENTER);
         this.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
     }
+}
+
+
+
+class VoiceInputFrame extends BorderPane {
+
+    private Button pressToSpeak;
+    private Boolean clicked;
+
+    public VoiceInputFrame(){
+        pressToSpeak = new Button("Press to speak.");
+        pressToSpeak.setPrefSize(200,200);
+        clicked = false;
+
+        this.setCenter(pressToSpeak);
+    }
+
+    public void setTitleAction(EventHandler<ActionEvent> eventHandler){
+        pressToSpeak.setOnAction(eventHandler);
+    }
+
+    public boolean getClicked(){
+        return clicked;
+    }
+
+    public void setClicked(Boolean status){
+        clicked = status;
+    }
+
+    public Button getPressButton(){
+        return pressToSpeak;
+    }
+
 }
