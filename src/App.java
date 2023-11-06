@@ -1,7 +1,6 @@
 package src;
 
 import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -14,11 +13,9 @@ public class App extends Application {
         View view = new View();
         Controller controller = new Controller(model, view);
         **/
-        View view = new View();
-        primaryStage.setScene(new Scene(view.getAppFrame(), 1280, 720));    // this is the size of the home screen 
-        primaryStage.setTitle("PantryPal");
-        primaryStage.setResizable(false);
-        primaryStage.show();
+        Model model = new Model();
+        View view = new View(primaryStage);
+        Controller controller = new Controller(view, model);
     }
 
     public static void main(String[] args) {

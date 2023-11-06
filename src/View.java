@@ -1,7 +1,10 @@
 package src;
 
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.stage.Stage; // Might need to open new stage (new window)
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -9,21 +12,35 @@ import javafx.scene.control.TextField; // Might not need this
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage; // Might need to open new stage (new window)
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 
 public class View {
     private AppFrame appframe;
+    private Stage mainStage;
+    private Scene currentScene;
+    // Add buttons here
 
-    public View() {
+    public View(Stage primaryStage) {
         this.appframe = new AppFrame();
+        this.mainStage = primaryStage;
+        this.currentScene = new Scene(this.appframe, 1280, 720);
+        mainStage.setScene(currentScene);    // this is the size of the home screen 
+        mainStage.setTitle("PantryPal");
+        mainStage.setResizable(false);
+        mainStage.show();
     }
 
     public AppFrame getAppFrame() {
         return this.appframe;
+    }
+    
+    public void switchScene(Scene scene) {
+        mainStage.setScene(scene);
+        mainStage.show();
     }
 }
 
@@ -74,11 +91,43 @@ class RecipeList extends VBox {
         test2.setRecipeName("test2");
         this.getChildren().add(test2);
     }
+
+    public void setAllTitleAction(EventHandler<MouseEvent> eventHandler) {
+        for(int i = 0; i < this.getChildren().size(); i++) {
+            if (this.getChildren().get(i) instanceof Recipe) {
+                ((Recipe) this.getChildren().get(i)).setTitleAction(eventHandler);;
+            }
+        }
+    }
 }
+
+class RecipeDetails extends VBox {
+    RecipeDetails() {
+        // Do we need setPrefSize? Maybe not?
+        // this.setPrefHeight(100);
+        this.setSpacing(10);
+        this.setStyle("-fx-background-color: #40d838");
+
+        //Add a testing recipe to recipeDetails
+        TextField text = new TextField();
+        text.setPrefHeight(200);
+        this.getChildren().add(text);
+
+    }
+
+    public void setAllTitleAction(EventHandler<MouseEvent> eventHandler) {
+        for(int i = 0; i < this.getChildren().size(); i++) {
+            if (this.getChildren().get(i) instanceof Recipe) {
+                ((Recipe) this.getChildren().get(i)).setTitleAction(eventHandler);;
+            }
+        }
+    }
+}
+
 
 class Recipe extends HBox {
 
-    private Button detail;
+    //private Button detail;
     private Label recipeTitle; //To made the title interactive it might not be textfield? Maybe a button with no boarder?
     private ImageView imageView;
     
@@ -99,38 +148,47 @@ class Recipe extends HBox {
         recipeTitle.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
         this.getChildren().add(recipeTitle); // add textlabel to task
 
-        detail = new Button("Detail");
-        detail.setPrefSize(100, 20);
-        detail.setAlignment(Pos.CENTER_RIGHT);
-        this.getChildren().add(detail);
+        //detail = new Button("Detail");
+        //detail.setPrefSize(100, 20);
+        //detail.setAlignment(Pos.CENTER_RIGHT);
+        //this.getChildren().add(detail);
     }
 
     public void setRecipeName(String name){
         this.recipeTitle.setText(name);
     }
-    
+
+    public Label getTitle() {
+        return this.recipeTitle;
+    }    
+
+    public void setTitleAction(EventHandler<MouseEvent> eventHandler) {
+        recipeTitle.setOnMouseClicked(eventHandler);
+    }
 }
 
 
 class AppFrame extends BorderPane {
     private Header header;
-    private Footer footer;
     private RecipeList recipeList;
+    private RecipeDetails recipeDetails;
+    private Footer footer;
 
     AppFrame() {
         // Initialise the header Object
         header = new Header();
 
-        // Create a tasklist Object to hold the tasks
+        // Create a recipeList Object to hold the recipes
         recipeList = new RecipeList();
+        recipeDetails = new RecipeDetails();
         
         // Initialise the Footer Object
         footer = new Footer();
 
         // TODO: Add a Scroller to the Recipe List
         ScrollPane scroller = new ScrollPane(recipeList); // Wrap the task list in a ScrollPane
-        scroller.setFitToWidth(true); // Set the width to match the width of the taskList
-        scroller.setFitToHeight(true); // Set the height to match the height of the taskList
+        scroller.setFitToWidth(true); // Set the width to match the width of the recipeList
+        scroller.setFitToHeight(true); // Set the height to match the height of the recipeList
 
         // Add header to the top of the BorderPane
         this.setTop(header);
@@ -138,5 +196,33 @@ class AppFrame extends BorderPane {
         this.setCenter(scroller);
         // Add footer to the bottom of the BorderPane
         this.setBottom(footer);
+    }
+    
+    public Header getHeader() {
+        return this.header;
+    }
+
+    public RecipeList geRecipeList(){
+        return this.recipeList;
+    }
+
+    public Footer getFooter() {
+        return this.footer;
+    }
+
+    public AppFrame showList(){
+        ScrollPane scroller = new ScrollPane(recipeList);
+        scroller.setFitToWidth(true);
+        scroller.setFitToHeight(true);
+        this.setCenter(scroller);
+        return this;
+    }
+
+    public AppFrame showDetail(){
+        ScrollPane scroller = new ScrollPane(recipeDetails);
+        scroller.setFitToWidth(true);
+        scroller.setFitToHeight(true);
+        this.setCenter(scroller);
+        return this;
     }
 }
