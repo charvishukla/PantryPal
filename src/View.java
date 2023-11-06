@@ -67,9 +67,12 @@ class RecipeList extends VBox {
         this.setSpacing(10);
         this.setStyle("-fx-background-color: #80d838");
         //Add a testing recipe to recipelist 
-        Recipe test = new Recipe();
-        test.setRecipeName("test");
-        this.getChildren().add(test);
+        Recipe test1 = new Recipe();
+        test1.setRecipeName("test1");
+        this.getChildren().add(test1);
+        Recipe test2 = new Recipe();
+        test2.setRecipeName("test2");
+        this.getChildren().add(test2);
     }
 }
 
@@ -98,7 +101,7 @@ class Recipe extends HBox {
 
         detail = new Button("Detail");
         detail.setPrefSize(100, 20);
-        detail.setAlignment(Pos.ri)
+        detail.setAlignment(Pos.CENTER_RIGHT);
         this.getChildren().add(detail);
     }
 
