@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="edu.ucsd.cse110.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-11-07T05:59:12" hostname="4vs-comp.local" time="0.025">
+<testsuite name="edu.ucsd.cse110.AppTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2023-11-07T06:11:09" hostname="4vs-comp.local" time="0.028">
   <properties/>
-  <testcase name="DummyTest1()" classname="edu.ucsd.cse110.AppTest" time="0.025"/>
+  <testcase name="DummyTest1()" classname="edu.ucsd.cse110.AppTest" time="0.028"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
