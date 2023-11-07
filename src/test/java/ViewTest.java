@@ -61,20 +61,20 @@ public class ViewTest {
     public void testBreakfastisnotNull(){
         View view = new View(new Stage());
         CreateFrame frame = view.getCreateFrame();
-        assertNotNull(frame.breakfastButton, "Verify, Breakfast Button is not NULL");
+        assertNotNull(frame.getBreakfastButton(), "Verify, Breakfast Button is not NULL");
     }
 
     @Test 
     public void testLunchisnotNull(){
         View view = new View(new Stage());
         CreateFrame frame = view.getCreateFrame();
-        assertNotNull(frame.lunchButton, "Verify, Lunch Button is not NULL");
+        assertNotNull(frame.getLunchButton(), "Verify, Lunch Button is not NULL");
     }
      @Test 
     public void testDinnerisnotNull(){
         View view = new View(new Stage());
         CreateFrame frame = view.getCreateFrame();
-        assertNotNull(frame.dinnerButton, "Verify, Dinner Button is not NULL");
+        assertNotNull(frame.getDinnerButton(), "Verify, Dinner Button is not NULL");
     }
 
 

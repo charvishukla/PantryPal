@@ -306,6 +306,18 @@ class CreateFrame extends TilePane {
         this.setAlignment(Pos.CENTER);
         this.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
     }
+
+    public Button getBreakfastButton() {
+        return this.breakfastButton;
+    }
+
+    public Button getLunchButton() {
+        return this.lunchButton;
+    }
+
+    public Button getDinnerButton() {
+        return this.dinnerButton;
+    }
 }
 
 
