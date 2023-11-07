@@ -1,11 +1,18 @@
 plugins {
+    id 'application'
     id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(11)
     }
+}
+
+javafx {
+    version = "18.0.1"
+    modules = ['javafx.controls', 'javafx.fxml']
 }
 
 repositories {
@@ -19,8 +26,19 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
     // This provides the TestEngine to actually run the tests.
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
+
+    implementation 'org.mongodb:mongodb-driver-sync:4.11.0'
+
+    implementation 'org.openjfx:javafx-controls:18.0.1'
+    implementation 'org.openjfx:javafx-fxml:18.0.1'
 }
 
-test {
+application {
+    mainClass = 'App'
+}
+
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
