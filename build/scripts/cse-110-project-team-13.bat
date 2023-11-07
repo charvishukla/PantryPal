@@ -67,7 +67,7 @@ goto fail
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\cse-110-project-team-13.jar;%APP_HOME%\lib\javafx-fxml-18.0.1-mac.jar;%APP_HOME%\lib\javafx-fxml-18.0.1.jar;%APP_HOME%\lib\javafx-controls-18.0.1-mac.jar;%APP_HOME%\lib\javafx-controls-18.0.1.jar;%APP_HOME%\lib\javafx-graphics-18.0.1-mac.jar;%APP_HOME%\lib\javafx-graphics-18.0.1.jar;%APP_HOME%\lib\javafx-base-18.0.1-mac.jar;%APP_HOME%\lib\javafx-base-18.0.1.jar;%APP_HOME%\lib\mongodb-driver-sync-4.11.0.jar;%APP_HOME%\lib\mongodb-driver-core-4.11.0.jar;%APP_HOME%\lib\bson-record-codec-4.11.0.jar;%APP_HOME%\lib\bson-4.11.0.jar
+set CLASSPATH=%APP_HOME%\lib\cse-110-project-team-13.jar;%APP_HOME%\lib\javafx-fxml-18.0.1-win.jar;%APP_HOME%\lib\javafx-fxml-18.0.1.jar;%APP_HOME%\lib\javafx-controls-18.0.1-win.jar;%APP_HOME%\lib\javafx-controls-18.0.1.jar;%APP_HOME%\lib\javafx-graphics-18.0.1-win.jar;%APP_HOME%\lib\javafx-graphics-18.0.1.jar;%APP_HOME%\lib\javafx-base-18.0.1-win.jar;%APP_HOME%\lib\javafx-base-18.0.1.jar;%APP_HOME%\lib\mongodb-driver-sync-4.11.0.jar;%APP_HOME%\lib\mongodb-driver-core-4.11.0.jar;%APP_HOME%\lib\bson-record-codec-4.11.0.jar;%APP_HOME%\lib\bson-4.11.0.jar
 
 
 @rem Execute cse-110-project-team-13
