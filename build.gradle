@@ -24,6 +24,8 @@ dependencies {
 
     // This provides the JUnit API.
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitVersion"
+    testImplementation 'org.testfx:testfx-core:4.0.16-alpha' 
+    testImplementation 'org.testfx:testfx-junit5:4.0.16-alpha'
     // This provides the TestEngine to actually run the tests.
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
 

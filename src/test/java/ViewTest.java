@@ -1,10 +1,13 @@
 
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.testfx.framework.junit5.ApplicationExtension;
+import org.testfx.framework.junit5.Start;
 
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
@@ -30,23 +33,30 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 
-
+@ExtendWith(ApplicationExtension.class)
 public class ViewTest {
+
+    private Stage stage;
+    private View view;
+    private Parent parentNode;
+    private CreateFrame frame;
+
+    @Start
+    public void onStart(Stage stage) {
+        this.stage = stage;
+        this.view = new View(stage);
+        parentNode = new Pane();
+        view.switchScene(parentNode);
+        frame = view.getCreateFrame();
+    }
 
     @Test
     public void testSwitchScene() {
-        Stage stage = new Stage();
-        View view = new View(stage);
-        
-        Parent parentNode = new Pane();
-        view.switchScene(parentNode);
-
         assertEquals(parentNode, stage.getScene().getRoot());
     }
 
     @Test
     public void testFooterCreateButtonAction() {
-        View view = new View(new Stage());
         Footer footer = view.getAppFrame().getFooter();
         Button createButton = footer.getCreateButton();
 
@@ -57,26 +67,21 @@ public class ViewTest {
 
         assertTrue(listener.isActionPerformed());
     }
+     
     @Test 
     public void testBreakfastisnotNull(){
-        View view = new View(new Stage());
-        CreateFrame frame = view.getCreateFrame();
         assertNotNull(frame.getBreakfastButton(), "Verify, Breakfast Button is not NULL");
     }
-
+    
     @Test 
     public void testLunchisnotNull(){
-        View view = new View(new Stage());
-        CreateFrame frame = view.getCreateFrame();
         assertNotNull(frame.getLunchButton(), "Verify, Lunch Button is not NULL");
     }
      @Test 
     public void testDinnerisnotNull(){
-        View view = new View(new Stage());
-        CreateFrame frame = view.getCreateFrame();
         assertNotNull(frame.getDinnerButton(), "Verify, Dinner Button is not NULL");
     }
-
+    
 
     // add more tests for other functionality
     /*

@@ -299,9 +299,9 @@ class CreateFrame extends TilePane {
         this.setOrientation(Orientation.HORIZONTAL);
         this.setHgap(30);
         this.setPrefColumns(3);
-        Button breakfastButton = new Button("Breakfast");
-        Button lunchButton = new Button("Lunch");
-        Button dinnerButton = new Button("Dinner");
+        this.breakfastButton = new Button("Breakfast");
+        this.lunchButton = new Button("Lunch");
+        this.dinnerButton = new Button("Dinner");
 
         this.setAlignment(Pos.CENTER);
         this.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
