@@ -21,6 +21,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -37,7 +38,7 @@ public class ViewTest {
         Stage stage = new Stage();
         View view = new View(stage);
         
-        Parent parentNode = new Parent();
+        Parent parentNode = new Pane();
         view.switchScene(parentNode);
 
         assertEquals(parentNode, stage.getScene().getRoot());
@@ -60,20 +61,20 @@ public class ViewTest {
     public void testBreakfastisnotNull(){
         View view = new View(new Stage());
         CreateFrame frame = view.getCreateFrame();
-        assertNotNULL("Verify, Breakfast Button is not NULL", frame.breakfastButton);
+        assertNotNull(frame.breakfastButton, "Verify, Breakfast Button is not NULL");
     }
 
     @Test 
     public void testLunchisnotNull(){
         View view = new View(new Stage());
         CreateFrame frame = view.getCreateFrame();
-        assertNotNULL("Verify, Lunch Button is not NULL", frame.lunchButton);
+        assertNotNull(frame.lunchButton, "Verify, Lunch Button is not NULL");
     }
      @Test 
     public void testDinnerisnotNull(){
         View view = new View(new Stage());
         CreateFrame frame = view.getCreateFrame();
-        assertNotNULL("Verify, Dinner Button is not NULL", frame.dinnerButton);
+        assertNotNull(frame.dinnerButton, "Verify, Dinner Button is not NULL");
     }
 
 
