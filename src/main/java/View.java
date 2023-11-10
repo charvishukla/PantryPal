@@ -35,7 +35,7 @@ public class View {
         this.voiceInputFrame = new VoiceInputFrame();
         
         this.mainStage = primaryStage;
-        this.currentScene = new Scene(this.voiceInputFrame, 1280, 720);
+        this.currentScene = new Scene(this.appframe, 1280, 720);
 
         mainStage.setScene(currentScene);    // this is the size of the home screen 
         mainStage.setTitle("PantryPal");
