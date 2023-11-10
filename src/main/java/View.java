@@ -1,5 +1,4 @@
 
-
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -36,7 +35,7 @@ public class View {
         this.voiceInputFrame = new VoiceInputFrame();
         
         this.mainStage = primaryStage;
-        this.currentScene = new Scene(this.voiceInputFrame, 1280, 720);
+        this.currentScene = new Scene(this.appframe, 1280, 720);
 
         mainStage.setScene(currentScene);    // this is the size of the home screen 
         mainStage.setTitle("PantryPal");
@@ -300,12 +299,24 @@ class CreateFrame extends TilePane {
         this.setOrientation(Orientation.HORIZONTAL);
         this.setHgap(30);
         this.setPrefColumns(3);
-        Button breakfastButton = new Button("Breakfast");
-        Button lunchButton = new Button("Lunch");
-        Button dinnerButton = new Button("Dinner");
+        this.breakfastButton = new Button("Breakfast");
+        this.lunchButton = new Button("Lunch");
+        this.dinnerButton = new Button("Dinner");
 
         this.setAlignment(Pos.CENTER);
         this.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
+    }
+
+    public Button getBreakfastButton() {
+        return this.breakfastButton;
+    }
+
+    public Button getLunchButton() {
+        return this.lunchButton;
+    }
+
+    public Button getDinnerButton() {
+        return this.dinnerButton;
     }
 }
 
