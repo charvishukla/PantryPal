@@ -1,6 +1,9 @@
+
+// Utils 
 import java.util.List;
 import java.util.Map;
-
+import java.util.stream.Collectors;
+// Event Handling
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 // Padding and Alignment
@@ -23,26 +26,22 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage; // Might need to open new stage (new window) 
 
-
-
-
 public class View {
-    private AppFrame appframe; //This is a scene
+    private AppFrame appframe; // This is a scene
     private CreateFrame createframe;
     private VoiceInputFrame voiceInputFrame;
     private Stage mainStage;
     private Scene currentScene;
-    // Add buttons here
 
     public View(Stage primaryStage) {
         this.appframe = new AppFrame();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
-        
+
         this.mainStage = primaryStage;
         this.currentScene = new Scene(this.appframe, 1280, 720);
 
-        mainStage.setScene(currentScene);   
+        mainStage.setScene(currentScene);
         mainStage.setTitle("PantryPal");
         mainStage.setResizable(true);
         mainStage.show();
@@ -52,16 +51,29 @@ public class View {
         return this.appframe;
     }
 
+    public void returnToAppFrame() {
+        this.appframe = new AppFrame(); // Create a new instance of AppFrame
+        this.currentScene.setRoot(this.appframe); // Set the new instance as the root
+        mainStage.show();
+    }
+
     public CreateFrame getCreateFrame() {
         return this.createframe;
     }
 
-    public VoiceInputFrame getVoiceInputFrame(){
+    public VoiceInputFrame getVoiceInputFrame() {
         return this.voiceInputFrame;
     }
-    
+
     public void switchScene(Parent node) {
-        this.currentScene = new Scene(node, 1280, 720);
+        // Check if the node is already part of a scene
+        if (node.getScene() != null) {
+            // If it is, use the existing scene
+            this.currentScene = node.getScene();
+        } else {
+            // Otherwise, create a new scene
+            this.currentScene = new Scene(node, 1280, 720);
+        }
         mainStage.setScene(currentScene);
         mainStage.show();
     }
@@ -71,34 +83,39 @@ class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button savedRecipesButton;
+
     Header() {
         // Style the header background
         this.setPrefSize(1280, 85); // Size of the header
         this.setStyle("-fx-background-color: #FFFFFF;"); // Color of the Header
         this.setPadding(new Insets(20, 35, 10, 35));
-         
-        // Button Styles 
+
+        // Button Styles
         this.homeButton = new Button("Pantry Pal");
-        homeButton.setStyle("-fx-padding: 10 20 10 20; -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-size: 30px; -fx-font-family: 'Verdana'; -fx-text-fill: #5DA9E9 !important;");
+        homeButton.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-size: 30px; -fx-font-family: 'Verdana'; -fx-text-fill: #5DA9E9 !important;");
 
         this.profileButton = new Button("My Profile");
-        profileButton.setStyle("-fx-padding: 10 20 1 20; -fx-font-family: 'Verdana';   -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
-        
+        profileButton.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana'; -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+
         this.savedRecipesButton = new Button("Saved");
-        savedRecipesButton.setStyle("-fx-padding: 10 20 1 20; -fx-font-family: 'Verdana';   -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        savedRecipesButton.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        
+
         // add all childeren
         this.getChildren().addAll(homeButton, spacer, savedRecipesButton, profileButton);
-        
+
     }
 }
 
-class Footer extends HBox {  
+class Footer extends HBox {
     private Button createButton;
+
     Footer() {
         this.setPrefSize(1280, 60);
         this.setStyle("-fx-background-color: #F0F8FF;");
@@ -122,22 +139,24 @@ class Footer extends HBox {
 }
 
 class DetailFooter extends HBox {
-
     private Button saveButton;
     private Button backButton;
-    
+
     DetailFooter() {
-        this.setPrefSize(1280, 60);
-        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setPrefSize(1280, 85);
+        this.setStyle("-fx-background-color: #FFFFFF; ");
         this.setSpacing(15);
-        String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
+        this.setPadding(new Insets(20, 35, 10, 35));
 
         backButton = new Button("Back");
-        backButton.setStyle(defaultButtonStyle);
+        backButton.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana'; fx-text-fill: 616161; ");
 
         saveButton = new Button("Save");
-        saveButton.setStyle(defaultButtonStyle);
+        saveButton.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  fx-text-fill: 616161;");
 
+        System.out.println("Hello, this is detail footer");
         this.getChildren().addAll(backButton, saveButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
@@ -153,6 +172,7 @@ class DetailFooter extends HBox {
     public void setBackButtonAction(EventHandler<ActionEvent> eventHandler) {
         backButton.setOnAction(eventHandler);
     }
+
 }
 
 /**
@@ -161,10 +181,11 @@ class DetailFooter extends HBox {
  * Each recipe is added to the grid, with a maximum of 4 recipes per row
  */
 class RecipeList extends GridPane {
-    private final int maxColumn = 4;                                      // we will have 4 recipes per column
+    private final int maxColumn = 4; // we will have 4 recipes per column
+
     public RecipeList() {
-        this.setHgap(15);  // horizontal gap in the grid
-        this.setVgap(15);  // vertical gap in the grid 
+        this.setHgap(15); // horizontal gap in the grid
+        this.setVgap(15); // vertical gap in the grid
         this.setStyle("-fx-background-color:#E5F4E3");
         this.setPadding(new Insets(25));
         addRecipeCard(new RecipeCard("Recipe 1", "Description of Recipe 1"));
@@ -174,12 +195,20 @@ class RecipeList extends GridPane {
         addRecipeCard(new RecipeCard("Recipe 5", "Description of Recipe 5"));
     }
 
-        public void addRecipeCard(RecipeCard card) {
+    public void addRecipeCard(RecipeCard card) {
         int index = getChildren().size();
         int row = index / maxColumn;
         int column = index % maxColumn;
-        
+
         this.add(card, column, row);
+    }
+
+    public List<RecipeCard> getRecipeCards() {
+        // Assuming all children of RecipeList are RecipeCards
+        return getChildren().stream()
+                .filter(node -> node instanceof RecipeCard)
+                .map(node -> (RecipeCard) node)
+                .collect(Collectors.toList());
     }
 
 }
@@ -188,11 +217,11 @@ class RecipeCard extends VBox {
     private String recipeTitle;
     private String recipeDescription;
     private Button detailsButton;
-    
+
     public RecipeCard(String title, String description) {
         this.recipeTitle = title;
         this.recipeDescription = description;
-        // make labels for title and description 
+        // make labels for title and description
         Label titleLabel = new Label(recipeTitle);
         Label descriptionLabel = new Label(recipeDescription);
 
@@ -205,63 +234,65 @@ class RecipeCard extends VBox {
         // details button
         detailsButton = new Button("Details");
         detailsButton.setStyle("-fx-background-color: #ADD8E6; -fx-font-weight: bold;");
-        
-        // Event handler for details button
-        detailsButton.setOnAction(event -> showRecipeDetails());
-
-        this.getChildren().addAll(titleLabel, descriptionLabel, detailsButton);    
+        this.getChildren().addAll(titleLabel, descriptionLabel, detailsButton);
     }
 
-    private void showRecipeDetails() {
-        RecipeDetailPage detailPage = new RecipeDetailPage();
-        Scene detailScene = new Scene(detailPage, 1280, 720); // Create a new scene with the detail page
-        
-        // Get the current stage and set the scene
-        Stage currentStage = (Stage) this.getScene().getWindow();
-        currentStage.setScene(detailScene);
+    public void setDetailsButtonAction(EventHandler<ActionEvent> eventHandler) {
+        detailsButton.setOnAction(eventHandler);
     }
 
 }
 
 /**
- * // here, we need to fetch the recipe details from MongoDB
+ * here, we need to fetch the recipe details from MongoDB
  */
-class RecipeDetailPage extends TilePane {
+class RecipeDetailPage extends BorderPane {
     private Label label;
-    private Header header;
-    private DetailFooter detailFooter;
-    
+    private Header header; // header
+    private DetailFooter detailFooter; // footer
+
     RecipeDetailPage() {
+        this.setStyle("-fx-background-color: #E5F4E3;");
+
+        // Initialize the header and footer
         header = new Header();
-        label = new Label("HIIIII");
         detailFooter = new DetailFooter();
-        this.getChildren().addAll(header, label, detailFooter);
+
+        // Label for content in the center
+        label = new Label("HIIIII");
+
+        // Set the header, label, and footer to their positions
+        this.setTop(header);
+        this.setCenter(label);
+        this.setBottom(detailFooter);
+    }
+
+    public DetailFooter getDetailFooter() {
+        return this.detailFooter;
     }
 }
-
-
 
 /**
  * Class: Recipe
  * Store stuff from the Chat GPT response into this object
  * 
  */
-class Recipe{
-    private String recipeTitle;                                                 // name of the recipe
+class Recipe {
+    private String recipeTitle; // name of the recipe
     private String description;
-    private String mealType;                                                    // type of the meal as selected by the user
-    private Map< String, String> ingredients;                                   // a map of ingredients and their quantities        
-    private List<String> directions;                                            // a list of ingredients 
-    
-    Recipe(){
-        this.recipeTitle = recipeTitle; 
+    private String mealType; // type of the meal as selected by the user
+    private Map<String, String> ingredients; // a map of ingredients and their quantities
+    private List<String> directions; // a list of ingredients
+
+    Recipe() {
+        this.recipeTitle = recipeTitle;
         this.description = description;
-        this.mealType = mealType; 
-        this.ingredients = ingredients; 
+        this.mealType = mealType;
+        this.ingredients = ingredients;
         this.directions = directions;
     }
 
-    // getters and setters for Recipe  
+    // getters and setters for Recipe
     public String getTitle() {
         return recipeTitle;
     }
@@ -277,48 +308,35 @@ class Recipe{
     public void setMealType(String mealType) {
         this.mealType = mealType;
     }
-}   
-
-
-
+}
 
 class AppFrame extends BorderPane {
     private Header header;
     private RecipeList recipeList;
-    //private RecipeDetails recipeDetails;
     private Footer footer;
     private DetailFooter detailFooter;
 
     AppFrame() {
-        // Initialise the header Object
-        header = new Header();
-
-        // Create a recipeList Object to hold the recipes
-        recipeList = new RecipeList();
-       // recipeDetails = new RecipeDetails();
-        
-        // Initialise the Footer Object
-        footer = new Footer();
+        header = new Header(); // Initialise the header Object
+        recipeList = new RecipeList(); // Create a recipeList Object to hold the recipes
+        footer = new Footer(); // Initialise the Footer Object
         detailFooter = new DetailFooter();
 
-        // TODO: Add a Scroller to the Recipe List
+        // Add a Scroller to the Recipe List
         ScrollPane scroller = new ScrollPane(recipeList); // Wrap the task list in a ScrollPane
         scroller.setFitToWidth(true); // Set the width to match the width of the recipeList
         scroller.setFitToHeight(true); // Set the height to match the height of the recipeList
 
-        // Add header to the top of the BorderPane
-        this.setTop(header);
-        // Add scroller to the centre of the BorderPane
-        this.setCenter(scroller);
-        // Add footer to the bottom of the BorderPane
-        this.setBottom(footer);
+        this.setTop(header); // Add header to the top of the BorderPane
+        this.setCenter(scroller); // Add scroller to the centre of the BorderPane
+        this.setBottom(footer); // Add footer to the bottom of the BorderPane
     }
-    
+
     public Header getHeader() {
         return this.header;
     }
 
-    public RecipeList geRecipeList(){
+    public RecipeList getRecipeList() {
         return this.recipeList;
     }
 
@@ -326,11 +344,11 @@ class AppFrame extends BorderPane {
         return this.footer;
     }
 
-    public DetailFooter getDetailFooter(){
+    public DetailFooter getDetailFooter() {
         return this.detailFooter;
     }
 
-    public AppFrame showList(){
+    public AppFrame showList() {
         ScrollPane scroller = new ScrollPane(recipeList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
@@ -339,22 +357,13 @@ class AppFrame extends BorderPane {
         return this;
     }
 
-    public AppFrame showDetail(){
-        ScrollPane scroller = new ScrollPane();
-        scroller.setFitToWidth(true);
-        scroller.setFitToHeight(true);
-        this.setCenter(scroller);
-        this.setBottom(detailFooter);
-        return this;
-    }
 }
-
 
 class CreateFrame extends TilePane {
     Button breakfastButton;
     Button lunchButton;
     Button dinnerButton;
-    
+
     CreateFrame() {
         this.setOrientation(Orientation.HORIZONTAL);
         this.setHgap(30);
@@ -380,15 +389,13 @@ class CreateFrame extends TilePane {
     }
 }
 
-
-
 class VoiceInputFrame extends BorderPane {
 
     private Button pressToSpeak;
 
-    public VoiceInputFrame(){
+    public VoiceInputFrame() {
         pressToSpeak = new Button("Press to speak.");
-        pressToSpeak.setPrefSize(200,200);
+        pressToSpeak.setPrefSize(200, 200);
 
         this.setCenter(pressToSpeak);
     }
@@ -397,11 +404,11 @@ class VoiceInputFrame extends BorderPane {
         pressToSpeak.setOnMousePressed(eventHandler);
     }
 
-    public void setReleased(EventHandler<MouseEvent> eventHandler){
+    public void setReleased(EventHandler<MouseEvent> eventHandler) {
         pressToSpeak.setOnMouseReleased(eventHandler);
     }
 
-    public Button getPressButton(){
+    public Button getPressButton() {
         return pressToSpeak;
     }
 
