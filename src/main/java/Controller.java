@@ -56,4 +56,5 @@ public class Controller {
         this.view.getVoiceInputFrame().getPressButton().setText("Press to speak.");
     }
 
+    
 }

@@ -15,6 +15,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -117,14 +120,22 @@ class Footer extends HBox {
     private Button createButton;
 
     Footer() {
-        this.setPrefSize(1280, 60);
-        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setPrefSize(1280, 90);
+        this.setStyle("-fx-background-color: #FFFFFF;");
         this.setSpacing(15);
-        String defaultButtonStyle = "-fx-font-style: italic; -fx-background-color: #FFFFFF;  -fx-font-weight: bold; -fx-font: 11 arial;";
+        
 
-        createButton = new Button("Create new recipe");
-        createButton.setStyle(defaultButtonStyle);
+        createButton = new Button("Create a New Recipe");
+        createButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
 
+        createButton.setOnMousePressed(e -> {
+            createButton.setScaleX(0.95);
+            createButton.setScaleY(0.95);
+        });
+        createButton.setOnMouseReleased(e -> {
+            createButton.setScaleX(1.0);
+            createButton.setScaleY(1.0);
+        });
         this.getChildren().addAll(createButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
@@ -143,19 +154,31 @@ class DetailFooter extends HBox {
     private Button backButton;
 
     DetailFooter() {
-        this.setPrefSize(1280, 85);
+        this.setPrefSize(1280, 90);
         this.setStyle("-fx-background-color: #FFFFFF; ");
         this.setSpacing(15);
         this.setPadding(new Insets(20, 35, 10, 35));
 
         backButton = new Button("Back");
-        backButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana'; fx-text-fill: 616161; ");
-
+        backButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        backButton.setOnMousePressed(e -> {
+            backButton.setScaleX(0.95);
+            backButton.setScaleY(0.95);
+        });
+        backButton.setOnMouseReleased(e -> {
+            backButton.setScaleX(1.0);
+            backButton.setScaleY(1.0);
+        });
         saveButton = new Button("Save");
-        saveButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  fx-text-fill: 616161;");
-
+        saveButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        saveButton.setOnMousePressed(e -> {
+            saveButton.setScaleX(0.95);
+            saveButton.setScaleY(0.95);
+        });
+        saveButton.setOnMouseReleased(e -> {
+            saveButton.setScaleX(1.0);
+            saveButton.setScaleY(1.0);
+        });
         System.out.println("Hello, this is detail footer");
         this.getChildren().addAll(backButton, saveButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
@@ -229,11 +252,24 @@ class RecipeCard extends VBox {
         this.setPrefSize(300, 200);
         this.setPadding(new Insets(15));
         this.setSpacing(10);
-        this.setStyle("-fx-border-color: transparent;  -fx-background-color: #FFFFFF;");
+        this.setStyle(
+                "-fx-border-color: transparent;  -fx-background-color: #FFFFFF;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
 
         // details button
         detailsButton = new Button("Details");
-        detailsButton.setStyle("-fx-background-color: #ADD8E6; -fx-font-weight: bold;");
+
+        detailsButton.setStyle(
+                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+
+        detailsButton.setOnMousePressed(e -> {
+            detailsButton.setScaleX(0.95);
+            detailsButton.setScaleY(0.95);
+        });
+        detailsButton.setOnMouseReleased(e -> {
+            detailsButton.setScaleX(1.0);
+            detailsButton.setScaleY(1.0);
+        });
+        detailsButton.setAlignment(Pos.BOTTOM_CENTER);
         this.getChildren().addAll(titleLabel, descriptionLabel, detailsButton);
     }
 
