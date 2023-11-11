@@ -1,24 +1,29 @@
+import java.util.List;
+import java.util.Map;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+// Padding and Alignment
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.stage.Stage; // Might need to open new stage (new window)
-import javafx.scene.Scene;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField; // Might not need this
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+// imports to make the HBOX grow 
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage; // Might need to open new stage (new window) 
+
+
 
 
 public class View {
@@ -37,7 +42,7 @@ public class View {
         this.mainStage = primaryStage;
         this.currentScene = new Scene(this.appframe, 1280, 720);
 
-        mainStage.setScene(currentScene);    // this is the size of the home screen 
+        mainStage.setScene(currentScene);   
         mainStage.setTitle("PantryPal");
         mainStage.setResizable(true);
         mainStage.show();
@@ -63,14 +68,32 @@ public class View {
 }
 
 class Header extends HBox {
+    Button homeButton;
+    Button profileButton;
+    Button savedRecipesButton;
     Header() {
-        this.setPrefSize(1280, 60); // Size of the header
-        this.setStyle("-fx-background-color: #F0F8FF;");
+        // Style the header background
+        this.setPrefSize(1280, 85); // Size of the header
+        this.setStyle("-fx-background-color: #FFFFFF;"); // Color of the Header
+        this.setPadding(new Insets(20, 35, 10, 35));
+         
+        // Button Styles 
+        this.homeButton = new Button("Pantry Pal");
+        homeButton.setStyle("-fx-padding: 10 20 10 20; -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-size: 30px; -fx-font-family: 'Verdana'; -fx-text-fill: #5DA9E9 !important;");
 
-        Text titleText = new Text("PantryPal"); // Text of the Header
-        titleText.setStyle("-fx-font-weight: bold; -fx-font-size: 20;");
-        this.getChildren().add(titleText);
-        this.setAlignment(Pos.CENTER); // Align the text to the Center
+        this.profileButton = new Button("My Profile");
+        profileButton.setStyle("-fx-padding: 10 20 1 20; -fx-font-family: 'Verdana';   -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        
+        this.savedRecipesButton = new Button("Saved");
+        savedRecipesButton.setStyle("-fx-padding: 10 20 1 20; -fx-font-family: 'Verdana';   -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        // A Region is used as a "spacer"
+        // occupies all available space between the buttons
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        // add all childeren
+        this.getChildren().addAll(homeButton, spacer, savedRecipesButton, profileButton);
+        
     }
 }
 
@@ -132,100 +155,137 @@ class DetailFooter extends HBox {
     }
 }
 
-class RecipeList extends VBox {
-    RecipeList() {
-        // Do we need setPrefSize? Maybe not?
-        this.setSpacing(10);
-        this.setStyle("-fx-background-color: #80d838");
-        //Add a testing recipe to recipelist 
-        Recipe test1 = new Recipe();
-        test1.setRecipeName("test1");
-        this.getChildren().add(test1);
-        Recipe test2 = new Recipe();
-        test2.setRecipeName("test2");
-        this.getChildren().add(test2);
+/**
+ * Class: Recipe List
+ * Extends GridPane to display recipes in a grid layout
+ * Each recipe is added to the grid, with a maximum of 4 recipes per row
+ */
+class RecipeList extends GridPane {
+    private final int maxColumn = 4;                                      // we will have 4 recipes per column
+    public RecipeList() {
+        this.setHgap(15);  // horizontal gap in the grid
+        this.setVgap(15);  // vertical gap in the grid 
+        this.setStyle("-fx-background-color:#E5F4E3");
+        this.setPadding(new Insets(25));
+        addRecipeCard(new RecipeCard("Recipe 1", "Description of Recipe 1"));
+        addRecipeCard(new RecipeCard("Recipe 2", "Description of Recipe 2"));
+        addRecipeCard(new RecipeCard("Recipe 3", "Description of Recipe 3"));
+        addRecipeCard(new RecipeCard("Recipe 4", "Description of Recipe 4"));
+        addRecipeCard(new RecipeCard("Recipe 5", "Description of Recipe 5"));
     }
 
-    public void setAllTitleAction(EventHandler<MouseEvent> eventHandler) {
-        for(int i = 0; i < this.getChildren().size(); i++) {
-            if (this.getChildren().get(i) instanceof Recipe) {
-                ((Recipe) this.getChildren().get(i)).setTitleAction(eventHandler);;
-            }
-        }
-    }
-}
-
-class RecipeDetails extends VBox {
-    RecipeDetails() {
-        // Do we need setPrefSize? Maybe not?
-        // this.setPrefHeight(100);
-        this.setSpacing(10);
-        this.setStyle("-fx-background-color: #40d838");
-
-        //Add a testing recipe to recipeDetails
-        TextField text = new TextField();
-        text.setPrefHeight(200);
-        this.getChildren().add(text);
-
-    }
-
-    public void setAllTitleAction(EventHandler<MouseEvent> eventHandler) {
-        for(int i = 0; i < this.getChildren().size(); i++) {
-            if (this.getChildren().get(i) instanceof Recipe) {
-                ((Recipe) this.getChildren().get(i)).setTitleAction(eventHandler);;
-            }
-        }
-    }
-}
-
-
-class Recipe extends HBox {
-
-    //private Button detail;
-    private Label recipeTitle; //To made the title interactive it might not be textfield? Maybe a button with no boarder?
-    private ImageView imageView;
-    
-
-    Recipe() {
-        this.setPrefSize(1280, 20);
-        this.setStyle("-fx-background-color: #DAE5EA; -fx-border-width: 0; -fx-font-weight: bold;");
-
-        imageView = new ImageView();
-        imageView.setFitWidth(60);
-        imageView.setFitHeight(60);
-        imageView.setPreserveRatio(true);
-        this.getChildren().add(imageView);
+        public void addRecipeCard(RecipeCard card) {
+        int index = getChildren().size();
+        int row = index / maxColumn;
+        int column = index % maxColumn;
         
-        recipeTitle = new Label();
-        recipeTitle.setPrefSize(380, 20); // set size of text field
-        recipeTitle.setTextAlignment(TextAlignment.CENTER); // Set alignment of recipe title label
-        recipeTitle.setPadding(new Insets(10, 0, 10, 0)); // adds some padding to the text field
-        this.getChildren().add(recipeTitle); // add textlabel to task
-
-        //detail = new Button("Detail");
-        //detail.setPrefSize(100, 20);
-        //detail.setAlignment(Pos.CENTER_RIGHT);
-        //this.getChildren().add(detail);
+        this.add(card, column, row);
     }
 
-    public void setRecipeName(String name){
-        this.recipeTitle.setText(name);
+}
+
+class RecipeCard extends VBox {
+    private String recipeTitle;
+    private String recipeDescription;
+    private Button detailsButton;
+    
+    public RecipeCard(String title, String description) {
+        this.recipeTitle = title;
+        this.recipeDescription = description;
+        // make labels for title and description 
+        Label titleLabel = new Label(recipeTitle);
+        Label descriptionLabel = new Label(recipeDescription);
+
+        // card styles
+        this.setPrefSize(300, 200);
+        this.setPadding(new Insets(15));
+        this.setSpacing(10);
+        this.setStyle("-fx-border-color: transparent;  -fx-background-color: #FFFFFF;");
+
+        // details button
+        detailsButton = new Button("Details");
+        detailsButton.setStyle("-fx-background-color: #ADD8E6; -fx-font-weight: bold;");
+        
+        // Event handler for details button
+        detailsButton.setOnAction(event -> showRecipeDetails());
+
+        this.getChildren().addAll(titleLabel, descriptionLabel, detailsButton);    
     }
 
-    public Label getTitle() {
-        return this.recipeTitle;
-    }    
+    private void showRecipeDetails() {
+        RecipeDetailPage detailPage = new RecipeDetailPage();
+        Scene detailScene = new Scene(detailPage, 1280, 720); // Create a new scene with the detail page
+        
+        // Get the current stage and set the scene
+        Stage currentStage = (Stage) this.getScene().getWindow();
+        currentStage.setScene(detailScene);
+    }
 
-    public void setTitleAction(EventHandler<MouseEvent> eventHandler) {
-        recipeTitle.setOnMouseClicked(eventHandler);
+}
+
+/**
+ * // here, we need to fetch the recipe details from MongoDB
+ */
+class RecipeDetailPage extends TilePane {
+    private Label label;
+    private Header header;
+    private DetailFooter detailFooter;
+    
+    RecipeDetailPage() {
+        header = new Header();
+        label = new Label("HIIIII");
+        detailFooter = new DetailFooter();
+        this.getChildren().addAll(header, label, detailFooter);
     }
 }
+
+
+
+/**
+ * Class: Recipe
+ * Store stuff from the Chat GPT response into this object
+ * 
+ */
+class Recipe{
+    private String recipeTitle;                                                 // name of the recipe
+    private String description;
+    private String mealType;                                                    // type of the meal as selected by the user
+    private Map< String, String> ingredients;                                   // a map of ingredients and their quantities        
+    private List<String> directions;                                            // a list of ingredients 
+    
+    Recipe(){
+        this.recipeTitle = recipeTitle; 
+        this.description = description;
+        this.mealType = mealType; 
+        this.ingredients = ingredients; 
+        this.directions = directions;
+    }
+
+    // getters and setters for Recipe  
+    public String getTitle() {
+        return recipeTitle;
+    }
+
+    public void setTitle(String title) {
+        this.recipeTitle = title;
+    }
+
+    public String getMealType() {
+        return mealType;
+    }
+
+    public void setMealType(String mealType) {
+        this.mealType = mealType;
+    }
+}   
+
+
 
 
 class AppFrame extends BorderPane {
     private Header header;
     private RecipeList recipeList;
-    private RecipeDetails recipeDetails;
+    //private RecipeDetails recipeDetails;
     private Footer footer;
     private DetailFooter detailFooter;
 
@@ -235,7 +295,7 @@ class AppFrame extends BorderPane {
 
         // Create a recipeList Object to hold the recipes
         recipeList = new RecipeList();
-        recipeDetails = new RecipeDetails();
+       // recipeDetails = new RecipeDetails();
         
         // Initialise the Footer Object
         footer = new Footer();
@@ -280,7 +340,7 @@ class AppFrame extends BorderPane {
     }
 
     public AppFrame showDetail(){
-        ScrollPane scroller = new ScrollPane(recipeDetails);
+        ScrollPane scroller = new ScrollPane();
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
         this.setCenter(scroller);

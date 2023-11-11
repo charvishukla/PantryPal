@@ -10,7 +10,7 @@ public class Controller{
         this.view = view;
         this.model = model;
 
-        this.view.getAppFrame().geRecipeList().setAllTitleAction(this::handleTitleClick);
+       // this.view.getAppFrame().geRecipeList().setAllTitleAction(this::handleTitleClick);
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
         this.view.getVoiceInputFrame().setClicked(this::handleVoiceInputButtonClicked);
