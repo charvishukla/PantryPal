@@ -9,6 +9,8 @@ import com.mongodb.client.MongoDatabase;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import java.util.List;
+import java.util.ArrayList;
 
 public class App extends Application {
     @Override
@@ -23,7 +25,7 @@ public class App extends Application {
         Model model = new Model();
         View view = new View(primaryStage);
         Controller controller = new Controller(view, model);
-
+        
     }
 
     public static void main(String[] args) {
