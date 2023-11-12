@@ -45,7 +45,7 @@ class ChatGPT {
     public String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
 
-        int maxTokens = 100;
+        int maxTokens = 500;
 
         JSONObject requestBody = new JSONObject();
         JSONArray messages = new JSONArray();
