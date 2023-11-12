@@ -1,7 +1,6 @@
 
 // Utils 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 // Event Handling
 import javafx.event.ActionEvent;
@@ -305,44 +304,6 @@ class RecipeDetailPage extends BorderPane {
 
     public DetailFooter getDetailFooter() {
         return this.detailFooter;
-    }
-}
-
-/**
- * Class: Recipe
- * Store stuff from the Chat GPT response into this object
- * 
- */
-class Recipe {
-    private String recipeTitle; // name of the recipe
-    private String description;
-    private String mealType; // type of the meal as selected by the user
-    private Map<String, String> ingredients; // a map of ingredients and their quantities
-    private List<String> directions; // a list of ingredients
-
-    Recipe() {
-        this.recipeTitle = recipeTitle;
-        this.description = description;
-        this.mealType = mealType;
-        this.ingredients = ingredients;
-        this.directions = directions;
-    }
-
-    // getters and setters for Recipe
-    public String getTitle() {
-        return recipeTitle;
-    }
-
-    public void setTitle(String title) {
-        this.recipeTitle = title;
-    }
-
-    public String getMealType() {
-        return mealType;
-    }
-
-    public void setMealType(String mealType) {
-        this.mealType = mealType;
     }
 }
 
