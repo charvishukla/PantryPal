@@ -1,7 +1,13 @@
-import java.util.List;
 
+import java.util.List;
 import javafx.event.ActionEvent;
+import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.InnerShadow;
+import javafx.scene.layout.BorderPane;
 
 public class Controller {
     private View view;
@@ -13,9 +19,16 @@ public class Controller {
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
-        this.view.getVoiceInputFrame().setClicked(this::handleVoiceInputButtonClicked);
-        this.view.getVoiceInputFrame().setReleased(this::handleVoiceInputButtonReleased);
-       
+        
+        //Create Frame actions.
+        this.view.getCreateFrame().recordPressed(this::handleCreateFrameRecord);
+        this.view.getCreateFrame().recordUnpressed(this::handleCreateFrameStopRecord);
+        this.view.getCreateFrame().nextButton(this::handleCreateFrameNext);
+
+        //Voice Input Frame actions.
+        this.view.getVoiceInputFrame().recordPressed(this::handleRecordVoiceInput);
+        this.view.getVoiceInputFrame().recordUnpressed(this::handleStopRecordVoiceInput);
+
         setupRecipeCardsDetailsAction();
 
     }
@@ -47,13 +60,45 @@ public class Controller {
         this.view.switchScene(this.view.getCreateFrame());
     }
 
-    private void handleVoiceInputButtonClicked(MouseEvent event) {
-        System.out.println("here");
-        this.view.getVoiceInputFrame().getPressButton().setText("Listening");
+    //If rocrd is started, let the microphone image glow,
+    //and let the next button be available.
+    private void handleCreateFrameRecord(MouseEvent event){
+        this.view.getCreateFrame().getImageView().setEffect(new Glow(50));
+        this.view.getCreateFrame().setMealType(null);
+        this.view.getCreateFrame().updateNextButton();
+        this.model.startRecording(); 
     }
 
-    private void handleVoiceInputButtonReleased(MouseEvent event) {
-        this.view.getVoiceInputFrame().getPressButton().setText("Press to speak.");
+    //If the recording is stoped, Stop recoding and 
+    //call on whisper to convert audio to text.
+    private void handleCreateFrameStopRecord(MouseEvent event){
+        this.view.getCreateFrame().getImageView().setEffect(null);
+        this.model.stopRecording();
+        mealType = model.performListening();
+        this.view.getCreateFrame().setMealType(mealType);
+        this.view.getCreateFrame().updateNextButton();
+    }
+
+    //If next is clicked, switches from create frame to voice input frame.
+    //And update the next frame to display what meal type you selected.
+    private void handleCreateFrameNext(ActionEvent event){
+        this.view.switchScene(this.view.getVoiceInputFrame());
+        this.view.getVoiceInputFrame().setTitle(this.view.getCreateFrame().getMealType());
+    }
+
+    //If the record button is clicked. 
+    private void handleRecordVoiceInput(MouseEvent event) {
+        this.view.getVoiceInputFrame().getImageView().setEffect(new Glow(50));
+        this.model.startRecording(); 
+    }
+
+    //If the recording is stoped, Stop recoding and 
+    //call on whisper to convert audio to text.
+    private void handleStopRecordVoiceInput(MouseEvent event){
+         this.view.getVoiceInputFrame().getImageView().setEffect(null);
+         this.model.stopRecording();
+         ingredients = model.performListening();
+         this.view.getVoiceInputFrame().updatePrompt(ingredients);
     }
 
     

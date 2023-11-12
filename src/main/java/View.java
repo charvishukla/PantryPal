@@ -29,6 +29,7 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage; // Might need to open new stage (new window) 
 
+
 public class View {
     private AppFrame appframe; // This is a scene
     private CreateFrame createframe;
@@ -396,56 +397,181 @@ class AppFrame extends BorderPane {
 }
 
 class CreateFrame extends TilePane {
-    Button breakfastButton;
-    Button lunchButton;
-    Button dinnerButton;
-
+    private Label breakfastButton;
+    private Label lunchButton;
+    private Label dinnerButton;
+    private Label Title;
+    private ImageView imageView;
+    private Image image;
+    private Region clickableRegion;
+    private Button next;
+    private String mealType;
+    
     CreateFrame() {
-        this.setOrientation(Orientation.HORIZONTAL);
-        this.setHgap(30);
-        this.setPrefColumns(3);
-        this.breakfastButton = new Button("Breakfast");
-        this.lunchButton = new Button("Lunch");
-        this.dinnerButton = new Button("Dinner");
 
-        this.setAlignment(Pos.CENTER);
-        this.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
+        this.setPadding(new javafx.geometry.Insets(100));
+
+        //Meal type labels
+        Label breakfastButton = new Label("Breakfast");
+        Label lunchButton = new Label("Lunch");
+        Label dinnerButton = new Label("Dinner");
+        breakfastButton.setFont(new Font(20)); 
+        lunchButton.setFont(new Font(20)); 
+        dinnerButton.setFont(new Font(20));
+
+        HBox hbox = new HBox();
+        hbox.setSpacing(100);
+        hbox.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
+        hbox.setAlignment(Pos.CENTER);
+
+        //Center prompt
+        Label Title = new Label("Please verbally choose a type of meal.");
+        Title.setFont(new Font(30));
+        this.setTop(Title);
+        this.setAlignment(Title, Pos.CENTER);
+        this.setCenter(hbox);
+
+        //Micorphone Image
+        imageView = new ImageView();
+        imageView.setFitWidth(200);
+        imageView.setFitHeight(200);
+        image = new Image("microphone.png"); 
+        imageView.setImage(image);
+
+        clickableRegion = new Region();
+        clickableRegion.setStyle("-fx-background-color: transparent;");
+        // Set the size of the clickable region (adjust as needed)
+        clickableRegion.setMinSize(200, 200);
+
+        //Next button to get to next scnene.
+        next = new Button("Next");
+        next.setVisible(false);
+        next.setDisable(true);
+
+        // Create a StackPane and add the ImageView and clickable region
+        StackPane stackPane = new StackPane(imageView, clickableRegion);
+        stackPane.setAlignment(Pos.CENTER);
+       
+        //Set up vbox for the bottom part of boaderpane
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setSpacing(30);
+        vbox.getChildren().addAll(stackPane, next);
+        
+        //Insert vox into bottom of borderpane.
+        this.setBottom(vbox);
     }
 
-    public Button getBreakfastButton() {
-        return this.breakfastButton;
+
+    public ImageView getImageView(){
+        return imageView;
     }
 
-    public Button getLunchButton() {
-        return this.lunchButton;
+    public void recordPressed(EventHandler<MouseEvent> eventHandler) {
+            clickableRegion.setOnMousePressed(eventHandler);
     }
 
-    public Button getDinnerButton() {
-        return this.dinnerButton;
+
+    public void recordUnpressed(EventHandler<MouseEvent> eventHandler) {
+            clickableRegion.setOnMouseReleased(eventHandler);
+    }
+
+    public void nextButton(EventHandler<ActionEvent> eventHandler){
+            next.setOnAction(eventHandler);
+    }
+
+    public void setMealType(String s){
+        this.mealType = s;
+    }
+
+    //Will let the next button be visible if a meal type has not been selected.
+    public void updateNextButton(){
+        if(mealType == null){
+            next.setVisible(false);
+            next.setDisable(true);
+        }
+        else{
+            next.setVisible(true);
+            next.setDisable(false);
+        }
+    }
+
+    //Returns the ,eal type the user picks.
+    public String getMealType(){
+        mealType = mealType.toLowerCase();
+        if(mealType.contains("breakfast")){
+            mealType = "breakfast";
+        }
+        else if(mealType.contains("lunch")){
+            mealType = "lunch";
+        }
+        else{
+            mealType = "dinner";
+        }
+        return mealType;
     }
 }
 
 class VoiceInputFrame extends BorderPane {
 
-    private Button pressToSpeak;
+    private Label title;
+    private Label prompt;
+    private ImageView imageView;
+    private Image image;
+    private Region clickableRegion;
 
-    public VoiceInputFrame() {
-        pressToSpeak = new Button("Press to speak.");
-        pressToSpeak.setPrefSize(200, 200);
+    public VoiceInputFrame(){
 
-        this.setCenter(pressToSpeak);
+        this.setPadding(new javafx.geometry.Insets(100));
+
+        //Setting up the prompt to ask the user to ask for ingredients.
+        prompt = new Label("Please list the ingredients you wish to cook with.");
+        prompt.setFont(new Font(30));
+        this.setCenter(prompt);
+        this.setAlignment(prompt, Pos.CENTER);
+
+
+        //Micorphone Image
+        imageView = new ImageView();
+        imageView.setFitWidth(200);
+        imageView.setFitHeight(200);
+        image = new Image("microphone.png"); 
+        imageView.setImage(image);
+
+        clickableRegion = new Region();
+        clickableRegion.setStyle("-fx-background-color: transparent;");
+        // Set the size of the clickable region (adjust as needed)
+        clickableRegion.setMinSize(200, 200);
+
+        // Create a StackPane and add the ImageView and clickable region
+        StackPane stackPane = new StackPane(imageView, clickableRegion);
+        stackPane.setAlignment(Pos.CENTER);
+        this.setBottom(stackPane);
     }
 
-    public void setClicked(EventHandler<MouseEvent> eventHandler) {
-        pressToSpeak.setOnMousePressed(eventHandler);
+    
+    public ImageView getImageView(){
+        return imageView;
+    }
+    
+    public void recordPressed(EventHandler<MouseEvent> eventHandler) {
+        clickableRegion.setOnMousePressed(eventHandler);
     }
 
-    public void setReleased(EventHandler<MouseEvent> eventHandler) {
-        pressToSpeak.setOnMouseReleased(eventHandler);
+    public void recordUnpressed(EventHandler<MouseEvent> eventHandler) {
+        clickableRegion.setOnMouseReleased(eventHandler);
     }
 
-    public Button getPressButton() {
-        return pressToSpeak;
+    public void updatePrompt(String s){
+        this.prompt.setText("Prompt recieved: " + s);
+    }
+
+    //This will set the title to indicate you have selcted breakfast, lunch or dinner.
+    public void setTitle(String s){
+        title = new Label("You have select " + s);
+        title.setFont(new Font(30));
+        this.setTop(title);
+        this.setAlignment(title, Pos.CENTER);
     }
 
 }

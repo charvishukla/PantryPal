@@ -1,4 +1,3 @@
-
 import org.bson.Document;
 
 import com.mongodb.client.MongoClient;
@@ -13,13 +12,7 @@ import javafx.stage.Stage;
 public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //AppFrame root = new AppFrame(primaryStage);                       // instantiating the entire appframe 
-
-        /**
-        Model model = new Model();
-        View view = new View();
-        Controller controller = new Controller(model, view);
-        **/
+        AppFrame root = new AppFrame(primaryStage);                       // instantiating the entire appframe 
         Model model = new Model();
         View view = new View(primaryStage);
         Controller controller = new Controller(view, model);
