@@ -48,6 +48,7 @@ public class Model {
     private Database db;
 
     public Model() {
+        this.audioRecorder = new AudioRecorder();
         this.db = new Database();       
     }
 
