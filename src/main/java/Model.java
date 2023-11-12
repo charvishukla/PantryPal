@@ -53,7 +53,7 @@ class ChatGPT {
         requestBody.put("model", MODEL);
         requestBody.put("messages", messages);
         requestBody.put("max_tokens", maxTokens);
-        requestBody.put("temperature", 1.0);
+        requestBody.put("temperature", 0.5);
 
         // Create the request object
         HttpRequest request = HttpRequest
