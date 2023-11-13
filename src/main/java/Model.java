@@ -75,6 +75,42 @@ public class Model {
         audioRecorder.stopRecording();
     }
 
+    public String formPrompt(String mealType, String ingredients) {
+        String prompt = "What is a step-by-step " + mealType + " recipe I can make using " + ingredients + "? Please provide a Title, ingredients, and steps.";
+        return prompt;
+    }
+
+    public List<String> parseGPTResponse(String prompt){
+        List<String> response = new ArrayList<>();
+        try{
+            String originalResponse = ChatGPT.generate(prompt);
+            System.out.println(originalResponse);
+            String[] parts = originalResponse.split("\n\n", 3);
+            String[] tidyParts = new String[] {parts[0].replace("Title: ", ""), parts[1], parts[2].replace("Steps:\n", "")};
+            response.add(tidyParts[0]);
+            response.add(tidyParts[1]);
+            String tidySteps = tidyParts[2].replaceAll("\n+", "\n");
+            String[] steps = tidySteps.split("\n");
+            for(String s: steps) {
+                if(!s.isEmpty()) {
+                    response.add(s);
+                }
+            }
+            /** 
+            int temp = 1;
+            for(String r: response) {
+                System.out.print(temp + ":: ");
+                System.out.println(r);
+                temp += 1;
+            }
+            **/            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        return response;
+    }
+
 }
 
 class ChatGPT {
