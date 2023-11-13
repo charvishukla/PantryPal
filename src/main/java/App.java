@@ -13,6 +13,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class App extends Application {
+
+    private Model model;
+    private View view;
+    private Controller controller;
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         //AppFrame root = new AppFrame(primaryStage);                       // instantiating the entire appframe 
@@ -22,10 +27,18 @@ public class App extends Application {
         View view = new View();
         Controller controller = new Controller(model, view);
         **/
-        Model model = new Model();
-        View view = new View(primaryStage);
-        Controller controller = new Controller(view, model);
+        this.model = new Model();
+        this.view = new View(primaryStage);
+        this.controller = new Controller(view, model);
         
+    }
+
+    @Override
+    public void stop() {
+        // Called when JavaFX application is closing
+        if (model.getDatabase() != null) {
+            model.getDatabase().close();
+        }
     }
 
     public static void main(String[] args) {
