@@ -196,7 +196,6 @@ class DetailFooter extends HBox {
             deleteButton.setScaleY(1.0);
         });
         
-        System.out.println("Hello, this is detail footer");
         this.getChildren().addAll(backButton, saveButton, deleteButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
@@ -303,6 +302,20 @@ class RecipeList extends GridPane {
             this.setColumnIndex(currentCard, i % maxColumn);
         }
     }
+    
+    public boolean checkRecipeExists(String title) {
+        int index = getRecipeCards().size();
+        int row = index / maxColumn;
+        int column = index % maxColumn; 
+
+        for (int i = 0; i < getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i);
+            if (title.equals(currentCard.getRecipeTitle())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public List<RecipeCard> getRecipeCards() {
         // Assuming all children of RecipeList are RecipeCards
@@ -386,6 +399,7 @@ class RecipeDetailPage extends BorderPane {
     private DetailList detailList;
     private Header header; // header
     private DetailFooter detailFooter; // footer
+    private int ingredientsSize;
 
     RecipeDetailPage() {
         this.setStyle("-fx-background-color: #E5F4E3;");
@@ -417,10 +431,12 @@ class RecipeDetailPage extends BorderPane {
 
         String tidyIngred = s.get(1).replaceAll("\n+", "\n");
         String[] ingredList = tidyIngred.split("\n");
+        ingredientsSize = 0;
         for(String i: ingredList){
             Label ingredients = new Label(i); 
             ingredients.setWrapText(true);
             detailList.getChildren().add(ingredients);
+            ingredientsSize += 1;
         }
         detailList.getChildren().add(new Label(" "));
         detailList.getChildren().add(new Label("Steps: "));
@@ -436,6 +452,14 @@ class RecipeDetailPage extends BorderPane {
 
     public DetailFooter getDetailFooter() {
         return this.detailFooter;
+    }
+
+    public List<String> getSteps(){
+        List<String> steps = new ArrayList<>();
+        for(int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++){
+            steps.add(((TextField)detailList.getChildren().get(i)).getText());
+        }
+        return steps;
     }
 }
 
