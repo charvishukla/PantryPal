@@ -43,6 +43,7 @@ public class View {
         this.appframe = new AppFrame();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
+        this.recipeList = new RecipeList();
 
         this.mainStage = primaryStage;
         this.currentScene = new Scene(this.appframe, 1280, 720);
@@ -83,6 +84,7 @@ public class View {
         mainStage.setScene(currentScene);
         mainStage.show();
     }
+
 }
 
 class Header extends HBox {
@@ -155,6 +157,7 @@ class Footer extends HBox {
 class DetailFooter extends HBox {
     private Button saveButton;
     private Button backButton;
+    private Button deleteButton;
 
     DetailFooter() {
         this.setPrefSize(1280, 90);
@@ -182,8 +185,20 @@ class DetailFooter extends HBox {
             saveButton.setScaleX(1.0);
             saveButton.setScaleY(1.0);
         });
+        
+        deleteButton = new Button("Delete");
+        deleteButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        deleteButton.setOnMousePressed(e -> {
+            deleteButton.setScaleX(0.95);
+            deleteButton.setScaleY(0.95);
+        });
+        deleteButton.setOnMouseReleased(e -> {
+            deleteButton.setScaleX(1.0);
+            deleteButton.setScaleY(1.0);
+        });
+        
         System.out.println("Hello, this is detail footer");
-        this.getChildren().addAll(backButton, saveButton); // adding buttons to footer
+        this.getChildren().addAll(backButton, saveButton, deleteButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
 
@@ -195,10 +210,22 @@ class DetailFooter extends HBox {
         return saveButton;
     }
 
+    public Button getDeleteButton() {
+        return deleteButton;
+    }
+
     public void setBackButtonAction(EventHandler<ActionEvent> eventHandler) {
         backButton.setOnAction(eventHandler);
     }
 
+    public void setDeleteButtonAction(EventHandler<ActionEvent> eventHandler) {
+        deleteButton.setOnAction(eventHandler);
+    }
+
+    public void setSaveButtonAction(EventHandler<ActionEvent> eventHandler) {
+        saveButton.setOnAction(eventHandler);
+        
+    }
 }
 
 /**
@@ -214,9 +241,11 @@ class RecipeList extends GridPane {
         this.setVgap(15); // vertical gap in the grid
         this.setStyle("-fx-background-color:#E5F4E3");
         this.setPadding(new Insets(25));
-        addRecipeCard(new RecipeCard("Recipe 1", "Description of Recipe 1"));
+        RecipeCard recipe1 = new RecipeCard("Recipe 1", "Description of Recipe 1");
+        RecipeCard recipe3 = new RecipeCard("Recipe 3", "Description of Recipe 3");
+        addRecipeCard(recipe1);
         addRecipeCard(new RecipeCard("Recipe 2", "Description of Recipe 2"));
-        addRecipeCard(new RecipeCard("Recipe 3", "Description of Recipe 3"));
+        addRecipeCard(recipe3);
         addRecipeCard(new RecipeCard("Recipe 4", "Description of Recipe 4"));
         addRecipeCard(new RecipeCard("Recipe 5", "Description of Recipe 5"));
     }
@@ -226,7 +255,33 @@ class RecipeList extends GridPane {
         int row = index / maxColumn;
         int column = index % maxColumn;
 
-        this.add(card, column, row);
+        for (int i = 1; i < getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i);
+            this.setRowIndex(currentCard, i / maxColumn);
+            this.setColumnIndex(currentCard, i % maxColumn);
+        }
+
+        this.add(card, 0, 0);
+    }
+
+    public void deleteRecipeCard(RecipeCard card) {
+        int index = getRecipeCards().size();
+        int row = index / maxColumn;
+        int column = index % maxColumn;
+
+        for (int i = 0; i < getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i);
+            if (card.getRecipeTitle().equals(currentCard.getRecipeTitle())) {
+                this.getChildren().remove(currentCard);
+            }
+        }
+
+        // Update indices
+        for (int i = 0; i < getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i);
+            this.setRowIndex(currentCard, i / maxColumn);
+            this.setColumnIndex(currentCard, i % maxColumn);
+        }
     }
 
     public List<RecipeCard> getRecipeCards() {
@@ -241,15 +296,14 @@ class RecipeList extends GridPane {
 
 class RecipeCard extends VBox {
     private String recipeTitle;
-    private String recipeDescription;
     private Button detailsButton;
+    private RecipeDetailPage recipeDetailPage;
 
-    public RecipeCard(String title, String description) {
+    public RecipeCard(String title) {
         this.recipeTitle = title;
-        this.recipeDescription = description;
         // make labels for title and description
         Label titleLabel = new Label(recipeTitle);
-        Label descriptionLabel = new Label(recipeDescription);
+        //Label descriptionLabel = new Label(recipeDescription);
 
         // card styles
         this.setPrefSize(300, 200);
@@ -277,9 +331,18 @@ class RecipeCard extends VBox {
     }
 
     public void setDetailsButtonAction(EventHandler<ActionEvent> eventHandler) {
-        detailsButton.setOnAction(eventHandler);
+        detailsButton.setOnAction(e->this.view.switchScene(recipeDetailPage));
     }
-
+    public String getRecipeTitle(){
+        return this.recipeTitle;
+    }
+    public String getRecipeDescription(){
+        return this.recipeDescription;
+    }
+    public void addRecipeDetail(RecipeDetailPage detailPage){
+      
+          this.recipeDetailPage = detailPage;
+    }
 }
 
 class DetailList extends VBox{

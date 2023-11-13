@@ -15,6 +15,7 @@ public class Controller {
         this.model = model;
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+        this.view.getAppFrame().getDetailFooter().setSaveButtonAction(this::handleSaveButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
 
         //Create Frame actions.
@@ -38,21 +39,33 @@ public class Controller {
         }
     }
 
-    // Method to show recipe details
-    private void showRecipeDetails() {
-        RecipeDetailPage deet = new RecipeDetailPage();
-        deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
-        this.view.switchScene(deet);
-    }
+    // // Method to show recipe details
+    // private void showRecipeDetails() {
+    //     RecipeDetailPage deet = new RecipeDetailPage();
+    //     deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+    //     deet.getDetailFooter().setDeleteButtonAction(this::handleDeleteButtonClick);
+    //     this.view.switchScene(deet);
+    // }
+    
 
     private void handleBackButtonClick(ActionEvent event) {
         System.out.println("Back button clicked"); 
-        
         this.view.switchScene(this.view.getAppFrame());
+    }
+
+    private void handleSaveButtonClick(ActionEvent event) {
+        System.out.println("Save button clicked"); 
+        
+        this.view.getRecipeList().
     }
 
     private void handleCreateButtonClick(ActionEvent event) {
         this.view.switchScene(this.view.getCreateFrame());
+    }
+
+    private void handleDeleteButtonClick(ActionEvent event) {
+        System.out.println("Delete button clicked"); 
+        this.view.switchScene(this.view.getAppFrame());
     }
 
     //If rocrd is started, let the microphone image glow,
@@ -109,9 +122,14 @@ public class Controller {
 
         String prompt = this.model.formPrompt(mealType, ingredients.substring(0, ingredients.length() - 1));
         //System.out.println(prompt);
-        List<String> reponse = this.model.parseGPTResponse(prompt);
-        RecipeDetailPage deet = new RecipeDetailPage(reponse);
+        List<String> response = this.model.parseGPTResponse(prompt);
+        RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+        deet.getDetailFooter().getSaveButton().setOnAction(
+            e ->    {RecipeCard recipe = new RecipeCard(response.get(0));
+                    recipe.addRecipeDetail(deet);
+                    this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
+                    });
         this.view.switchScene(deet);
 
     }
