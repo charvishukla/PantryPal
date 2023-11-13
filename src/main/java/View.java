@@ -1,5 +1,6 @@
 
 // Utils 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 // Event Handling
@@ -14,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -280,11 +282,19 @@ class RecipeCard extends VBox {
 
 }
 
+class DetailList extends VBox{
+    DetailList() {
+        this.setSpacing(5);
+        this.setPrefSize(1280, 545);
+        this.setStyle("-fx-background-color: #F0F8FF;");
+    }
+}
+
 /**
  * here, we need to fetch the recipe details from MongoDB
  */
 class RecipeDetailPage extends BorderPane {
-    private Label label;
+    private DetailList detailList;
     private Header header; // header
     private DetailFooter detailFooter; // footer
 
@@ -294,20 +304,52 @@ class RecipeDetailPage extends BorderPane {
         // Initialize the header and footer
         header = new Header();
         detailFooter = new DetailFooter();
-
-        // Label for content in the center
-        label = new Label("HIIIII");
-
-        // Set the header, label, and footer to their positions
+        detailList = new DetailList();
+        ScrollPane scroller = new ScrollPane(detailList);
+        scroller.setFitToWidth(true); 
+        scroller.setFitToHeight(true);
+        
         this.setTop(header);
-        this.setCenter(label);
+        this.setCenter(scroller);
         this.setBottom(detailFooter);
+    }
+
+    RecipeDetailPage(List<String> s){
+        this.setStyle("-fx-background-color: #E5F4E3;");
+        header = new Header();
+        detailFooter = new DetailFooter();
+        detailList = new DetailList();
+        ScrollPane scroller = new ScrollPane(detailList);
+        scroller.setFitToWidth(true); 
+        scroller.setFitToHeight(true);
+
+        Label title = new Label(s.get(0) + "\n");
+        detailList.getChildren().add(title);
+
+        String tidyIngred = s.get(1).replaceAll("\n+", "\n");
+        String[] ingredList = tidyIngred.split("\n");
+        for(String i: ingredList){
+            Label ingredients = new Label(i); 
+            ingredients.setWrapText(true);
+            detailList.getChildren().add(ingredients);
+        }
+        detailList.getChildren().add(new Label(" "));
+        detailList.getChildren().add(new Label("Steps: "));
+
+        for(int i = 2; i < s.size(); i++) {
+            detailList.getChildren().add(new TextField(s.get(i)));
+        }
+
+        this.setTop(header);
+        this.setBottom(detailFooter);
+        this.setCenter(scroller);
     }
 
     public DetailFooter getDetailFooter() {
         return this.detailFooter;
     }
 }
+
 
 class AppFrame extends BorderPane {
     private Header header;
@@ -362,7 +404,6 @@ class CreateFrame extends BorderPane {
     Button breakfastButton;
     Button lunchButton;
     Button dinnerButton;
-    private Region clickableRegion;
     private Button next;
     private String mealType;
     private Button record;
@@ -438,17 +479,17 @@ class CreateFrame extends BorderPane {
         }
     }
 
-     //Returns the ,eal type the user picks.
+     //Returns the meal type the user picks.
     public String getMealType(){
         mealType = mealType.toLowerCase();
         if(mealType.contains("breakfast")){
             mealType = "breakfast";
         }
-        else if(mealType.contains("lunch")){
-            mealType = "lunch";
+        else if(mealType.contains("dinner")){
+            mealType = "dinner";
         }
         else{
-            mealType = "dinner";
+            mealType = "lunch";
         }
         return mealType;
     }
@@ -458,8 +499,9 @@ class VoiceInputFrame extends BorderPane {
 
     private Label title;
     private Label prompt;
-    private ImageView imageView;
     private Button record;
+    private Button next;
+    private String ingredients;
 
 
     public VoiceInputFrame(){
@@ -473,16 +515,34 @@ class VoiceInputFrame extends BorderPane {
         setAlignment(prompt, Pos.CENTER);
 
 
-        //Micorphone Image
+        //Record button
         record = new Button("Record");
+        //Next button to get to next scnene.
+        next = new Button("Next");
+        next.setVisible(false);
+        next.setDisable(true);
 
-        this.setBottom(record);
-        setAlignment(record, Pos.CENTER);
+        //Set up vbox for the bottom part of boaderpane
+        VBox vbox = new VBox();
+        vbox.setAlignment(Pos.CENTER);
+        vbox.setSpacing(30);
+        vbox.getChildren().addAll(record, next);
+
+        this.setBottom(vbox);
+        setAlignment(vbox, Pos.CENTER);
     }
 
     
     public Button getRecordButton(){
         return record;
+    }
+
+    public Button getNextButton() {
+        return next;
+    }
+
+    public void nextButton(EventHandler<ActionEvent> eventHandler){
+            next.setOnAction(eventHandler);
     }
     
     public void recordPressed(EventHandler<MouseEvent> eventHandler) {
@@ -494,7 +554,8 @@ class VoiceInputFrame extends BorderPane {
     }
 
     public void updatePrompt(String s){
-        this.prompt.setText("Prompt recieved: " + s);
+        this.prompt.setText(s);
+        ingredients = s;
     }
 
     //This will set the title to indicate you have selcted breakfast, lunch or dinner.
@@ -505,5 +566,19 @@ class VoiceInputFrame extends BorderPane {
         setAlignment(title, Pos.CENTER);
     }
 
+    //Will let the next button be visible if a meal type has not been selected.
+    public void updateNextButton(){
+        if(ingredients == null){
+            next.setVisible(false);
+            next.setDisable(true);
+        }
+        else{
+            next.setVisible(true);
+            next.setDisable(false);
+        }
+    }
 
+    public void setIngredients(String s){
+        ingredients = s;
+    }
 }
