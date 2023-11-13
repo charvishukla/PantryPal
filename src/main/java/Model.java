@@ -44,7 +44,7 @@ public class Model {
 
     public Model() {
         this.audioRecorder = new AudioRecorder();
-        this.db = new Database();       
+        this.db = new Database();    
     }
 
     public String audioToText() {
@@ -72,12 +72,37 @@ public class Model {
 
 }
 
-class ChatGPT {
+interface GPT {
+    public String generate(String prompt) throws IOException, InterruptedException, URISyntaxException;
+}
+
+class ChatGPTAPI implements GPT{
+    public String generate(String prompt) throws IOException, InterruptedException, URISyntaxException{
+
+        String generatedText = "";
+
+        if (!(prompt instanceof String)){
+            throw new IOException();
+        }
+
+        try {
+            generatedText = "This is a recipe based on " + prompt;
+        }
+        catch (org.json.JSONException e) {
+            System.out.println(e);
+            System.out.println("Error");
+        }
+
+        return generatedText;
+    }
+}
+
+class ChatGPT implements GPT{
     private static final String API_ENDPOINT = "https://api.openai.com/v1/chat/completions";
     private static final String API_KEY = "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";
     private static final String MODEL = "gpt-3.5-turbo";
 
-    public static String generate(String prompt) throws
+    public String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
 
         HttpClient client = HttpClient.newHttpClient();
