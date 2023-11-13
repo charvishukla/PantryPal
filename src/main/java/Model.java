@@ -104,37 +104,12 @@ public class Model {
 
 }
 
-interface GPT {
-    public String generate(String prompt) throws IOException, InterruptedException, URISyntaxException;
-}
-
-class ChatGPTAPI implements GPT{
-    public String generate(String prompt) throws IOException, InterruptedException, URISyntaxException{
-
-        String generatedText = "";
-
-        if (!(prompt instanceof String)){
-            throw new IOException();
-        }
-
-        try {
-            generatedText = "whatever";
-        }
-        catch (org.json.JSONException e) {
-            System.out.println(e);
-            System.out.println("Error");
-        }
-
-        return generatedText;
-    }
-}
-
-class ChatGPT implements GPT{
+class ChatGPT {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/chat/completions";
     private static final String API_KEY = "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";
     private static final String MODEL = "gpt-3.5-turbo";
 
-    public String generate(String prompt) throws
+    public static String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
 
         HttpClient client = HttpClient.newHttpClient();
@@ -360,7 +335,7 @@ class Whisper {
         // Set up request headers
         String boundary = "Boundary-" + System.currentTimeMillis();
         connection.setRequestProperty(
-    "Content-Type",
+        "Content-Type",
         "multipart/form-data; boundary=" + boundary
         );
         connection.setRequestProperty("Authorization", "Bearer " + TOKEN);

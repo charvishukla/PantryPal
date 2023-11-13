@@ -20,24 +20,36 @@ import javafx.event.ActionEvent;
 class ControllerTest {
     @InjectMocks
     private Controller controller;
+    private View mockView;
+    private Model mockModel;
 
     @BeforeEach
     void setUp() {
-        Model mockModel = mock(Model.class);
-        View mockView = mock(View.class);
-        controller = new Controller(mockView, mockModel);
+        MockitoAnnotations.openMocks(this);
+        mockModel = mock(Model.class);
+        mockView = mock(View.class);
+        //List<RecipeCard> l = mock(List.class);
+        //controller = new Controller(mockView, mockModel);
     }
     
     
-    // /* US 1 BDD Scenario 1 - no recipes displayed */
+    /* US 1 BDD Scenario 1 - no recipes displayed */
     // @Test
     // public void testNoRecipesDisplayedOnHomepage() {
 
     //     ActionEvent mockEvent = mock(ActionEvent.class);
+    //     List<RecipeCard> recipeCards = new ArrayList<RecipeCard>();
 
-    //     controller.handleCreateButtonClick(mockEvent);
+    //     when(mockView.getAppFrame().getRecipeList().getRecipeCards()).thenReturn(recipeCards);
 
-    //     assertFalse(this.view.getAppFrame().getRecipeList().getRecipeCards().isEmpty());
+    //     // controller.handleCreateButtonClick(mockEvent);
+
+    //     // assertFalse(this.mockView.getAppFrame().getRecipeList().getRecipeCards().isEmpty());
+    // }
+
+    // @Test
+    // public void testCreateButton() {
+    //     when(mockView.switchScene()).thenReturn(true);
     // }
 
     /* US 1 BDD Scenario 2 - at least one recipe displayed */
@@ -49,12 +61,25 @@ class ControllerTest {
     }*/
 
     /* US 2 BDD Scenario 1 - A new recipe is created */
-    /*@Test
-    public void testCreateNewRecipe() {
-        ActionEvent newRecipeButtonEvent = mock(ActionEvent.class);
-
-        controller.handleCreateButtonClick(newRecipeButtonEvent);
-
+    // @Test
+    // public void testCreateNewRecipe() {
         
-    }*/
+    //     RecipeCard recipeCard = mock(RecipeCard.class);
+
+    //     when(this.mockView.getAppFrame().getRecipeList().addRecipeCard(recipeCard)).thenReturn(recipeCard);
+
+    //     controller.handleCreateButtonClick(mockEvent);
+
+    //     int initialSize = this.mockView.getAppFrame().getRecipeList().getRecipeCards().size();
+
+    //     controller.handleCreateButtonClick(mockEvent);
+
+    //     int finalSize = this.mockView.getAppFrame().getRecipeList().getRecipeCards().size();
+
+    //     assertEquals(initialSize + 1, finalSize);
+        
+    // }
+    
+    
+    
 }

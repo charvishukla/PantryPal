@@ -75,9 +75,9 @@ public class Controller {
         this.view.switchScene(this.view.getAppFrame());
     }
 
-    private void handleCreateButtonClick(ActionEvent event) {
-        this.view.switchScene(this.view.getCreateFrame());
-    }
+    // private void handleCreateButtonClick(ActionEvent event) {
+    //     this.view.switchScene(this.view.getCreateFrame());
+    // }
 
     //If rocrd is started, let the microphone image glow,
     //and let the next button be available.
@@ -106,6 +106,10 @@ public class Controller {
         this.view.getVoiceInputFrame().setTitle(this.view.getCreateFrame().getMealType());
         this.view.getCreateFrame().setMealType(null);
         this.view.getCreateFrame().updateNextButton();
+    }
+
+    public void handleCreateButtonClick(ActionEvent event) {
+        this.view.switchScene(this.view.getCreateFrame());
     }
 
     //If the record button is clicked. 
