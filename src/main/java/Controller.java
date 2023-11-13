@@ -25,6 +25,7 @@ public class Controller {
         //Voice Input Frame actions.
         this.view.getVoiceInputFrame().recordPressed(this::handleRecordVoiceInput);
         this.view.getVoiceInputFrame().recordUnpressed(this::handleStopRecordVoiceInput);
+        this.view.getVoiceInputFrame().nextButton(this::handleVoiceInputFrameNext);
        
         setupRecipeCardsDetailsAction();
 
@@ -48,7 +49,10 @@ public class Controller {
         System.out.println("Back button clicked"); 
         
         this.view.switchScene(this.view.getAppFrame());
-        // this.view.mainStage.setScene(this.view.getAppFrame());
+    }
+
+    private void handleCreateButtonClick(ActionEvent event) {
+        this.view.switchScene(this.view.getCreateFrame());
     }
 
     //If rocrd is started, let the microphone image glow,
@@ -67,6 +71,7 @@ public class Controller {
         this.model.stopRecording();
         mealType = model.audioToText();
         this.view.getCreateFrame().setMealType(mealType);
+        mealType = this.view.getCreateFrame().getMealType();
         this.view.getCreateFrame().updateNextButton();
     }
 
@@ -75,10 +80,8 @@ public class Controller {
     private void handleCreateFrameNext(ActionEvent event){
         this.view.switchScene(this.view.getVoiceInputFrame());
         this.view.getVoiceInputFrame().setTitle(this.view.getCreateFrame().getMealType());
-    }
-
-    private void handleCreateButtonClick(ActionEvent event) {
-        this.view.switchScene(this.view.getCreateFrame());
+        this.view.getCreateFrame().setMealType(null);
+        this.view.getCreateFrame().updateNextButton();
     }
 
     //If the record button is clicked. 
@@ -93,7 +96,23 @@ public class Controller {
          this.view.getVoiceInputFrame().getRecordButton().setEffect(null);
          this.model.stopRecording();
          ingredients = model.audioToText();
-         this.view.getVoiceInputFrame().updatePrompt(ingredients);
+         this.view.getVoiceInputFrame().updatePrompt("Prompt recieved: " + ingredients);
+         this.view.getVoiceInputFrame().updateNextButton();
+    }    
+
+    //If next is clicked, switches from voice input frame to recipe genati
+    //And update the next frame to display what meal type you selected.
+    private void handleVoiceInputFrameNext(ActionEvent event){
+        this.view.getVoiceInputFrame().updatePrompt("Please list the ingredients you wish to cook with.");
+        this.view.getVoiceInputFrame().setIngredients(null);
+        this.view.getVoiceInputFrame().updateNextButton();
+
+        String prompt = this.model.formPrompt(mealType, ingredients.substring(0, ingredients.length() - 1));
+        //System.out.println(prompt);
+        List<String> reponse = this.model.parseGPTResponse(prompt);
+        RecipeDetailPage deet = new RecipeDetailPage(reponse);
+        deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+        this.view.switchScene(deet);
+
     }
-    
 }
