@@ -86,7 +86,7 @@ class ChatGPTAPI implements GPT{
         }
 
         try {
-            generatedText = "This is a recipe based on " + prompt;
+            generatedText = "whatever";
         }
         catch (org.json.JSONException e) {
             System.out.println(e);
