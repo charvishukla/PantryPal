@@ -55,7 +55,7 @@ public class Controller {
         this.view.switchScene(this.view.getCreateFrame());
     }
 
-    //If rocrd is started, let the microphone image glow,
+    //If recording is started, let the microphone image glow,
     //and let the next button be available.
     private void handleCreateFrameRecord(MouseEvent event){
         this.view.getCreateFrame().getRecordButton().setEffect(new Glow(50));
@@ -64,7 +64,7 @@ public class Controller {
         this.model.startRecording(); 
     }
 
-    //If the recording is stoped, Stop recoding and 
+    //If the recording is stopped, Stop recording and 
     //call on whisper to convert audio to text.
     private void handleCreateFrameStopRecord(MouseEvent event){
         this.view.getCreateFrame().getRecordButton().setEffect(null);
