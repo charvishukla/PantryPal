@@ -45,7 +45,7 @@ public class Model {
 
     public Model() {
         this.audioRecorder = new AudioRecorder();
-        this.db = new Database();       
+        this.db = new Database();    
     }
 
     public String audioToText() {
@@ -335,7 +335,7 @@ class Whisper {
         // Set up request headers
         String boundary = "Boundary-" + System.currentTimeMillis();
         connection.setRequestProperty(
-    "Content-Type",
+        "Content-Type",
         "multipart/form-data; boundary=" + boundary
         );
         connection.setRequestProperty("Authorization", "Bearer " + TOKEN);
