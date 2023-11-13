@@ -36,7 +36,7 @@ public class Controller {
 
         //Returns a list of titles of each recipe in database;
         List<String> titles = model.getDatabase().getAllTitles();
-        System.out.println(titles.get(0));
+        //System.out.println(titles.get(0));
         //An arrayList to store title, ingredients, and step by step recipe.
         List<String> response = new ArrayList<>();
 
