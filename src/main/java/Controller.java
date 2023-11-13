@@ -15,7 +15,7 @@ public class Controller {
         this.model = model;
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
-        this.view.getAppFrame().getDetailFooter().setSaveButtonAction(this::handleSaveButtonClick);
+        //this.view.getAppFrame().getDetailFooter().setSaveButtonAction(this::handleSaveButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
 
         //Create Frame actions.
@@ -28,16 +28,16 @@ public class Controller {
         this.view.getVoiceInputFrame().recordUnpressed(this::handleStopRecordVoiceInput);
         this.view.getVoiceInputFrame().nextButton(this::handleVoiceInputFrameNext);
        
-        setupRecipeCardsDetailsAction();
+        //setupRecipeCardsDetailsAction();
 
     }
 
-    private void setupRecipeCardsDetailsAction() {
-        List<RecipeCard> recipeCards = this.view.getAppFrame().getRecipeList().getRecipeCards();
-        for (RecipeCard card : recipeCards) {
-            card.setDetailsButtonAction(event -> showRecipeDetails());
-        }
-    }
+    // private void setupRecipeCardsDetailsAction() {
+    //     List<RecipeCard> recipeCards = this.view.getAppFrame().getRecipeList().getRecipeCards();
+    //     for (RecipeCard card : recipeCards) {
+    //         card.setDetailsButtonAction(event -> showRecipeDetails());
+    //     }
+    // }
 
     // // Method to show recipe details
     // private void showRecipeDetails() {
@@ -53,20 +53,19 @@ public class Controller {
         this.view.switchScene(this.view.getAppFrame());
     }
 
-    private void handleSaveButtonClick(ActionEvent event) {
-        System.out.println("Save button clicked"); 
-        
-        this.view.getRecipeList().
-    }
+    // private void handleSaveButtonClick(ActionEvent event) {
+    //     System.out.println("Save button clicked"); 
+    //     this.view.getRecipeList().
+    // }
 
     private void handleCreateButtonClick(ActionEvent event) {
         this.view.switchScene(this.view.getCreateFrame());
     }
 
-    private void handleDeleteButtonClick(ActionEvent event) {
-        System.out.println("Delete button clicked"); 
-        this.view.switchScene(this.view.getAppFrame());
-    }
+    // private void handleDeleteButtonClick(ActionEvent event) {
+    //     System.out.println("Delete button clicked"); 
+    //     this.view.switchScene(this.view.getAppFrame());
+    // }
 
     //If rocrd is started, let the microphone image glow,
     //and let the next button be available.
@@ -126,9 +125,17 @@ public class Controller {
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
-            e ->    {RecipeCard recipe = new RecipeCard(response.get(0));
+            e ->    {System.out.println("Delete button clicked");
+                    RecipeCard recipe = new RecipeCard(response.get(0));
                     recipe.addRecipeDetail(deet);
+                    recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
                     this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
+                    this.view.switchScene(this.view.getAppFrame());
+                    });
+        deet.getDetailFooter().getDeleteButton().setOnAction(
+            e ->    {System.out.println("Delete button clicked"); 
+                    this.view.getAppFrame().getRecipeList().deleteRecipeCardByTitle(response.get(0));
+                    this.view.switchScene(this.view.getAppFrame());
                     });
         this.view.switchScene(deet);
 

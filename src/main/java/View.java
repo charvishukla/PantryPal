@@ -43,7 +43,6 @@ public class View {
         this.appframe = new AppFrame();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
-        this.recipeList = new RecipeList();
 
         this.mainStage = primaryStage;
         this.currentScene = new Scene(this.appframe, 1280, 720);
@@ -241,13 +240,13 @@ class RecipeList extends GridPane {
         this.setVgap(15); // vertical gap in the grid
         this.setStyle("-fx-background-color:#E5F4E3");
         this.setPadding(new Insets(25));
-        RecipeCard recipe1 = new RecipeCard("Recipe 1", "Description of Recipe 1");
-        RecipeCard recipe3 = new RecipeCard("Recipe 3", "Description of Recipe 3");
-        addRecipeCard(recipe1);
-        addRecipeCard(new RecipeCard("Recipe 2", "Description of Recipe 2"));
-        addRecipeCard(recipe3);
-        addRecipeCard(new RecipeCard("Recipe 4", "Description of Recipe 4"));
-        addRecipeCard(new RecipeCard("Recipe 5", "Description of Recipe 5"));
+        //RecipeCard recipe1 = new RecipeCard("Recipe 1", "Description of Recipe 1");
+        //RecipeCard recipe3 = new RecipeCard("Recipe 3", "Description of Recipe 3");
+        //addRecipeCard(recipe1);
+        //addRecipeCard(new RecipeCard("Recipe 2", "Description of Recipe 2"));
+        //addRecipeCard(recipe3);
+        //addRecipeCard(new RecipeCard("Recipe 4", "Description of Recipe 4"));
+        //addRecipeCard(new RecipeCard("Recipe 5", "Description of Recipe 5"));
     }
 
     public void addRecipeCard(RecipeCard card) {
@@ -272,6 +271,27 @@ class RecipeList extends GridPane {
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
             if (card.getRecipeTitle().equals(currentCard.getRecipeTitle())) {
+                this.getChildren().remove(currentCard);
+            }
+        }
+
+        // Update indices
+        for (int i = 0; i < getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i);
+            this.setRowIndex(currentCard, i / maxColumn);
+            this.setColumnIndex(currentCard, i % maxColumn);
+        }
+    }
+    
+
+    public void deleteRecipeCardByTitle(String title) {
+        int index = getRecipeCards().size();
+        int row = index / maxColumn;
+        int column = index % maxColumn;
+
+        for (int i = 0; i < getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i);
+            if (title.equals(currentCard.getRecipeTitle())) {
                 this.getChildren().remove(currentCard);
             }
         }
@@ -327,21 +347,27 @@ class RecipeCard extends VBox {
             detailsButton.setScaleY(1.0);
         });
         detailsButton.setAlignment(Pos.BOTTOM_CENTER);
-        this.getChildren().addAll(titleLabel, descriptionLabel, detailsButton);
+        this.getChildren().addAll(titleLabel, detailsButton);
     }
 
-    public void setDetailsButtonAction(EventHandler<ActionEvent> eventHandler) {
-        detailsButton.setOnAction(e->this.view.switchScene(recipeDetailPage));
+    // public void setDetailsButtonAction(EventHandler<ActionEvent> event) {
+    //     detailsButton.setOnAction(e -> 
+    //     {Scene newScene = new Scene(recipeDetailPage);
+    //     mainStage.setScene(newScene);
+    //     mainStage.show();
+    //     });
+    // }
+
+    public Button getDetailButton(){
+        return this.detailsButton;
     }
+    
     public String getRecipeTitle(){
         return this.recipeTitle;
     }
-    public String getRecipeDescription(){
-        return this.recipeDescription;
-    }
+    
     public void addRecipeDetail(RecipeDetailPage detailPage){
-      
-          this.recipeDetailPage = detailPage;
+        this.recipeDetailPage = detailPage;
     }
 }
 
