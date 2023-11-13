@@ -249,12 +249,8 @@ class RecipeList extends GridPane {
     }
 
     public void addRecipeCard(RecipeCard card) {
-        int index = getChildren().size();
-        int row = index / maxColumn;
-        int column = index % maxColumn;
-
-        for (int i = 1; i < getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i);
+        for (int i = 1; i <= getRecipeCards().size(); i++) {
+            RecipeCard currentCard = getRecipeCards().get(i-1);
             this.setRowIndex(currentCard, i / maxColumn);
             this.setColumnIndex(currentCard, i % maxColumn);
         }
