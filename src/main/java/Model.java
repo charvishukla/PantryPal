@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -59,7 +60,7 @@ public class Model implements HttpHandler {
             System.out.println(e);
         }
         this.audioRecorder = new AudioRecorder();
-        this.db = new Database();       
+        this.db = new Database();    
     }
 
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -176,7 +177,6 @@ public class Model implements HttpHandler {
         List<String> response = new ArrayList<>();
         try{
             String originalResponse = ChatGPT.generate(prompt);
-            System.out.println(originalResponse);
             String[] parts = originalResponse.split("\n\n", 3);
             String[] tidyParts = new String[] {parts[0].replace("Title: ", ""), parts[1], parts[2].replace("Steps:\n", "")};
             response.add(tidyParts[0]);
@@ -187,20 +187,16 @@ public class Model implements HttpHandler {
                 if(!s.isEmpty()) {
                     response.add(s);
                 }
-            }
-            /** 
-            int temp = 1;
-            for(String r: response) {
-                System.out.print(temp + ":: ");
-                System.out.println(r);
-                temp += 1;
-            }
-            **/            
+            }          
         } catch (Exception e) {
             e.printStackTrace();
         }
     
         return response;
+    }
+
+    public Database getDatabase(){
+        return db;
     }
 
 }
@@ -433,40 +429,32 @@ class Whisper {
         connection.setRequestMethod("POST");
         connection.setDoOutput(true);
 
-
         // Set up request headers
         String boundary = "Boundary-" + System.currentTimeMillis();
         connection.setRequestProperty(
-    "Content-Type",
+        "Content-Type",
         "multipart/form-data; boundary=" + boundary
         );
         connection.setRequestProperty("Authorization", "Bearer " + TOKEN);
 
-
         // Set up output stream to write request body
         OutputStream outputStream = connection.getOutputStream();
-
 
         // Write model parameter to request body
         writeParameterToOutputStream(outputStream, "model", MODEL, boundary);
 
-
         // Write file parameter to request body
         writeFileToOutputStream(outputStream, file, boundary);
 
-
         // Write closing boundary to request body
         outputStream.write(("\r\n--" + boundary + "--\r\n").getBytes());
-
 
         // Flush and close output stream
         outputStream.flush();
         outputStream.close();
 
-
         // Get response code
         int responseCode = connection.getResponseCode();
-
         String generatedText = "";
 
         // Check response code and handle response accordingly
@@ -485,54 +473,23 @@ class Whisper {
 
 class Database{
     private String uri;
+    private MongoClient client;
     private MongoDatabase database;
     private MongoCollection<Document> recipeCollection;
 
     public Database(){
         this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
 
-        try (MongoClient mongoClient = MongoClients.create(uri)) {
-            this.database = mongoClient.getDatabase("PantryPal");
-            this.recipeCollection = database.getCollection("Recipe");
-            System.out.println("Successfully connected to MongoDB! :)");
+        // Initialize MongoClient without try-with-resources
+        this.client = MongoClients.create(uri);
+        this.database = client.getDatabase("PantryPal");
+        this.recipeCollection = database.getCollection("Recipe");
+        System.out.println("Successfully connected to MongoDB! :)");
+    }
 
-            //test insert
-            /** 
-            List<String> test = new ArrayList<>();
-            test.add("Title 1");
-            test.add("Ingredient A B C D");
-            test.add("Step 1: Add water");
-            test.add("Step 2: Boil");
-            this.insert(test);
-            **/
-
-            //test get
-            /** 
-            List<String> test1 = new ArrayList<>();
-            test1 = this.get("Title 1");
-            System.out.println("Testing get");
-            System.out.println(test1.get(0));
-            **/
-
-            //test delete
-            /**
-            this.delete("Title 1");
-            **/
-
-            //test update
-            /** 
-            this.updateIngredient("Title 1", "new Ingredent update");
-            List<String> test2 = new ArrayList<>();
-            test2.add("Step 1: Add water");
-            test2.add("Step 2: Boil");
-            test2.add("Step 3: Bake");
-            test2.add("Step 4: Eat");
-            this.updateSteps("Title 1", test2);
-            **/
-            
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.out.println("Error: " + ex.getMessage());
+    public void close() {
+        if (client != null) {
+            this.client.close();
         }
     }
 
@@ -586,6 +543,16 @@ class Database{
         Bson filter = eq("Title", title);
         DeleteResult result = recipeCollection.deleteMany(filter);
         System.out.println(result);
+    }
+
+    public List<String> getAllTitles() {
+        List<String> recipes = new ArrayList<>();
+        try (MongoCursor<Document> cursor = recipeCollection.find().iterator()) {
+            while (cursor.hasNext()) {
+                recipes.add(cursor.next().getString("Title"));
+            }
+        }
+        return recipes;
     }
 }
 

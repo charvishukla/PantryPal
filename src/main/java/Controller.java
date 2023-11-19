@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.ArrayList;
 
 import javafx.event.ActionEvent;
 import javafx.scene.effect.Glow;
@@ -32,28 +33,51 @@ public class Controller {
     }
 
     private void setupRecipeCardsDetailsAction() {
-        List<RecipeCard> recipeCards = this.view.getAppFrame().getRecipeList().getRecipeCards();
-        for (RecipeCard card : recipeCards) {
-            card.setDetailsButtonAction(event -> showRecipeDetails());
+
+        //Returns a list of titles of each recipe in database;
+        List<String> titles = model.getDatabase().getAllTitles();
+        //System.out.println(titles.get(0));
+        //An arrayList to store title, ingredients, and step by step recipe.
+        List<String> response = new ArrayList<>();
+
+        for(String title : titles){
+            //Generate the recipe detail page.
+            response = model.getDatabase().get(title);
+            RecipeDetailPage deet = new RecipeDetailPage(response);
+
+            RecipeCard newRecipe = new RecipeCard(title);
+            newRecipe.addRecipeDetail(deet);
+            this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
+            newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
+            
+            deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+            deet.getDetailFooter().getSaveButton().setOnAction(
+                e ->    {RecipeCard recipe = new RecipeCard(title);
+                        recipe.addRecipeDetail(deet);
+                        recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
+                        if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(title)) {
+                            this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
+                        } else {
+                            model.getDatabase().updateSteps(title, deet.getSteps());
+                        }
+                        this.view.switchScene(this.view.getAppFrame());
+                        });
+            deet.getDetailFooter().getDeleteButton().setOnAction(
+                e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCardByTitle(title);
+                        model.getDatabase().delete(title);
+                        this.view.switchScene(this.view.getAppFrame());
+                        });
         }
     }
-
-    // Method to show recipe details
-    private void showRecipeDetails() {
-        RecipeDetailPage deet = new RecipeDetailPage();
-        deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
-        this.view.switchScene(deet);
-    }
+    
 
     private void handleBackButtonClick(ActionEvent event) {
-        System.out.println("Back button clicked"); 
-        
         this.view.switchScene(this.view.getAppFrame());
     }
 
-    private void handleCreateButtonClick(ActionEvent event) {
-        this.view.switchScene(this.view.getCreateFrame());
-    }
+    // private void handleCreateButtonClick(ActionEvent event) {
+    //     this.view.switchScene(this.view.getCreateFrame());
+    // }
 
     //If recording is started, let the microphone image glow,
     //and let the next button be available.
@@ -84,6 +108,10 @@ public class Controller {
         this.view.getCreateFrame().updateNextButton();
     }
 
+    public void handleCreateButtonClick(ActionEvent event) {
+        this.view.switchScene(this.view.getCreateFrame());
+    }
+
     //If the record button is clicked. 
     private void handleRecordVoiceInput(MouseEvent event) {
         this.view.getVoiceInputFrame().getRecordButton().setEffect(new Glow(50));
@@ -109,9 +137,29 @@ public class Controller {
 
         String prompt = this.model.formPrompt(mealType, ingredients.substring(0, ingredients.length() - 1));
         //System.out.println(prompt);
-        List<String> reponse = this.model.parseGPTResponse(prompt);
-        RecipeDetailPage deet = new RecipeDetailPage(reponse);
+        //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
+        List<String> response = this.model.parseGPTResponse(prompt);
+        RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+        deet.getDetailFooter().getSaveButton().setOnAction(
+            e ->    {
+                    RecipeCard recipe = new RecipeCard(response.get(0));
+                    recipe.addRecipeDetail(deet);
+                    recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
+                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.get(0))) {
+                        this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
+                        model.getDatabase().insert(response);
+                    } else {
+                        model.getDatabase().updateSteps(response.get(0), deet.getSteps());
+                    }
+                    this.view.switchScene(this.view.getAppFrame());
+                    });
+        deet.getDetailFooter().getDeleteButton().setOnAction(
+            e ->    {
+                    this.view.getAppFrame().getRecipeList().deleteRecipeCardByTitle(response.get(0));
+                    model.getDatabase().delete(response.get(0));
+                    this.view.switchScene(this.view.getAppFrame());
+                    });
         this.view.switchScene(deet);
 
     }
