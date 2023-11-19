@@ -57,12 +57,6 @@ public class View {
         return this.appframe;
     }
 
-    public void returnToAppFrame() {
-        this.appframe = new AppFrame(); // Create a new instance of AppFrame
-        this.currentScene.setRoot(this.appframe); // Set the new instance as the root
-        mainStage.show();
-    }
-
     public CreateFrame getCreateFrame() {
         return this.createframe;
     }
