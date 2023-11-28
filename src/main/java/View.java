@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 // Event Handling
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 // Padding and Alignment
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -47,13 +48,15 @@ public class View {
     private Scene currentScene;
 
     private LoginPage loginPage;
+    private CreateAccountPage createAccountPage;
 
     public View(Stage primaryStage) {
         this.appframe = new AppFrame();
         this.loginPage = new LoginPage();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
-
+        this.loginPage = new LoginPage();
+        this.createAccountPage = new CreateAccountPage();
         this.mainStage = primaryStage;
         // the appframe scene needs to be accessed after the login page 
         //this.currentScene = new Scene(this.appframe, 1280, 720);
@@ -67,8 +70,12 @@ public class View {
     }
 
 
-    private void handleLogin() {
-        // todo 
+    public CreateAccountPage getCreateAccountPage() {
+        return this.createAccountPage;
+    }
+
+    public LoginPage getLoginPage(){
+        return this.loginPage;
     }
 
     public AppFrame getAppFrame() {
@@ -105,16 +112,112 @@ public class View {
 }
 
 class CreateAccountPage extends HBox { 
-    private Label firstName_Label;
+    private Label firstNameLabel;
     private TextField firstName;
-    private Label lastName_Label;
+    private Label lastNameLabel;
     private TextField lastName;
-    private Label email_Label;
+    private Label emailLabel;
     private TextField emailAddress; 
+    private Label passwordLabel; 
+    private TextField password; 
+    private Label passwordLabel2;
+    private TextField password2; 
+    private Label phoneLabel; 
+    private TextField phone;
+    private Button createAccount; 
+    Button loginPageButton;
     
     CreateAccountPage(){
+        this.setPadding(new Insets(20, 20, 20, 20));
+        this.setStyle("-fx-background-color: #E5F4E3;");
+        this.setAlignment(Pos.CENTER);
+        this.setSpacing(20);
+
+        Label appTitle = new Label("PantryPal");
+        appTitle.setFont(Font.font("Arial", FontWeight.BOLD, 64));
+        appTitle.setPadding(new Insets(0, 20, 0, 0));
+        appTitle.setMaxWidth(Double.MAX_VALUE);
+        appTitle.setAlignment(Pos.CENTER);
+        appTitle.setPrefWidth(500);
+
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(25, 25, 25, 25));
+        gridPane.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 5px;");
+
+        String labelStyle = "-fx-font-size: 18;";
+        Label createAccountLabel = new Label("Create New Account");
+        createAccountLabel.setStyle("-fx-font-size: 26; -fx-font-weight: bold;");
+        firstNameLabel = new Label("First Name: "); 
+        firstNameLabel.setStyle(labelStyle);
+        firstName = new TextField();
         
+        lastNameLabel = new Label("Last Name: "); 
+        lastNameLabel.setStyle(labelStyle);
+        lastName = new TextField(); 
+        
+        emailLabel = new Label("Email Address: "); 
+        emailLabel.setStyle(labelStyle);
+        emailAddress = new TextField(); 
+
+        phoneLabel = new Label("Mobile: ");
+        phoneLabel.setStyle(labelStyle);
+        phone = new TextField(); 
+        
+        passwordLabel = new Label("Enter Password: "); 
+        passwordLabel.setStyle(labelStyle);
+        password = new TextField(); 
+        
+        passwordLabel2 = new Label("Re-enter Password: "); 
+        passwordLabel2.setStyle(labelStyle);
+        password2 = new TextField(); 
+
+        createAccount = new Button("Create Account");
+        createAccount.setStyle("-fx-background-color: #5DA9E9 ; -fx-border-color: #CCCCCC;");
+        
+        String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
+        loginPageButton = new Button("Aleady have an account?");
+        loginPageButton.setStyle(buttonStyle);
+
+        gridPane.add(createAccountLabel, 0, 0); 
+        gridPane.add(firstNameLabel, 0, 1);
+        gridPane.add(firstName, 1, 1);
+        gridPane.add(lastNameLabel, 0, 2);
+        gridPane.add(lastName, 1, 2);
+        gridPane.add(emailLabel, 0, 3);
+        gridPane.add(emailAddress, 1, 3);
+        gridPane.add(phoneLabel, 0, 4);
+        gridPane.add(phone, 1, 4);
+        gridPane.add(passwordLabel, 0, 5);
+        gridPane.add(password, 1, 5);
+        gridPane.add(passwordLabel2, 0, 6);
+        gridPane.add(password2, 1, 6);
+        gridPane.add(createAccount, 1, 7); 
+        GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
+        gridPane.add(loginPageButton, 1, 8); 
+
+    
+        // GridPane.setHalignment(createAccount, HPos.RIGHT);
+        // GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
+
+       
+        // GridPane.setHalignment(loginPageButton, HPos.CENTER);
+        // GridPane.setMargin(loginPageButton, new Insets(10, 0, 0, 0));
+
+       
+        HBox.setHgrow(gridPane, Priority.ALWAYS);
+
+        
+        this.getChildren().addAll(appTitle, gridPane);
     }
+
+    public void setLoginPageButtonAction(EventHandler<ActionEvent> eventHandler) {
+        loginPageButton.setOnAction(eventHandler);
+    }
+
+
 }
 
 
@@ -191,6 +294,7 @@ class LoginPage extends HBox {
     public void setForgotPasswordButtonOnAction(EventHandler<ActionEvent> eventHandler) {
         forgotPasswordButton.setOnAction(eventHandler);
     }
+
 
 
 }
