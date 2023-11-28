@@ -1,8 +1,5 @@
-import java.util.List;
-
-import javax.swing.Action;
-
 import java.util.ArrayList;
+import java.util.List;
 
 import javafx.event.ActionEvent;
 import javafx.scene.effect.Glow;
@@ -23,6 +20,8 @@ public class Controller {
         
         this.view.getLoginPage().setCreateAccountButtonAction(this::handleCreateAccountButtonClick);
         this.view.getCreateAccountPage().setLoginPageButtonAction(this::handleLoginPageButtonClick);
+
+        this.view.getCreateAccountPage().setCreateAccountButtonAction(this::handleCreateAccountClick);
         //Create Frame actions.
         this.view.getCreateFrame().recordPressed(this::handleCreateFrameRecord);
         this.view.getCreateFrame().recordUnpressed(this::handleCreateFrameStopRecord);
@@ -37,14 +36,32 @@ public class Controller {
 
     }
 
+    /**
+     * Create a new account 
+     * @param event
+     */
+    private void handleCreateAccountClick(ActionEvent event) {
+        
+    }
+    /**
+     * Navigates from Login Page to Create Account Page if the user does not have an account
+     * @param event
+     */
     private void handleCreateAccountButtonClick(ActionEvent event){
         view.switchScene(this.view.getCreateAccountPage());
     }
 
+    /**
+     * Navigates from Create Account Page to Login Page if the user already has an account
+     * @param event
+     */
     private void handleLoginPageButtonClick(ActionEvent event){
         view.switchScene(this.view.getLoginPage());
     }
 
+    /**
+     * 
+     */
     private void setupRecipeCardsDetailsAction() {
 
         //Returns a list of titles of each recipe in database;
@@ -86,10 +103,6 @@ public class Controller {
     private void handleBackButtonClick(ActionEvent event) {
         this.view.switchScene(this.view.getAppFrame());
     }
-
-    // private void handleCreateButtonClick(ActionEvent event) {
-    //     this.view.switchScene(this.view.getCreateFrame());
-    // }
 
     //If rocrd is started, let the microphone image glow,
     //and let the next button be available.

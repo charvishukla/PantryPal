@@ -182,29 +182,28 @@ class CreateAccountPage extends HBox {
         loginPageButton.setStyle(buttonStyle);
 
         gridPane.add(createAccountLabel, 0, 0); 
+        
         gridPane.add(firstNameLabel, 0, 1);
         gridPane.add(firstName, 1, 1);
+        
         gridPane.add(lastNameLabel, 0, 2);
         gridPane.add(lastName, 1, 2);
+        
         gridPane.add(emailLabel, 0, 3);
         gridPane.add(emailAddress, 1, 3);
+        
         gridPane.add(phoneLabel, 0, 4);
         gridPane.add(phone, 1, 4);
+        
         gridPane.add(passwordLabel, 0, 5);
         gridPane.add(password, 1, 5);
+        
         gridPane.add(passwordLabel2, 0, 6);
         gridPane.add(password2, 1, 6);
+       
         gridPane.add(createAccount, 1, 7); 
         GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
         gridPane.add(loginPageButton, 1, 8); 
-
-    
-        // GridPane.setHalignment(createAccount, HPos.RIGHT);
-        // GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
-
-       
-        // GridPane.setHalignment(loginPageButton, HPos.CENTER);
-        // GridPane.setMargin(loginPageButton, new Insets(10, 0, 0, 0));
 
        
         HBox.setHgrow(gridPane, Priority.ALWAYS);
@@ -215,6 +214,10 @@ class CreateAccountPage extends HBox {
 
     public void setLoginPageButtonAction(EventHandler<ActionEvent> eventHandler) {
         loginPageButton.setOnAction(eventHandler);
+    }
+
+    public void setCreateAccountButtonAction(EventHandler<ActionEvent> eventHandler) {
+        createAccount.setOnAction(eventHandler);
     }
 
 
