@@ -1,4 +1,7 @@
 import java.util.List;
+
+import javax.swing.Action;
+
 import java.util.ArrayList;
 
 import javafx.event.ActionEvent;
@@ -17,7 +20,9 @@ public class Controller {
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
-
+        
+        this.view.getLoginPage().setCreateAccountButtonAction(this::handleCreateAccountButtonClick);
+        this.view.getCreateAccountPage().setLoginPageButtonAction(this::handleLoginPageButtonClick);
         //Create Frame actions.
         this.view.getCreateFrame().recordPressed(this::handleCreateFrameRecord);
         this.view.getCreateFrame().recordUnpressed(this::handleCreateFrameStopRecord);
@@ -30,6 +35,14 @@ public class Controller {
        
         setupRecipeCardsDetailsAction();
 
+    }
+
+    private void handleCreateAccountButtonClick(ActionEvent event){
+        view.switchScene(this.view.getCreateAccountPage());
+    }
+
+    private void handleLoginPageButtonClick(ActionEvent event){
+        view.switchScene(this.view.getLoginPage());
     }
 
     private void setupRecipeCardsDetailsAction() {
@@ -70,7 +83,6 @@ public class Controller {
         }
     }
     
-
     private void handleBackButtonClick(ActionEvent event) {
         this.view.switchScene(this.view.getAppFrame());
     }
