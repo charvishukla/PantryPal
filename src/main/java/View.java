@@ -59,8 +59,8 @@ public class View {
         this.createAccountPage = new CreateAccountPage();
         this.mainStage = primaryStage;
         // the appframe scene needs to be accessed after the login page 
-        //this.currentScene = new Scene(this.appframe, 1280, 720);
-        this.currentScene = new Scene(this.loginPage, 1280, 720);
+        this.currentScene = new Scene(this.appframe, 1280, 720);
+        //this.currentScene = new Scene(this.loginPage, 1280, 720);
 
 
         mainStage.setScene(currentScene);
