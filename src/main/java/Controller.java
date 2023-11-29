@@ -58,21 +58,15 @@ public class Controller {
             response = model.getDatabase().get(title);
             RecipeDetailPage deet = new RecipeDetailPage(response);
 
-            RecipeCard newRecipe = new RecipeCard(title);
+            RecipeCard newRecipe = new RecipeCard(title, response.getLast());
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
             
             deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
             deet.getDetailFooter().getSaveButton().setOnAction(
-                e ->    {RecipeCard recipe = new RecipeCard(title);
-                        recipe.addRecipeDetail(deet);
-                        recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
-                        if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(title)) {
-                            this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
-                        } else {
-                            model.getDatabase().updateSteps(title, deet.getSteps());
-                        }
+                e ->    {
+                        model.getDatabase().updateSteps(title, deet.getSteps());
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getDeleteButton().setOnAction(
@@ -151,11 +145,12 @@ public class Controller {
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
         List<String> response = this.model.parseGPTResponse(prompt);
+        response.addLast(mealType);
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
             e ->    {
-                    RecipeCard recipe = new RecipeCard(response.get(0));
+                    RecipeCard recipe = new RecipeCard(response.get(0), mealType);
                     recipe.addRecipeDetail(deet);
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.get(0))) {

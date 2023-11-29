@@ -538,14 +538,17 @@ class RecipeList extends GridPane {
 
 class RecipeCard extends VBox {
     private String recipeTitle;
+    private String mealType;
     private Button detailsButton;
     private RecipeDetailPage recipeDetailPage;
 
-    public RecipeCard(String title) {
+    public RecipeCard(String title, String mealType) {
         this.recipeTitle = title;
+        this.mealType = mealType;
         // make labels for title and description
         Label titleLabel = new Label(recipeTitle);
         //Label descriptionLabel = new Label(recipeDescription);
+        Label mealTypeLabel = new Label(mealType);
 
         // card styles
         this.setPrefSize(300, 200);
@@ -569,7 +572,7 @@ class RecipeCard extends VBox {
             detailsButton.setScaleY(1.0);
         });
         detailsButton.setAlignment(Pos.BOTTOM_CENTER);
-        this.getChildren().addAll(titleLabel, detailsButton);
+        this.getChildren().addAll(titleLabel, mealTypeLabel, detailsButton);
     }
 
     // public void setDetailsButtonAction(EventHandler<ActionEvent> event) {
@@ -586,6 +589,14 @@ class RecipeCard extends VBox {
     
     public String getRecipeTitle(){
         return this.recipeTitle;
+    }
+
+    public String getMealType(){
+        return this.mealType;
+    }
+
+    public RecipeDetailPage getRecipeDetailPage(){
+        return this.recipeDetailPage;
     }
     
     public void addRecipeDetail(RecipeDetailPage detailPage){
@@ -653,7 +664,7 @@ class RecipeDetailPage extends BorderPane {
         detailList.getChildren().add(new Label(" "));
         detailList.getChildren().add(new Label("Steps: "));
 
-        for(int i = 2; i < s.size(); i++) {
+        for(int i = 2; i < s.size() - 1; i++) {
             detailList.getChildren().add(new TextField(s.get(i)));
         }
 
