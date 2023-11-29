@@ -1,10 +1,8 @@
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Action;
-
-import java.util.ArrayList;
-
 import javafx.event.ActionEvent;
+import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
@@ -21,8 +19,14 @@ public class Controller {
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
         
+        // Login Page
         this.view.getLoginPage().setCreateAccountButtonAction(this::handleCreateAccountButtonClick);
+        this.view.getLoginPage().setLoginButtonAction(this::handleLoginButtonClick);
+
+        // Create Account Page
         this.view.getCreateAccountPage().setLoginPageButtonAction(this::handleLoginPageButtonClick);
+        this.view.getCreateAccountPage().setCreateAccountButtonAction(this::handleCreateAccountClick);
+
         //Create Frame actions.
         this.view.getCreateFrame().recordPressed(this::handleCreateFrameRecord);
         this.view.getCreateFrame().recordUnpressed(this::handleCreateFrameStopRecord);
@@ -37,14 +41,69 @@ public class Controller {
 
     }
 
+    private void handleLoginButtonClick(ActionEvent event) {
+        Authentication authManager = new Authentication();
+        String username = this.view.getLoginPage().getUsername();
+        String password = this.view.getLoginPage().getPassword();
+        UserSession loginDetails = authManager.login(username, password);
+        if (loginDetails != null){
+            view.switchScene(this.view.getAppFrame());
+            this.view.getAppFrame().getHeader().setUsername(username);
+        }else{
+            this.view.getLoginPage().showAlert();
+        }
+    }
+    /**
+     * Create a new account 
+     * @param event
+     */
+    private void handleCreateAccountClick(ActionEvent event) {
+        Authentication authManager = new Authentication();
+        String username = this.view.getCreateAccountPage().getUsername();
+        String password = this.view.getCreateAccountPage().getPassword();
+        String confirmPassword = this.view.getCreateAccountPage().getConfirmPassword();
+        String phone = this.view.getCreateAccountPage().getPhone();
+        String firstName = this.view.getCreateAccountPage().getFirstName();
+        String lastName = this.view.getCreateAccountPage().getLastName();
+
+        if (!password.equals(confirmPassword)){
+            this.view.getCreateAccountPage().showAlert("Passwords do not match");
+            return;
+        }
+        
+        if (authManager.checkUserExists(username)){
+            this.view.getCreateAccountPage().showAlert("Username already exists");
+            return;
+        }
+
+        if (authManager.createUser(username, confirmPassword, firstName, lastName, phone)){
+            this.view.switchScene(this.view.getLoginPage());
+            return;
+        }else{
+            this.view.getCreateAccountPage().showAlert("Something went wrong");
+            return;
+        }
+    }
+    /**
+     * Navigates from Login Page to Create Account Page if the user does not have an account
+     * @param event
+     */
     private void handleCreateAccountButtonClick(ActionEvent event){
         view.switchScene(this.view.getCreateAccountPage());
     }
 
+    /**
+     * Navigates from Create Account Page to Login Page if the user already has an account
+     * @param event
+     */
     private void handleLoginPageButtonClick(ActionEvent event){
         view.switchScene(this.view.getLoginPage());
+        this.view.getCreateAccountPage().clearInputs();
     }
 
+    /**
+     * 
+     */
     private void setupRecipeCardsDetailsAction() {
 
         //Returns a list of titles of each recipe in database;
@@ -86,10 +145,6 @@ public class Controller {
     private void handleBackButtonClick(ActionEvent event) {
         this.view.switchScene(this.view.getAppFrame());
     }
-
-    // private void handleCreateButtonClick(ActionEvent event) {
-    //     this.view.switchScene(this.view.getCreateFrame());
-    // }
 
     //If rocrd is started, let the microphone image glow,
     //and let the next button be available.
