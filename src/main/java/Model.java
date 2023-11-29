@@ -401,14 +401,15 @@ class Database{
 
     public void insert(List<String> recipeDetail) {
         List<Document> stepList = new ArrayList<>();
-        for(int i = 2; i < recipeDetail.size(); i++) {
+        for(int i = 2; i < recipeDetail.size() - 1; i++) {
             stepList.add(new Document("Step", recipeDetail.get(i)));
         }
 
         Document recipe = new Document("_id", new ObjectId());
         recipe.append("Title", recipeDetail.get(0))
               .append("Ingredients", recipeDetail.get(1))
-              .append("Steps", stepList);
+              .append("Steps", stepList)
+              .append("MealType", recipeDetail.get(recipeDetail.size()-1));
 
         recipeCollection.insertOne(recipe);
     }
@@ -423,6 +424,7 @@ class Database{
             for(Document step: stepList) {
                 recipeDetail.add(step.getString("Step"));
             }
+            recipeDetail.add(recipe.getString("MealType"));
         }
         return recipeDetail;
     }
