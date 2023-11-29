@@ -63,7 +63,7 @@ public class Controller {
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getDeleteButton().setOnAction(
-                e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCardByTitle(title);
+                e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCard(title);
                         model.getDatabase().delete(title);
                         this.view.switchScene(this.view.getAppFrame());
                         });
@@ -135,10 +135,9 @@ public class Controller {
         this.view.getVoiceInputFrame().setIngredients(null);
         this.view.getVoiceInputFrame().updateNextButton();
 
-        String prompt = this.model.formPrompt(mealType, ingredients.substring(0, ingredients.length() - 1));
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
-        List<String> response = this.model.parseGPTResponse(prompt);
+        List<String> response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
@@ -156,7 +155,7 @@ public class Controller {
                     });
         deet.getDetailFooter().getDeleteButton().setOnAction(
             e ->    {
-                    this.view.getAppFrame().getRecipeList().deleteRecipeCardByTitle(response.get(0));
+                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.get(0));
                     model.getDatabase().delete(response.get(0));
                     this.view.switchScene(this.view.getAppFrame());
                     });
