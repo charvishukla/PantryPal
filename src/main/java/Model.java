@@ -478,6 +478,14 @@ class Authentication{
         System.out.println("Successfully connected to MongoDB! :)");
     }
 
+    public Authentication(MongoClient client, MongoDatabase database, MongoCollection<Document> userCollection){
+        this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
+
+        this.client= MongoClients.create(uri);; 
+        this.database = client.getDatabase("PantryPal");
+        this.userCollection = database.getCollection("Users");
+    }
+
     public void close() {
         if (client != null) {
             this.client.close();
@@ -504,6 +512,18 @@ class Authentication{
         }
     }
 
+    public Document mockCreateUser(String username, String password, String firstName, String lastName, String phone) {
+        
+            // Store the user's information in the database
+            Document userDocument = new Document("username", username)
+                    .append("password", password)
+                    .append("phone", phone)
+                    .append("firstName", firstName)
+                    .append("lastName", lastName);
+            userCollection.insertOne(userDocument);
+            return userDocument;
+    }
+
     public boolean checkUserExists(String username){
         Document userDocument = userCollection.find(new Document("username", username)).first();
         if (userDocument != null){
@@ -512,6 +532,10 @@ class Authentication{
         else{
             return false;
         }
+    }
+
+    public boolean mockCheckUserExists(Document doc, ArrayList<Document> list ){
+        return list.contains(doc);
     }
 
     public boolean verifyUser(String username, String password) {

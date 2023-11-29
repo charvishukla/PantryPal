@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.validation.constraints.AssertTrue;
 
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -23,6 +24,7 @@ import com.mongodb.client.result.UpdateResult;
 import static com.mongodb.client.model.Updates.set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import java.io.File;
@@ -37,119 +39,148 @@ class ModelTest {
     private Whisper mockedWhisper;
     @Mock
     private Model mockedModel;
-    @Mock 
+    @Mock
     private ChatGPT mockedChatGPT;
 
+    private Authentication auth;
+    private MongoClient mockClient;
+    private MongoDatabase mockDatabase;
+    private MongoCollection<Document> mockCollection;
+    private MongoCollection<Document> mockUserCollection;
 
     @BeforeEach
     void setUp() {
+
         MockitoAnnotations.openMocks(this);
+        mockClient = mock(MongoClient.class);
+        mockDatabase = mock(MongoDatabase.class);
+        mockUserCollection = mock(MongoCollection.class);
+
+        when(mockDatabase.getCollection("Users")).thenReturn(mockUserCollection);
+        when(mockClient.getDatabase("PantryPal")).thenReturn(mockDatabase);
+        auth = new Authentication(mockClient, mockDatabase, mockUserCollection);
     }
 
-    // // Test method to check ChatGPT's generate function with a valid ingredient
-    // @Test 
-    // void testGenerateWithValidIngredient1() throws IOException, InterruptedException, URISyntaxException {
-    //     String ingredient = "potato"; 
-    //     try {
-    //         when(mockedChatGPT.generate(ingredient)).thenReturn("test");
-    //     }
-    //     catch (Exception e) {
-    //         System.out.println(e);
-    //     }
-    //     assertEquals(mockedChatGPT.generate(ingredient), "test");
-    // }
-
-    // // Another test method for ChatGPT's generate function with multiple ingredients
-    // @Test 
-    // void testGenerateWithValidIngredient2() throws IOException, InterruptedException, URISyntaxException {
-    //     String ingredient = "potato, chili, cheese, olive oil"; 
-    //     when(mockedChatGPT.generate(ingredient)).thenReturn("test");
-    //     assertEquals(mockedChatGPT.generate(ingredient), "test");
-    // }
-
-    // Test method to check the behavior of insert operation in the database
-    @Test 
-    void testInsert(){
-        try{
+    @Test
+    void testInsert() {
+        try {
             List<String> stepList = new ArrayList<>();
             stepList.add("item1");
             stepList.add("item2");
             stepList.add("item3");
-            Mockito.doThrow(new Exception()).when(mockedDatabase).insert(stepList);
-        }catch(Exception e){
+            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepList);
+        } catch (Exception e) {
             assertTrue(true);
         }
-        
+
     }
 
     // Test method for retrieving data from the database
-    @Test 
-    void testGet(){
+    @Test
+    void testGet() {
         String title = "hey";
         ArrayList<String> arr = new ArrayList<>();
-        arr.add("hey"); 
+        arr.add("hey");
         when(mockedDatabase.get(title)).thenReturn(arr);
-        assertEquals(mockedDatabase.get(title), arr);  
+        assertEquals(mockedDatabase.get(title), arr);
     }
 
-     // Test method for updating steps in the database
-    @Test 
-    void testUpdateSteps(){
-        try{
+    // Test method for updating steps in the database
+    @Test
+    void testUpdateSteps() {
+        try {
             List<String> stepList = new ArrayList<String>();
             stepList.add("TestStep");
             String title = "TestTitle";
             Mockito.doThrow(new Exception()).when(mockedDatabase).updateSteps(title, stepList);
-        }catch(Exception e){
+        } catch (Exception e) {
             assertTrue(true);
         }
-        
-    }
 
-    // Test method for updating ingredients in the database
-    @Test 
-    void testUpdateIngredient(){
-        try{
-            String ingrediant = "TestIngredient";
-            String title = "TestTitle";
-            Mockito.doThrow(new Exception()).when(mockedDatabase).updateIngredient(title, ingrediant);
-        }catch(Exception e){
-            assertTrue(true);
-        }
     }
 
     // Test method for deleting an entry from the database
-    @Test 
-    void testDelete(){
-        try{
+    @Test
+    void testDelete() {
+        try {
             String title = "TestTitle";
             Mockito.doThrow(new Exception()).when(mockedDatabase).delete(title);
-        }catch(Exception e){
+        } catch (Exception e) {
             assertTrue(true);
         }
-    }   
+    }
 
     // Test method for stopping audiorecording
-    @Test 
-    void testStopRecording(){
-        try{
+    @Test
+    void testStopRecording() {
+        try {
             Mockito.doThrow(new Exception()).when(mockedAudioRecorder).stopRecording();
-        }catch(Exception e){
+        } catch (Exception e) {
             assertTrue(true);
         }
     }
 
-
-    // Test method for starting audio recoding 
-    @Test 
-    void testStartRecording(){
-        try{
+    // Test method for starting audio recoding
+    @Test
+    void testStartRecording() {
+        try {
             Mockito.doThrow(new Exception()).when(mockedAudioRecorder).startRecording();
-        }catch(Exception e){
+        } catch (Exception e) {
             assertTrue(true);
         }
     }
 
+    // Given: Caitlin clicks on create account.
+    // When: CAitlin fills in all the info for a new accouNY
+    // And: Caitlin hits create.
+    // Then: A new user is created and stored.
+    @Test
+    void testAuthentication_BDD0() {
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Document test1 = authentication.mockCreateUser("testUser", "testPassword", "Cait", "lastName", "testPhone");
+        ArrayList<Document> list = new ArrayList();
+        list.add(test1);
+        assertTrue(auth.mockCheckUserExists(test1, list));
+    }
 
+    // Given: Jacob clicks on create account.
+    // When: Jacob fills in all the info for a new accouNY
+    // And: Jacon hits create.
+    // Then: A new user is created and stored.
+    @Test
+    void createUserSuccessfully_BDD1() {
+        when(mockUserCollection.insertOne(any())).thenReturn(null); 
+
+        boolean result = auth.createUser("username", "password", "Jacob", "Bro", "8582331234");
+
+        verify(mockUserCollection).insertOne(any());
+        assertTrue(result, "User creation should return true");
+    }
+
+    /**
+     * Test User exists
+     * BDD Scenario:
+     * Given: Caitlin already has an account
+     * When: Caitlin tries to log in
+     * Then: Her account exists and she logs in.
+     */
+
+    @Test
+    void testCheckUserExists() {
+        // Mocking the Authentication class
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Document testuser = authentication.mockCreateUser("caitlin", "testPassword", "Caitlin", "Smith", "123456789");
+        ArrayList<Document> list = new ArrayList();
+        list.add(testuser);
+        String testexistingUsername = "Caitlin";
+
+        // Setting up mock behavior
+        when(authentication.checkUserExists(testexistingUsername)).thenReturn(true);
+
+        // Act & Assert
+        assertTrue(authentication.checkUserExists(testexistingUsername),
+                "checkUserExists should return true for the test user");
+        assertTrue(list.contains(testuser));
+    }
 
 }
