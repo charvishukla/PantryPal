@@ -117,7 +117,7 @@ public class Controller {
             response = model.getDatabase().get(title);
             RecipeDetailPage deet = new RecipeDetailPage(response);
 
-            RecipeCard newRecipe = new RecipeCard(title, response.getLast());
+            RecipeCard newRecipe = new RecipeCard(title, Helper._splitMealType(response));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});

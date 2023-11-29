@@ -712,11 +712,10 @@ class RecipeDetailPage extends BorderPane {
         scroller.setFitToWidth(true); 
         scroller.setFitToHeight(true);
 
-        Label title = new Label(s.get(0) + "\n");
+        Label title = new Label(Helper._splitTitle(s));
         detailList.getChildren().add(title);
 
-        String tidyIngred = s.get(1).replaceAll("\n+", "\n");
-        String[] ingredList = tidyIngred.split("\n");
+        String[] ingredList = Helper._splitIngred(s);
         ingredientsSize = 0;
         for(String i: ingredList){
             Label ingredients = new Label(i); 
