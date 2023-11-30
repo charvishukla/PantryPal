@@ -34,6 +34,8 @@ dependencies {
 
     implementation 'org.openjfx:javafx-controls:18.0.1'
     implementation 'org.openjfx:javafx-fxml:18.0.1'
+
+    implementation group: 'at.favre.lib', name: 'bcrypt', version: '0.10.2'
     
     implementation 'org.json:json:20231013'
     implementation 'javax:javaee-api:8.0.1'

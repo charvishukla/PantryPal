@@ -10,7 +10,6 @@ import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -19,6 +18,8 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import static com.mongodb.client.model.Updates.set;
+
+import javax.faces.context.FlashWrapper;
 import javax.sound.sampled.*;
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,6 +44,7 @@ import java.util.Map;
 
 import java.util.Scanner;
 import com.sun.net.httpserver.*;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public class Model implements HttpHandler {
     private AudioRecorder audioRecorder;
@@ -497,14 +499,15 @@ class Database{
 
     public void insert(List<String> recipeDetail) {
         List<Document> stepList = new ArrayList<>();
-        for(int i = 2; i < recipeDetail.size(); i++) {
+        for(int i = 2; i < recipeDetail.size() - 1; i++) {
             stepList.add(new Document("Step", recipeDetail.get(i)));
         }
 
         Document recipe = new Document("_id", new ObjectId());
         recipe.append("Title", recipeDetail.get(0))
               .append("Ingredients", recipeDetail.get(1))
-              .append("Steps", stepList);
+              .append("Steps", stepList)
+              .append("MealType", recipeDetail.get(recipeDetail.size()-1));
 
         recipeCollection.insertOne(recipe);
     }
@@ -519,6 +522,7 @@ class Database{
             for(Document step: stepList) {
                 recipeDetail.add(step.getString("Step"));
             }
+            recipeDetail.add(recipe.getString("MealType"));
         }
         return recipeDetail;
     }
@@ -557,3 +561,152 @@ class Database{
         return recipes;
     }
 }
+
+class Authentication{
+    private String uri;
+    private MongoClient client;
+    private MongoDatabase database;
+    private MongoCollection<Document> userCollection;
+
+    public Authentication(){
+        this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
+
+        // Initialize MongoClient without try-with-resources
+        this.client = MongoClients.create(uri);
+        this.database = client.getDatabase("PantryPal");
+        this.userCollection = database.getCollection("Users");
+        System.out.println("Successfully connected to MongoDB! :)");
+    }
+
+    public Authentication(MongoClient client, MongoDatabase database, MongoCollection<Document> userCollection){
+        this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
+
+        this.client= MongoClients.create(uri);; 
+        this.database = client.getDatabase("PantryPal");
+        this.userCollection = database.getCollection("Users");
+    }
+
+    public void close() {
+        if (client != null) {
+            this.client.close();
+        }
+    } 
+
+    public boolean createUser(String username, String password, String firstName, String lastName, String phone) {
+        try{
+            // Generate a bcrypt hash of the password
+            String hashedPassword = hashPassword(password);
+
+            // Store the user's information in the database
+            Document userDocument = new Document("username", username)
+                    .append("password", hashedPassword)
+                    .append("phone", phone)
+                    .append("firstName", firstName)
+                    .append("lastName", lastName);
+            userCollection.insertOne(userDocument);
+            return true;
+        }
+        catch (Exception e){
+            System.out.println(e.toString());
+            return false;
+        }
+    }
+
+    public Document mockCreateUser(String username, String password, String firstName, String lastName, String phone) {
+        
+            // Store the user's information in the database
+            Document userDocument = new Document("username", username)
+                    .append("password", password)
+                    .append("phone", phone)
+                    .append("firstName", firstName)
+                    .append("lastName", lastName);
+            userCollection.insertOne(userDocument);
+            return userDocument;
+    }
+
+    public boolean checkUserExists(String username){
+        Document userDocument = userCollection.find(new Document("username", username)).first();
+        if (userDocument != null){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean mockCheckUserExists(Document doc, ArrayList<Document> list ){
+        return list.contains(doc);
+    }
+
+    public boolean verifyUser(String username, String password) {
+        // Retrieve the user's information from the database
+        Document userDocument = userCollection.find(new Document("username", username)).first();
+
+        if (userDocument != null) {
+            // Extract the stored hashed password
+            String storedHashedPassword = userDocument.getString("password");
+            //return storedHashedPassword.equals(password);
+
+            // Verify the provided password against the stored hash
+            return verifyPassword(password, storedHashedPassword);
+        }
+        
+        return false; // User not found
+    }
+
+    public UserSession login(String username, String password) {
+        // Verify the user's credentials
+        if (verifyUser(username, password)) {
+            return new UserSession(username);
+        }
+        return null; // Authentication failed
+    }
+
+    private String hashPassword(String password) {
+        String bcryptHashString = BCrypt.withDefaults().hashToString(12, password.toCharArray());
+        return bcryptHashString;
+    }
+
+    private boolean verifyPassword(String password, String hashedPassword) {
+        BCrypt.Result result = BCrypt.verifyer().verify(password.toCharArray(), hashedPassword);
+        return result.verified;
+    }
+
+}
+
+class UserSession {
+    private String username;
+
+    public UserSession(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}
+
+// class UserSessionService {
+//     private static UserSessionService instance;
+//     private UserSession currentUserSession;
+
+//     private UserSessionService() {
+//         // Private constructor to enforce singleton pattern
+//     }
+
+//     public static UserSessionService getInstance() {
+//         if (instance == null) {
+//             System.out.println
+//             instance = new UserSessionService();
+//         }
+//         return instance;
+//     }
+
+//     public UserSession getCurrentUserSession() {
+//         return currentUserSession;
+//     }
+
+//     public void setCurrentUserSession(UserSession userSession) {
+//         currentUserSession = userSession;
+//     }
+// }

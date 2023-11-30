@@ -1,4 +1,5 @@
 
+import javafx.application.Application;
 // Utils 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,17 +7,23 @@ import java.util.stream.Collectors;
 // Event Handling
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 // Padding and Alignment
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -30,6 +37,7 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage; // Might need to open new stage (new window) 
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 
 public class View {
@@ -39,18 +47,35 @@ public class View {
     private Stage mainStage;
     private Scene currentScene;
 
+    private LoginPage loginPage;
+    private CreateAccountPage createAccountPage;
+
     public View(Stage primaryStage) {
         this.appframe = new AppFrame();
+        this.loginPage = new LoginPage();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
-
+        this.loginPage = new LoginPage();
+        this.createAccountPage = new CreateAccountPage();
         this.mainStage = primaryStage;
-        this.currentScene = new Scene(this.appframe, 1280, 720);
+        // the appframe scene needs to be accessed after the login page 
+        //this.currentScene = new Scene(this.appframe, 1280, 720);
+        this.currentScene = new Scene(this.loginPage, 1280, 720);
+
 
         mainStage.setScene(currentScene);
         mainStage.setTitle("PantryPal");
         mainStage.setResizable(true);
         mainStage.show();
+    }
+
+
+    public CreateAccountPage getCreateAccountPage() {
+        return this.createAccountPage;
+    }
+
+    public LoginPage getLoginPage(){
+        return this.loginPage;
     }
 
     public AppFrame getAppFrame() {
@@ -86,10 +111,258 @@ public class View {
 
 }
 
+class CreateAccountPage extends HBox { 
+    private Label firstNameLabel;
+    private TextField firstName;
+    private Label lastNameLabel;
+    private TextField lastName;
+    private Label usernameLabel;
+    private TextField username; 
+    private Label passwordLabel; 
+    private TextField password; 
+    private Label passwordLabel2;
+    private TextField password2; 
+    private Label phoneLabel; 
+    private TextField phone;
+    private Button createAccount; 
+    Button loginPageButton;
+    
+    CreateAccountPage(){
+        this.setPadding(new Insets(20, 20, 20, 20));
+        this.setStyle("-fx-background-color: #E5F4E3;");
+        this.setAlignment(Pos.CENTER);
+        this.setSpacing(20);
+
+        Label appTitle = new Label("PantryPal");
+        appTitle.setFont(Font.font("Arial", FontWeight.BOLD, 64));
+        appTitle.setPadding(new Insets(0, 20, 0, 0));
+        appTitle.setMaxWidth(Double.MAX_VALUE);
+        appTitle.setAlignment(Pos.CENTER);
+        appTitle.setPrefWidth(500);
+
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(25, 25, 25, 25));
+        gridPane.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 5px;");
+
+        String labelStyle = "-fx-font-size: 18;";
+        Label createAccountLabel = new Label("Create New Account");
+        createAccountLabel.setStyle("-fx-font-size: 26; -fx-font-weight: bold;");
+        firstNameLabel = new Label("First Name: "); 
+        firstNameLabel.setStyle(labelStyle);
+        firstName = new TextField();
+        
+        lastNameLabel = new Label("Last Name: "); 
+        lastNameLabel.setStyle(labelStyle);
+        lastName = new TextField(); 
+        
+        usernameLabel = new Label("Username: "); 
+        usernameLabel.setStyle(labelStyle);
+        username= new TextField(); 
+
+        phoneLabel = new Label("Mobile: ");
+        phoneLabel.setStyle(labelStyle);
+        phone = new TextField(); 
+        
+        passwordLabel = new Label("Enter Password: "); 
+        passwordLabel.setStyle(labelStyle);
+        password = new TextField(); 
+        
+        passwordLabel2 = new Label("Re-enter Password: "); 
+        passwordLabel2.setStyle(labelStyle);
+        password2 = new TextField(); 
+
+        createAccount = new Button("Create Account");
+        createAccount.setStyle("-fx-background-color: #5DA9E9 ; -fx-border-color: #CCCCCC;");
+        
+        String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
+        loginPageButton = new Button("Aleady have an account?");
+        loginPageButton.setStyle(buttonStyle);
+
+        gridPane.add(createAccountLabel, 0, 0); 
+        
+        gridPane.add(firstNameLabel, 0, 1);
+        gridPane.add(firstName, 1, 1);
+        
+        gridPane.add(lastNameLabel, 0, 2);
+        gridPane.add(lastName, 1, 2);
+        
+        gridPane.add(usernameLabel, 0, 3);
+        gridPane.add(username, 1, 3);
+        
+        gridPane.add(phoneLabel, 0, 4);
+        gridPane.add(phone, 1, 4);
+        
+        gridPane.add(passwordLabel, 0, 5);
+        gridPane.add(password, 1, 5);
+        
+        gridPane.add(passwordLabel2, 0, 6);
+        gridPane.add(password2, 1, 6);
+       
+        gridPane.add(createAccount, 1, 7); 
+        GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
+        gridPane.add(loginPageButton, 1, 8); 
+
+       
+        HBox.setHgrow(gridPane, Priority.ALWAYS);
+
+        
+        this.getChildren().addAll(appTitle, gridPane);
+    }
+
+    public void setLoginPageButtonAction(EventHandler<ActionEvent> eventHandler) {
+        loginPageButton.setOnAction(eventHandler);
+    }
+
+    public void setCreateAccountButtonAction(EventHandler<ActionEvent> eventHandler) {
+        createAccount.setOnAction(eventHandler);
+    }
+
+    public String getFirstName(){
+        return this.firstName.getText();
+    }
+
+    public String getLastName(){
+        return this.lastName.getText();
+    }
+
+    public String getUsername(){
+        return this.username.getText();
+    }
+
+    public String getPhone(){
+        return this.phone.getText();
+    }
+
+    public String getPassword(){
+        return this.password.getText();
+    }
+
+    public String getConfirmPassword(){
+        return this.password2.getText();
+    }
+
+    public void showAlert(String message){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error creating an account!");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public void clearInputs(){
+        this.firstName.setText("");
+        this.lastName.setText("");
+        this.username.setText("");
+        this.password.setText("");
+        this.password2.setText("");
+        this.phone.setText("");
+    }
+
+
+}
+
+
+class LoginPage extends HBox { 
+    private Label loginLabel;
+    private Label usernameLabel; 
+    private TextField usernameTextField; 
+    private Label passwordLabel;
+    private TextField passwordTextField; 
+    Button loginButton;
+    Button forgotPasswordButton; 
+    Button createAccountButton;
+
+    LoginPage(){
+        this.setPadding(new Insets(20, 20, 20, 20));
+        this.setStyle("-fx-background-color: #E5F4E3;");
+        this.setAlignment(Pos.CENTER);
+        this.setSpacing(20);
+
+        Label appTitle = new Label("PantryPal");
+        appTitle.setFont(Font.font("Arial", FontWeight.BOLD, 64));
+        appTitle.setPadding(new Insets(0, 20, 0, 0));
+        appTitle.setMaxWidth(Double.MAX_VALUE);
+        appTitle.setAlignment(Pos.CENTER);
+        appTitle.setPrefWidth(500);
+        
+        GridPane gridPane = new GridPane();
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setHgap(10);
+        gridPane.setVgap(10);
+        gridPane.setPadding(new Insets(25, 25, 25, 25));
+        gridPane.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 5px;");
+
+        loginLabel = new Label("Login");
+        loginLabel.setStyle("-fx-font-size: 26; -fx-font-weight: bold;");
+        usernameLabel = new Label("Username:");
+        usernameLabel.setStyle("-fx-font-size: 18;");
+        usernameTextField = new TextField();
+        passwordLabel = new Label("Password:");
+        passwordLabel.setStyle("-fx-font-size: 18;");
+        passwordTextField = new TextField();
+        loginButton = new Button("Login");
+        loginButton.setStyle("-fx-background-color: #5DA9E9 ; -fx-border-color: #CCCCCC;");
+        forgotPasswordButton = new Button("Forgot Password?");
+        createAccountButton = new Button("Don't have an account?");
+
+        String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
+        forgotPasswordButton.setStyle(buttonStyle);
+        createAccountButton.setStyle(buttonStyle);
+        
+        gridPane.add(loginLabel, 1, 0);
+        gridPane.add(usernameLabel, 0, 1);
+        gridPane.add(usernameTextField, 1, 1);
+        gridPane.add(passwordLabel, 0, 2);
+        gridPane.add(passwordTextField, 1, 2);
+        gridPane.add(loginButton, 1, 3);
+        GridPane.setMargin(loginButton, new Insets(10, 0, 0, 0));
+
+        gridPane.add(forgotPasswordButton, 0, 4);
+        gridPane.add(createAccountButton, 1, 4);
+        
+        HBox.setHgrow( gridPane, Priority.ALWAYS);
+        this.getChildren().addAll(appTitle, gridPane);
+    }
+
+    public void setLoginButtonAction(EventHandler<ActionEvent> eventHandler) {
+        loginButton.setOnAction(eventHandler);
+    }
+
+    public void setCreateAccountButtonAction(EventHandler<ActionEvent> eventHandler) {
+        createAccountButton.setOnAction(eventHandler); 
+    }
+
+    public void setForgotPasswordButtonOnAction(EventHandler<ActionEvent> eventHandler) {
+        forgotPasswordButton.setOnAction(eventHandler);
+    }
+
+    public String getUsername(){
+        return this.usernameTextField.getText();
+    }
+
+    public String getPassword(){
+        return this.passwordTextField.getText();
+    }
+
+    public void showAlert(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Authentication Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Invalid username or password. Please try again.");
+        alert.showAndWait();
+    }
+
+
+}
+
 class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button savedRecipesButton;
+    Button logoutButton;
 
     Header() {
         // Style the header background
@@ -116,8 +389,16 @@ class Header extends HBox {
 
         // add all childeren
         this.getChildren().addAll(homeButton, spacer, savedRecipesButton, profileButton);
-
     }
+
+    public void setProfileButtonOnAction (EventHandler<ActionEvent> eventHandler) {
+        profileButton.setOnAction(eventHandler);
+    }
+
+    public void setUsername(String username){
+        this.profileButton.setText(username);
+    }
+
 }
 
 class Footer extends HBox {
@@ -239,13 +520,6 @@ class RecipeList extends GridPane {
         this.setVgap(15); // vertical gap in the grid
         this.setStyle("-fx-background-color:#E5F4E3");
         this.setPadding(new Insets(25));
-        //RecipeCard recipe1 = new RecipeCard("Recipe 1", "Description of Recipe 1");
-        //RecipeCard recipe3 = new RecipeCard("Recipe 3", "Description of Recipe 3");
-        //addRecipeCard(recipe1);
-        //addRecipeCard(new RecipeCard("Recipe 2", "Description of Recipe 2"));
-        //addRecipeCard(recipe3);
-        //addRecipeCard(new RecipeCard("Recipe 4", "Description of Recipe 4"));
-        //addRecipeCard(new RecipeCard("Recipe 5", "Description of Recipe 5"));
     }
 
     public void addRecipeCard(RecipeCard card) {
@@ -303,16 +577,21 @@ class RecipeList extends GridPane {
 
 }
 
+
+
 class RecipeCard extends VBox {
     private String recipeTitle;
+    private String mealType;
     private Button detailsButton;
     private RecipeDetailPage recipeDetailPage;
 
-    public RecipeCard(String title) {
+    public RecipeCard(String title, String mealType) {
         this.recipeTitle = title;
+        this.mealType = mealType;
         // make labels for title and description
         Label titleLabel = new Label(recipeTitle);
         //Label descriptionLabel = new Label(recipeDescription);
+        Label mealTypeLabel = new Label(mealType);
 
         // card styles
         this.setPrefSize(300, 200);
@@ -336,7 +615,7 @@ class RecipeCard extends VBox {
             detailsButton.setScaleY(1.0);
         });
         detailsButton.setAlignment(Pos.BOTTOM_CENTER);
-        this.getChildren().addAll(titleLabel, detailsButton);
+        this.getChildren().addAll(titleLabel, mealTypeLabel, detailsButton);
     }
 
     // public void setDetailsButtonAction(EventHandler<ActionEvent> event) {
@@ -354,11 +633,22 @@ class RecipeCard extends VBox {
     public String getRecipeTitle(){
         return this.recipeTitle;
     }
+
+    public String getMealType(){
+        return this.mealType;
+    }
+
+    public RecipeDetailPage getRecipeDetailPage(){
+        return this.recipeDetailPage;
+    }
     
     public void addRecipeDetail(RecipeDetailPage detailPage){
         this.recipeDetailPage = detailPage;
     }
 }
+
+
+
 
 class DetailList extends VBox{
     DetailList() {
@@ -402,11 +692,10 @@ class RecipeDetailPage extends BorderPane {
         scroller.setFitToWidth(true); 
         scroller.setFitToHeight(true);
 
-        Label title = new Label(s.get(0) + "\n");
+        Label title = new Label(Helper._splitTitle(s));
         detailList.getChildren().add(title);
 
-        String tidyIngred = s.get(1).replaceAll("\n+", "\n");
-        String[] ingredList = tidyIngred.split("\n");
+        String[] ingredList = Helper._splitIngred(s);
         ingredientsSize = 0;
         for(String i: ingredList){
             Label ingredients = new Label(i); 
@@ -417,7 +706,7 @@ class RecipeDetailPage extends BorderPane {
         detailList.getChildren().add(new Label(" "));
         detailList.getChildren().add(new Label("Steps: "));
 
-        for(int i = 2; i < s.size(); i++) {
+        for(int i = 2; i < s.size() - 1; i++) {
             detailList.getChildren().add(new TextField(s.get(i)));
         }
 
