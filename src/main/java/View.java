@@ -274,6 +274,7 @@ class LoginPage extends HBox {
     Button loginButton;
     Button forgotPasswordButton; 
     Button createAccountButton;
+    private CheckBox autoLoginCheckBox;
 
     LoginPage(){
         this.setPadding(new Insets(20, 20, 20, 20));
@@ -307,6 +308,11 @@ class LoginPage extends HBox {
         loginButton.setStyle("-fx-background-color: #5DA9E9 ; -fx-border-color: #CCCCCC;");
         forgotPasswordButton = new Button("Forgot Password?");
         createAccountButton = new Button("Don't have an account?");
+        autoLoginCheckBox = new CheckBox("Remember me");
+        autoLoginCheckBox.setStyle(
+            "-fx-background-color: white" +
+            "-fx-font-size: 20;"
+        );
 
         String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
         forgotPasswordButton.setStyle(buttonStyle);
@@ -319,9 +325,10 @@ class LoginPage extends HBox {
         gridPane.add(passwordTextField, 1, 2);
         gridPane.add(loginButton, 1, 3);
         GridPane.setMargin(loginButton, new Insets(10, 0, 0, 0));
+        gridPane.add(autoLoginCheckBox,1, 5 );
 
-        gridPane.add(forgotPasswordButton, 0, 4);
-        gridPane.add(createAccountButton, 1, 4);
+        gridPane.add(forgotPasswordButton, 0, 6);
+        gridPane.add(createAccountButton, 1, 6);
         
         HBox.setHgrow( gridPane, Priority.ALWAYS);
         this.getChildren().addAll(appTitle, gridPane);
@@ -353,6 +360,10 @@ class LoginPage extends HBox {
         alert.setHeaderText(null);
         alert.setContentText("Invalid username or password. Please try again.");
         alert.showAndWait();
+    }
+
+    public boolean getAutoLoginStatus(){
+        return autoLoginCheckBox.isSelected();
     }
 
 

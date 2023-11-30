@@ -45,14 +45,19 @@ public class Controller {
         Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
+        Boolean autoLoginStatus = this.view.getLoginPage().getAutoLoginStatus();
         UserSession loginDetails = authManager.login(username, password);
         if (loginDetails != null){
+            if(autoLoginStatus == true){
+                authManager.markAutoLoginStatus(username);
+            }
             view.switchScene(this.view.getAppFrame());
             this.view.getAppFrame().getHeader().setUsername(username);
         }else{
             this.view.getLoginPage().showAlert();
         }
     }
+ 
     /**
      * Create a new account 
      * @param event

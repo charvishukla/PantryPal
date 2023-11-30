@@ -564,6 +564,12 @@ class Authentication{
         return null; // Authentication failed
     }
 
+    public void markAutoLoginStatus(String username) {
+        Bson filter = eq("username", username);
+        Bson updateOperation = set("auto login", "True");
+        userCollection.updateOne(filter, updateOperation);
+    }
+
     private String hashPassword(String password) {
         String bcryptHashString = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         return bcryptHashString;
