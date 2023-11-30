@@ -531,29 +531,9 @@ class RecipeList extends GridPane {
 
         this.add(card, 0, 0);
     }
-
-    public void deleteRecipeCard(RecipeCard card) {
-        int index = getRecipeCards().size();
-        int row = index / maxColumn;
-        int column = index % maxColumn;
-
-        for (int i = 0; i < getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i);
-            if (card.getRecipeTitle().equals(currentCard.getRecipeTitle())) {
-                this.getChildren().remove(currentCard);
-            }
-        }
-
-        // Update indices
-        for (int i = 0; i < getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i);
-            this.setRowIndex(currentCard, i / maxColumn);
-            this.setColumnIndex(currentCard, i % maxColumn);
-        }
-    }
     
 
-    public void deleteRecipeCardByTitle(String title) {
+    public void deleteRecipeCard(String title) {
         int index = getRecipeCards().size();
         int row = index / maxColumn;
         int column = index % maxColumn;

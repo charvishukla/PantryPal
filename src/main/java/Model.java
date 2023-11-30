@@ -1,6 +1,8 @@
 import static com.mongodb.client.model.Filters.eq;
 
 import java.io.IOException;
+import java.io.InputStream;
+
 import org.bson.Document;
 
 import org.bson.conversions.Bson;
@@ -22,22 +24,18 @@ import javax.sound.sampled.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import org.json.JSONObject;
 import org.json.JSONException;
 import java.util.List;
 import java.util.ArrayList;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
@@ -48,7 +46,7 @@ public class Model {
 
     public Model() {
         this.audioRecorder = new AudioRecorder();
-        this.db = new Database();    
+        this.db = new Database();
     }
 
     public String audioToText() {
@@ -74,33 +72,12 @@ public class Model {
         audioRecorder.stopRecording();
     }
 
-    public String formPrompt(String mealType, String ingredients) {
-        String prompt = "What is a step-by-step " + mealType + " recipe I can make using " + ingredients + "? Please provide a Title, ingredients, and steps.";
-        return prompt;
-    }
-
-    public List<String> parseGPTResponse(String prompt){
-        List<String> response = new ArrayList<>();
-        try{
-            String originalResponse = ChatGPT.generate(prompt);
-            String[] parts = originalResponse.split("\n\n", 3);
-            String[] tidyParts = new String[] {parts[0].replace("Title: ", ""), parts[1], parts[2].replace("Steps:\n", "")};
-            response.add(tidyParts[0]);
-            response.add(tidyParts[1]);
-            String tidySteps = tidyParts[2].replaceAll("\n+", "\n");
-            String[] steps = tidySteps.split("\n");
-            for(String s: steps) {
-                if(!s.isEmpty()) {
-                    response.add(s);
-                }
-            }          
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    
+    public List<String> getNewRecipe(String mealType, String ingredients) {
+        String prompt = ChatGPT.formPrompt(mealType, ingredients);
+        List<String> response = ChatGPT.generateRecipe(prompt);
         return response;
     }
-
+    
     public Database getDatabase(){
         return db;
     }
@@ -155,6 +132,33 @@ class ChatGPT {
         }
 
         return generatedText;
+    }
+
+    public static String formPrompt(String mealType, String ingredients) {
+        String prompt = "What is a step-by-step " + mealType + " recipe I can make using " + ingredients + "? Please provide a Title, ingredients, and steps.";
+        return prompt;
+    }
+
+    public static List<String> generateRecipe(String prompt) {
+        List<String> response = new ArrayList<>();
+        try{
+            String originalResponse = ChatGPT.generate(prompt);
+            String[] parts = originalResponse.split("\n\n", 3);
+            String[] tidyParts = new String[] {parts[0].replace("Title: ", ""), parts[1], parts[2].replace("Steps:\n", "")};
+            response.add(tidyParts[0]);
+            response.add(tidyParts[1]);
+            String tidySteps = tidyParts[2].replaceAll("\n+", "\n");
+            String[] steps = tidySteps.split("\n");
+            for(String s: steps) {
+                if(!s.isEmpty()) {
+                    response.add(s);
+                }
+            }          
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    
+        return response;
     }
 }
 
