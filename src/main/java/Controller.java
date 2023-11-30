@@ -47,7 +47,10 @@ public class Controller {
         String password = this.view.getLoginPage().getPassword();
         Boolean autoLoginStatus = this.view.getLoginPage().getAutoLoginStatus();
         UserSession loginDetails = authManager.login(username, password);
+
         if (loginDetails != null){
+            //If user selected remeber me, then we leave a mark in the database
+            //to remember. 
             if(autoLoginStatus == true){
                 authManager.markAutoLoginStatus(username);
             }
