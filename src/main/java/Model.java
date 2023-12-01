@@ -21,6 +21,8 @@ import javax.faces.context.FlashWrapper;
 import javax.sound.sampled.*;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -41,6 +43,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import java.security.SecureRandom;
 
 public class Model {
     private AudioRecorder audioRecorder;
@@ -565,9 +568,41 @@ class Authentication{
     }
 
     public void markAutoLoginStatus(String username) {
+        long timestamp = System.currentTimeMillis();
+        int random = new SecureRandom().nextInt();
+        String uniqueToken = timestamp + "_" + random;
+
         Bson filter = eq("username", username);
-        Bson updateOperation = set("auto login", "True");
+        Bson updateOperation = set("token", uniqueToken);
         userCollection.updateOne(filter, updateOperation);
+
+        try{
+            FileWriter file = new FileWriter("Device Identifyer");
+            file.write(uniqueToken);
+            file.close();
+
+        }catch (IOException e){
+            System.out.println("Error writing to device identifier.");
+        }
+    }
+
+    public boolean SkipLoginIfRemembered(){
+         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifyer"))) {
+                String line;
+                if((line = reader.readLine() ) != null){
+                    Bson filter = eq("token", line);
+                    if(userCollection.find(filter).first() != null){
+                        return true;
+                    }
+                }
+                else{
+                    return false;
+                }
+
+        } catch (IOException e) {
+            return false;
+        }
+        return false;
     }
 
     private String hashPassword(String password) {

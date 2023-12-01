@@ -309,10 +309,6 @@ class LoginPage extends HBox {
         forgotPasswordButton = new Button("Forgot Password?");
         createAccountButton = new Button("Don't have an account?");
         autoLoginCheckBox = new CheckBox("Remember me");
-        autoLoginCheckBox.setStyle(
-            "-fx-background-color: white" +
-            "-fx-font-size: 20;"
-        );
 
         String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
         forgotPasswordButton.setStyle(buttonStyle);

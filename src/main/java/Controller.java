@@ -39,6 +39,12 @@ public class Controller {
        
         setupRecipeCardsDetailsAction();
 
+        Authentication authManager = new Authentication();
+
+        if(authManager.SkipLoginIfRemembered()){
+            view.switchScene(this.view.getAppFrame());
+        }
+
     }
 
     private void handleLoginButtonClick(ActionEvent event) {
@@ -184,7 +190,9 @@ public class Controller {
     //If the record button is clicked. 
     private void handleRecordVoiceInput(MouseEvent event) {
         this.view.getVoiceInputFrame().getRecordButton().setEffect(new Glow(50));
-        this.model.startRecording(); 
+        this.model.startRecording();
+        this.view.getVoiceInputFrame().setIngredients(null); 
+        this.view.getVoiceInputFrame().updateNextButton();
     }
 
     //If the recording is stopped, Stop recoding and 
@@ -193,7 +201,7 @@ public class Controller {
          this.view.getVoiceInputFrame().getRecordButton().setEffect(null);
          this.model.stopRecording();
          ingredients = model.audioToText();
-         this.view.getVoiceInputFrame().updatePrompt("Prompt recieved: " + ingredients);
+         this.view.getVoiceInputFrame().updatePrompt("Prompt received: " + ingredients);
          this.view.getVoiceInputFrame().updateNextButton();
     }    
 
