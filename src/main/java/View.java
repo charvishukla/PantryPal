@@ -15,13 +15,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
-
-import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
@@ -39,37 +32,45 @@ import javafx.stage.Stage; // Might need to open new stage (new window)
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-
+/**
+ * Class: View
+ * responsible for initializing and switching 
+ * between different frames and pages within the application.
+ */
 public class View {
-    private AppFrame appframe; // This is a scene
+    
+    private AppFrame appframe; 
     private CreateFrame createframe;
     private VoiceInputFrame voiceInputFrame;
     private Stage mainStage;
     private Scene currentScene;
-
     private LoginPage loginPage;
     private CreateAccountPage createAccountPage;
-
+    /**
+     * Initializes various frames and pages, sets up the primary stage and the initial scene.
+     * @param primaryStage:  The primary stage for this application, onto which scenes are set.
+     */
     public View(Stage primaryStage) {
-        this.appframe = new AppFrame();
+        // Initialization of frames and pages.
+        this.appframe = new AppFrame();             
         this.loginPage = new LoginPage();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
         this.loginPage = new LoginPage();
         this.createAccountPage = new CreateAccountPage();
         this.mainStage = primaryStage;
-        // the appframe scene needs to be accessed after the login page 
-        //this.currentScene = new Scene(this.appframe, 1280, 720);
+
+        // Setting the initial scene to be the login page.
         this.currentScene = new Scene(this.loginPage, 1280, 720);
 
-
+        // Configuring the main stage with the initial scene and showing it.
         mainStage.setScene(currentScene);
         mainStage.setTitle("PantryPal");
         mainStage.setResizable(true);
         mainStage.show();
     }
 
-
+    // GETTERS AND SETTERS FOR VIEW 
     public CreateAccountPage getCreateAccountPage() {
         return this.createAccountPage;
     }
@@ -81,13 +82,7 @@ public class View {
     public AppFrame getAppFrame() {
         return this.appframe;
     }
-
-    public void returnToAppFrame() {
-        this.appframe = new AppFrame(); // Create a new instance of AppFrame
-        this.currentScene.setRoot(this.appframe); // Set the new instance as the root
-        mainStage.show();
-    }
-
+    
     public CreateFrame getCreateFrame() {
         return this.createframe;
     }
@@ -95,6 +90,25 @@ public class View {
     public VoiceInputFrame getVoiceInputFrame() {
         return this.voiceInputFrame;
     }
+
+    /**
+     * Method: returnToAppFrame
+     * Resets the app frame and sets it as the current scene.
+     * use this to return to the app frame from other scenes.
+     */
+    public void returnToAppFrame() {
+        this.appframe = new AppFrame(); // Create a new instance of AppFrame
+        this.currentScene.setRoot(this.appframe); // Set the new instance as the root
+        mainStage.show();
+    }
+
+
+    /**
+     * Method: switchScene
+     * Switches the current scene to the provided node.
+     * If the node is already part of a scene, that scene is used; otherwise, a new scene is created.
+     * @param node: The parent node for the new scene.
+     */
 
     public void switchScene(Parent node) {
         // Check if the node is already part of a scene
