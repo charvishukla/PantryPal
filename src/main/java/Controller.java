@@ -39,8 +39,11 @@ public class Controller {
        
         setupRecipeCardsDetailsAction();
 
+        /*
+         * Determines if the app has to automatically log in
+         * a user.
+         */
         Authentication authManager = new Authentication();
-
         if(authManager.SkipLoginIfRemembered()){
             view.switchScene(this.view.getAppFrame());
         }
@@ -55,13 +58,14 @@ public class Controller {
         UserSession loginDetails = authManager.login(username, password);
 
         if (loginDetails != null){
-            //If user selected remeber me, then we leave a mark in the database
-            //to remember. 
+
+            //If user selected remeber me, then we leave a mark in the database to remember. 
             if(autoLoginStatus == true){
                 authManager.markAutoLoginStatus(username);
             }
             view.switchScene(this.view.getAppFrame());
             this.view.getAppFrame().getHeader().setUsername(username);
+            
         }else{
             this.view.getLoginPage().showAlert();
         }
