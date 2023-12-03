@@ -402,7 +402,7 @@ class Database{
         }
     }
 
-    public void insert(List<String> recipeDetail) {
+    public void insert(List<String> recipeDetail, String username) {
         List<Document> stepList = new ArrayList<>();
         for(int i = 2; i < recipeDetail.size() - 1; i++) {
             stepList.add(new Document("Step", recipeDetail.get(i)));
@@ -412,7 +412,8 @@ class Database{
         recipe.append("Title", recipeDetail.get(0))
               .append("Ingredients", recipeDetail.get(1))
               .append("Steps", stepList)
-              .append("MealType", recipeDetail.get(recipeDetail.size()-1));
+              .append("MealType", recipeDetail.get(recipeDetail.size()-1))
+              .append("Users", username);
 
         recipeCollection.insertOne(recipe);
     }
@@ -456,9 +457,10 @@ class Database{
         System.out.println(result);
     }
 
-    public List<String> getAllTitles() {
+    public List<String> getAllTitles(String username) {
         List<String> recipes = new ArrayList<>();
-        try (MongoCursor<Document> cursor = recipeCollection.find().iterator()) {
+        Bson filter = eq("Users", username);
+        try (MongoCursor<Document> cursor = recipeCollection.find(filter).iterator()) {
             while (cursor.hasNext()) {
                 recipes.add(cursor.next().getString("Title"));
             }
