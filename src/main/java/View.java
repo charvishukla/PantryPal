@@ -16,6 +16,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.effect.Reflection;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,6 +29,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage; // Might need to open new stage (new window) 
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -62,7 +64,8 @@ public class View {
 
         // Setting the initial scene to be the login page.
         this.currentScene = new Scene(this.loginPage, 1280, 720);
-
+       
+        //src/main/resources/stylesheets/LoginPage.css
         // Configuring the main stage with the initial scene and showing it.
         mainStage.setScene(currentScene);
         mainStage.setTitle("PantryPal");
@@ -122,7 +125,6 @@ public class View {
         mainStage.setScene(currentScene);
         mainStage.show();
     }
-
 }
 
 class CreateAccountPage extends HBox { 
@@ -291,47 +293,64 @@ class LoginPage extends HBox {
     private CheckBox autoLoginCheckBox;
 
     LoginPage(){
-        this.setPadding(new Insets(20, 20, 20, 20));
-        this.setStyle("-fx-background-color: #E5F4E3;");
+        this.getStyleClass().add("login-page");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/LoginPage.css").toExternalForm());
+        
+        Circle shape1 = new Circle(120); 
+        shape1.getStyleClass().add("shape-blue");
+        shape1.setTranslateX(630); 
+        shape1.setTranslateY(-300);
+        shape1.setEffect(new GaussianBlur(10));
+        
+        Circle shape2 = new Circle(100);
+        shape2.getStyleClass().add("shape-orange");
+        shape2.setTranslateX(810); 
+        shape2.setTranslateY(291); 
+        shape2.setEffect(new GaussianBlur(10));
+
+        this.setPadding(new Insets(20, 0, 20, 0));
+        this.getStyleClass().add("login-page-background");
         this.setAlignment(Pos.CENTER);
         this.setSpacing(20);
 
         Label appTitle = new Label("PantryPal");
-        appTitle.setFont(Font.font("Arial", FontWeight.BOLD, 64));
-        appTitle.setPadding(new Insets(0, 20, 0, 0));
+        appTitle.getStyleClass().add("app-title");
+
+        appTitle.setMinWidth(Control.USE_PREF_SIZE); 
         appTitle.setMaxWidth(Double.MAX_VALUE);
-        appTitle.setAlignment(Pos.CENTER);
-        appTitle.setPrefWidth(500);
-        
+        appTitle.setTranslateX(-300);
+    
+    
         GridPane gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER);
+        gridPane.getStyleClass().add("grid-pane");
+        gridPane.setPrefWidth(700);
+        gridPane.setPrefHeight(200);
+        gridPane.setTranslateX(-55);
+        gridPane.setAlignment(Pos.BASELINE_LEFT);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(25, 25, 25, 25));
-        gridPane.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 5px;");
 
         loginLabel = new Label("Login");
-        loginLabel.setStyle("-fx-font-size: 26; -fx-font-weight: bold;");
-        usernameLabel = new Label("Username:");
-        usernameLabel.setStyle("-fx-font-size: 18;");
-        usernameTextField = new TextField();
-        passwordLabel = new Label("Password:");
-        passwordLabel.setStyle("-fx-font-size: 18;");
-        passwordTextField = new TextField();
-        loginButton = new Button("Login");
-        loginButton.setStyle("-fx-background-color: #5DA9E9 ; -fx-border-color: #CCCCCC;");
-        forgotPasswordButton = new Button("Forgot Password?");
-        createAccountButton = new Button("Don't have an account?");
-        autoLoginCheckBox = new CheckBox("Remember me");
-        autoLoginCheckBox.setStyle(
-            "-fx-background-color: white" +
-            "-fx-font-size: 20;"
-        );
-
-        String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
-        forgotPasswordButton.setStyle(buttonStyle);
-        createAccountButton.setStyle(buttonStyle);
+        loginLabel.getStyleClass().add("label-login");
         
+        usernameLabel = new Label("Username:");
+        usernameLabel.getStyleClass().add("label-common");
+        usernameTextField = new TextField();
+
+        passwordLabel = new Label("Password:");
+        passwordLabel.getStyleClass().add("label-common");
+        passwordTextField = new TextField();
+
+        loginButton = new Button("Login");
+        loginButton.getStyleClass().add("button-login");
+        forgotPasswordButton = new Button("Forgot Password?");
+        forgotPasswordButton.getStyleClass().add("link-button-style");
+        createAccountButton = new Button("Don't have an account?");
+        createAccountButton.getStyleClass().add("link-button-style");
+        autoLoginCheckBox = new CheckBox("Remember me");
+        autoLoginCheckBox.getStyleClass().add("checkbox-style");
+
+
         gridPane.add(loginLabel, 1, 0);
         gridPane.add(usernameLabel, 0, 1);
         gridPane.add(usernameTextField, 1, 1);
@@ -345,7 +364,7 @@ class LoginPage extends HBox {
         gridPane.add(createAccountButton, 1, 6);
         
         HBox.setHgrow( gridPane, Priority.ALWAYS);
-        this.getChildren().addAll(appTitle, gridPane);
+        this.getChildren().addAll(shape1, shape2, appTitle, gridPane);
     }
 
     public void setLoginButtonAction(EventHandler<ActionEvent> eventHandler) {
