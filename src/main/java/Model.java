@@ -82,6 +82,10 @@ public class Model {
         return db;
     }
 
+    public AudioRecorder getAudioRecorder() {
+        return audioRecorder;
+    }
+
 }
 
 class ChatGPT {
@@ -139,21 +143,22 @@ class ChatGPT {
         return prompt;
     }
 
-    public static List<String> generateRecipe(String prompt) {
-        List<String> response = new ArrayList<>();
+    public static JSONObject generateRecipe(String prompt) {
+        JSONObject response = new JSONObject();
         try{
             String originalResponse = ChatGPT.generate(prompt);
             String[] parts = originalResponse.split("\n\n", 3);
             String[] tidyParts = new String[] {parts[0].replace("Title: ", ""), parts[1], parts[2].replace("Steps:\n", "")};
-            response.add(tidyParts[0]);
-            response.add(tidyParts[1]);
+            response.put("Title", tidyParts[0]);
+            response.put("Ingredients", tidyParts[1]);
             String tidySteps = tidyParts[2].replaceAll("\n+", "\n");
             String[] steps = tidySteps.split("\n");
-            for(String s: steps) {
-                if(!s.isEmpty()) {
-                    response.add(s);
+            for(int i = 1; i <= steps.length; i++) {
+                if(!steps[i].isEmpty()) {
+                    response.put(String.valueOf(i), steps[i]);
                 }
-            }          
+            }
+            response.put("numSteps", steps.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
