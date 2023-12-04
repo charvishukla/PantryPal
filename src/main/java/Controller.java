@@ -201,7 +201,7 @@ public class Controller {
 
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
-        JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
+        JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
@@ -213,14 +213,14 @@ public class Controller {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
                         model.getDatabase().insert(response); //TODO
                     } else {
-                        model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps());
+                        model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps()); //TODO
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getDeleteButton().setOnAction(
             e ->    {
                     this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.getString("Title"));
-                    model.getDatabase().delete(response.getString("Title"));
+                    model.getDatabase().delete(response.getString("Title")); //TODO
                     this.view.switchScene(this.view.getAppFrame());
                     });
         this.view.switchScene(deet);

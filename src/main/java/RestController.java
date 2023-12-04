@@ -37,7 +37,7 @@ public class RestController {
                         throw new BadRequestResponse();
                     }
                     JSONObject requestBody = new JSONObject(ctx.body());
-                    String title = requestBody.getString("title");
+                    model.getDatabase().insert(requestBody);
                 });
                 
                 get(ctx -> {
@@ -95,6 +95,10 @@ public class RestController {
                 });
 
             });
+        });
+
+        app.ws("ws/audio", ws -> {
+            ws.onConnect(ctx -> log.info("Client connected to WebSocket"));
         });
 
         app.exception(Exception.class, (e, ctx) -> {
