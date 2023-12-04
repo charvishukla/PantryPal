@@ -1,4 +1,6 @@
 
+import javafx.animation.Interpolator;
+import javafx.animation.ScaleTransition;
 import javafx.application.Application;
 // Utils 
 import java.util.ArrayList;
@@ -29,32 +31,39 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage; // Might need to open new stage (new window) 
+import javafx.util.Duration;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 /**
  * Class: View
- * responsible for initializing and switching 
+ * responsible for initializing and switching
  * between different frames and pages within the application.
  */
 public class View {
-    
-    private AppFrame appframe; 
+
+    private AppFrame appframe;
     private CreateFrame createframe;
     private VoiceInputFrame voiceInputFrame;
     private Stage mainStage;
     private Scene currentScene;
     private LoginPage loginPage;
     private CreateAccountPage createAccountPage;
+
     /**
-     * Initializes various frames and pages, sets up the primary stage and the initial scene.
-     * @param primaryStage:  The primary stage for this application, onto which scenes are set.
+     * Initializes various frames and pages, sets up the primary stage and the
+     * initial scene.
+     * 
+     * @param primaryStage: The primary stage for this application, onto which
+     *                      scenes are set.
      */
     public View(Stage primaryStage) {
         // Initialization of frames and pages.
-        this.appframe = new AppFrame();             
+        this.appframe = new AppFrame();
         this.loginPage = new LoginPage();
         this.createframe = new CreateFrame();
         this.voiceInputFrame = new VoiceInputFrame();
@@ -64,8 +73,8 @@ public class View {
 
         // Setting the initial scene to be the login page.
         this.currentScene = new Scene(this.loginPage, 1280, 720);
-       
-        //src/main/resources/stylesheets/LoginPage.css
+
+        // src/main/resources/stylesheets/LoginPage.css
         // Configuring the main stage with the initial scene and showing it.
         mainStage.setScene(currentScene);
         mainStage.setTitle("PantryPal");
@@ -73,19 +82,19 @@ public class View {
         mainStage.show();
     }
 
-    // GETTERS AND SETTERS FOR VIEW 
+    // GETTERS AND SETTERS FOR VIEW
     public CreateAccountPage getCreateAccountPage() {
         return this.createAccountPage;
     }
 
-    public LoginPage getLoginPage(){
+    public LoginPage getLoginPage() {
         return this.loginPage;
     }
 
     public AppFrame getAppFrame() {
         return this.appframe;
     }
-    
+
     public CreateFrame getCreateFrame() {
         return this.createframe;
     }
@@ -105,11 +114,12 @@ public class View {
         mainStage.show();
     }
 
-
     /**
      * Method: switchScene
      * Switches the current scene to the provided node.
-     * If the node is already part of a scene, that scene is used; otherwise, a new scene is created.
+     * If the node is already part of a scene, that scene is used; otherwise, a new
+     * scene is created.
+     * 
      * @param node: The parent node for the new scene.
      */
 
@@ -127,36 +137,42 @@ public class View {
     }
 }
 
-class CreateAccountPage extends HBox { 
+/**
+ * Class: CreateAccountPage
+ */
+class CreateAccountPage extends HBox {
     private Label firstNameLabel;
     private TextField firstName;
     private Label lastNameLabel;
     private TextField lastName;
     private Label usernameLabel;
-    private TextField username; 
-    private Label passwordLabel; 
-    private TextField password; 
+    private TextField username;
+    private Label passwordLabel;
+    private TextField password;
     private Label passwordLabel2;
-    private TextField password2; 
-    private Label phoneLabel; 
+    private TextField password2;
+    private Label phoneLabel;
     private TextField phone;
-    private Button createAccount; 
+    private Button createAccount;
     Button loginPageButton;
-    
-    CreateAccountPage(){
+
+    /**
+     * 
+     */
+    CreateAccountPage() {
         this.getStyleClass().add("create-account-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/CreateAccountPage.css").toExternalForm());
-        
-        Circle shape1 = new Circle(120); 
+
+        Circle shape1 = new Circle(120);
         shape1.getStyleClass().add("shape-blue");
-        shape1.setTranslateX(630); 
+        shape1.setTranslateX(630);
         shape1.setTranslateY(-300);
         shape1.setEffect(new GaussianBlur(10));
-        
+
         Circle shape2 = new Circle(100);
         shape2.getStyleClass().add("shape-orange");
-        shape2.setTranslateX(810); 
-        shape2.setTranslateY(291); 
+        shape2.setTranslateX(810);
+        shape2.setTranslateY(291);
         shape2.setEffect(new GaussianBlur(10));
 
         this.setPadding(new Insets(20, 0, 20, 0));
@@ -166,7 +182,7 @@ class CreateAccountPage extends HBox {
 
         Label appTitle = new Label("PantryPal");
         appTitle.getStyleClass().add("app-title");
-        appTitle.setMinWidth(Control.USE_PREF_SIZE); 
+        appTitle.setMinWidth(Control.USE_PREF_SIZE);
         appTitle.setMaxWidth(Double.MAX_VALUE);
         appTitle.setTranslateX(-250);
 
@@ -179,46 +195,45 @@ class CreateAccountPage extends HBox {
         gridPane.setHgap(10);
         gridPane.setVgap(10);
 
-
         Label createAccountLabel = new Label("Create New Account");
         createAccountLabel.getStyleClass().add("label-create-account");
-        
-        firstNameLabel = new Label("First Name: "); 
+
+        firstNameLabel = new Label("First Name: ");
         firstNameLabel.getStyleClass().add("label-common");
         firstName = new TextField();
         firstName.getStyleClass().add("text-field");
 
-        lastNameLabel = new Label("Last Name: "); 
+        lastNameLabel = new Label("Last Name: ");
         lastNameLabel.getStyleClass().add("label-common");
-        lastName = new TextField(); 
+        lastName = new TextField();
         lastName.getStyleClass().add("text-field");
 
-        usernameLabel = new Label("Username: "); 
+        usernameLabel = new Label("Username: ");
         usernameLabel.getStyleClass().add("label-common");
-        username= new TextField(); 
+        username = new TextField();
         username.getStyleClass().add("text-field");
 
         phoneLabel = new Label("Mobile: ");
         phoneLabel.getStyleClass().add("label-common");
-        phone = new TextField(); 
+        phone = new TextField();
         phone.getStyleClass().add("text-field");
-        
-        passwordLabel = new Label("Enter Password: "); 
+
+        passwordLabel = new Label("Enter Password: ");
         passwordLabel.getStyleClass().add("label-common");
-        password = new TextField(); 
+        password = new TextField();
         password.getStyleClass().add("text-field");
-        
-        passwordLabel2 = new Label("Re-enter Password: "); 
+
+        passwordLabel2 = new Label("Re-enter Password: ");
         passwordLabel2.getStyleClass().add("label-common");
-        password2 = new TextField(); 
+        password2 = new TextField();
         password2.getStyleClass().add("text-field");
         createAccount = new Button("Create Account");
         createAccount.getStyleClass().add("button-create;");
         loginPageButton = new Button("Aleady have an account?");
         loginPageButton.getStyleClass().add("link-button-style");
 
-        gridPane.add(createAccountLabel, 0, 0); 
-        
+        gridPane.add(createAccountLabel, 0, 0);
+
         gridPane.add(firstNameLabel, 0, 1);
         gridPane.add(firstName, 1, 1);
         gridPane.add(lastNameLabel, 0, 2);
@@ -231,14 +246,13 @@ class CreateAccountPage extends HBox {
         gridPane.add(password, 1, 5);
         gridPane.add(passwordLabel2, 0, 6);
         gridPane.add(password2, 1, 6);
-       
-        gridPane.add(createAccount, 1, 7); 
+
+        gridPane.add(createAccount, 1, 7);
         GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
-        gridPane.add(loginPageButton, 1, 8); 
-       
+        gridPane.add(loginPageButton, 1, 8);
+
         HBox.setHgrow(gridPane, Priority.ALWAYS);
 
-        
         this.getChildren().addAll(shape1, shape2, appTitle, gridPane);
     }
 
@@ -250,31 +264,35 @@ class CreateAccountPage extends HBox {
         createAccount.setOnAction(eventHandler);
     }
 
-    public String getFirstName(){
+    public String getFirstName() {
         return this.firstName.getText();
     }
 
-    public String getLastName(){
+    public String getLastName() {
         return this.lastName.getText();
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return this.username.getText();
     }
 
-    public String getPhone(){
+    public String getPhone() {
         return this.phone.getText();
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return this.password.getText();
     }
 
-    public String getConfirmPassword(){
+    public String getConfirmPassword() {
         return this.password2.getText();
     }
 
-    public void showAlert(String message){
+    /**
+     * 
+     * @param message
+     */
+    public void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error creating an account!");
         alert.setHeaderText(null);
@@ -282,7 +300,10 @@ class CreateAccountPage extends HBox {
         alert.showAndWait();
     }
 
-    public void clearInputs(){
+    /**
+     * 
+     */
+    public void clearInputs() {
         this.firstName.setText("");
         this.lastName.setText("");
         this.username.setText("");
@@ -291,35 +312,39 @@ class CreateAccountPage extends HBox {
         this.phone.setText("");
     }
 
-
 }
 
-
-class LoginPage extends HBox { 
+/**
+ * Class: LoginPage
+ */
+class LoginPage extends HBox {
     private Label loginLabel;
-    private Label usernameLabel; 
-    private TextField usernameTextField; 
+    private Label usernameLabel;
+    private TextField usernameTextField;
     private Label passwordLabel;
-    private TextField passwordTextField; 
+    private TextField passwordTextField;
     Button loginButton;
-    Button forgotPasswordButton; 
+    Button forgotPasswordButton;
     Button createAccountButton;
     private CheckBox autoLoginCheckBox;
 
-    LoginPage(){
+    /**
+     * 
+     */
+    LoginPage() {
         this.getStyleClass().add("login-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/LoginPage.css").toExternalForm());
-        
-        Circle shape1 = new Circle(120); 
+
+        Circle shape1 = new Circle(120);
         shape1.getStyleClass().add("shape-blue");
-        shape1.setTranslateX(630); 
+        shape1.setTranslateX(630);
         shape1.setTranslateY(-300);
         shape1.setEffect(new GaussianBlur(10));
-        
+
         Circle shape2 = new Circle(100);
         shape2.getStyleClass().add("shape-orange");
-        shape2.setTranslateX(810); 
-        shape2.setTranslateY(291); 
+        shape2.setTranslateX(810);
+        shape2.setTranslateY(291);
         shape2.setEffect(new GaussianBlur(10));
 
         this.setPadding(new Insets(20, 0, 20, 0));
@@ -330,11 +355,10 @@ class LoginPage extends HBox {
         Label appTitle = new Label("PantryPal");
         appTitle.getStyleClass().add("app-title");
 
-        appTitle.setMinWidth(Control.USE_PREF_SIZE); 
+        appTitle.setMinWidth(Control.USE_PREF_SIZE);
         appTitle.setMaxWidth(Double.MAX_VALUE);
         appTitle.setTranslateX(-300);
-    
-    
+
         GridPane gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
         gridPane.setPrefWidth(700);
@@ -346,28 +370,28 @@ class LoginPage extends HBox {
 
         loginLabel = new Label("Login");
         loginLabel.getStyleClass().add("label-login");
-        
+
         usernameLabel = new Label("Username:");
         usernameLabel.getStyleClass().add("label-common");
-        
+
         usernameTextField = new TextField();
         usernameTextField.getStyleClass().add("text-field");
 
         passwordLabel = new Label("Password:");
         passwordLabel.getStyleClass().add("label-common");
-        
+
         passwordTextField = new TextField();
         passwordTextField.getStyleClass().add("text-field");
-        
+
         loginButton = new Button("Login");
         loginButton.getStyleClass().add("button-login");
-        
+
         forgotPasswordButton = new Button("Forgot Password?");
         forgotPasswordButton.getStyleClass().add("link-button-style");
-        
+
         createAccountButton = new Button("Don't have an account?");
         createAccountButton.getStyleClass().add("link-button-style");
-        
+
         autoLoginCheckBox = new CheckBox("Remember me");
         autoLoginCheckBox.getStyleClass().add("checkbox-style");
 
@@ -378,36 +402,52 @@ class LoginPage extends HBox {
         gridPane.add(passwordTextField, 1, 2);
         gridPane.add(loginButton, 1, 3);
         GridPane.setMargin(loginButton, new Insets(10, 0, 0, 0));
-        gridPane.add(autoLoginCheckBox,1, 5 );
+        gridPane.add(autoLoginCheckBox, 1, 5);
 
         gridPane.add(forgotPasswordButton, 0, 6);
         gridPane.add(createAccountButton, 1, 6);
-        
-        HBox.setHgrow( gridPane, Priority.ALWAYS);
+
+        HBox.setHgrow(gridPane, Priority.ALWAYS);
         this.getChildren().addAll(shape1, shape2, appTitle, gridPane);
     }
 
+    /**
+     * 
+     * @param eventHandler
+     */
     public void setLoginButtonAction(EventHandler<ActionEvent> eventHandler) {
         loginButton.setOnAction(eventHandler);
     }
 
+    /**
+     * 
+     * @param eventHandler
+     */
     public void setCreateAccountButtonAction(EventHandler<ActionEvent> eventHandler) {
-        createAccountButton.setOnAction(eventHandler); 
+        createAccountButton.setOnAction(eventHandler);
     }
 
+    /**
+     * 
+     * @param eventHandler
+     */
     public void setForgotPasswordButtonOnAction(EventHandler<ActionEvent> eventHandler) {
         forgotPasswordButton.setOnAction(eventHandler);
     }
 
-    public String getUsername(){
+    // GETTERS METHODS
+    public String getUsername() {
         return this.usernameTextField.getText();
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return this.passwordTextField.getText();
     }
 
-    public void showAlert(){
+    /**
+     * 
+     */
+    public void showAlert() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Authentication Error");
         alert.setHeaderText(null);
@@ -415,84 +455,97 @@ class LoginPage extends HBox {
         alert.showAndWait();
     }
 
-    public boolean getAutoLoginStatus(){
+    /**
+     * 
+     * @return
+     */
+    public boolean getAutoLoginStatus() {
         return autoLoginCheckBox.isSelected();
     }
-
 
 }
 
 class Header extends HBox {
     Button homeButton;
     Button profileButton;
-    Button savedRecipesButton;
     Button logoutButton;
 
     Header() {
-        // Style the header background
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 36);
+        this.getStylesheets().add(getClass().getResource("/stylesheets/Header.css").toExternalForm());
+        this.getStyleClass().add("header-background");
+        this.homeButton = new Button("Pantry Pal");
+        homeButton.getStyleClass().add("pantry-pal-button");
+
         this.setPrefSize(1280, 85); // Size of the header
-        this.setStyle("-fx-background-color: #FFFFFF;"); // Color of the Header
         this.setPadding(new Insets(20, 35, 10, 35));
 
-        // Button Styles
-        this.homeButton = new Button("Pantry Pal");
-        homeButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-background-color: transparent; -fx-border-color: transparent; -fx-font-size: 30px; -fx-font-family: 'Verdana'; -fx-text-fill: #5DA9E9 !important;");
-
         this.profileButton = new Button("My Profile");
-        profileButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana'; -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        profileButton.getStyleClass().add("my-profile-button");
+        profileButton.setTranslateY(25);
 
-        this.savedRecipesButton = new Button("Saved");
-        savedRecipesButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, savedRecipesButton, profileButton);
+        this.getChildren().addAll(homeButton, spacer, profileButton);
     }
 
-    public void setProfileButtonOnAction (EventHandler<ActionEvent> eventHandler) {
+    public void setProfileButtonOnAction(EventHandler<ActionEvent> eventHandler) {
         profileButton.setOnAction(eventHandler);
     }
 
-    public void setUsername(String username){
+    public void setUsername(String username) {
         this.profileButton.setText(username);
     }
 
 }
 
+/**
+ * Class: Footer
+ * This is the footer used in the HomePage
+ */
 class Footer extends HBox {
     private Button createButton;
 
+    /**
+     * Default constructor for the he footer takes no arguments, initalizes a button
+     * object
+     * and loads its stylesheet
+     */
     Footer() {
+        this.getStylesheets().add(getClass().getResource("/stylesheets/Footer.css").toExternalForm());
+        this.getStyleClass().add("footer-background");
         this.setPrefSize(1280, 90);
-        this.setStyle("-fx-background-color: #FFFFFF;");
         this.setSpacing(15);
-        
-
         createButton = new Button("Create a New Recipe");
-        createButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        createButton.getStyleClass().add("create-button");
 
-        createButton.setOnMousePressed(e -> {
-            createButton.setScaleX(0.95);
-            createButton.setScaleY(0.95);
+        createButton.setOnMouseEntered(e -> {
+            createButton.setEffect(new DropShadow(30, Color.rgb(255, 255, 255, .6)));
+            createButton.setStyle("-fx-background-color: #23a2f6; -fx-text-fill: #fff;");
         });
-        createButton.setOnMouseReleased(e -> {
-            createButton.setScaleX(1.0);
-            createButton.setScaleY(1.0);
+
+        createButton.setOnMouseExited(e -> {
+            createButton.setEffect(null);
+            createButton.setStyle("-fx-background-color: transparent; -fx-text-fill: fff;");
         });
+
         this.getChildren().addAll(createButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
 
+    // Getter for the create button
     public Button getCreateButton() {
         return createButton;
     }
 
+    /**
+     * 
+     * @param eventHandler
+     */
     public void setCreateButtonAction(EventHandler<ActionEvent> eventHandler) {
         createButton.setOnAction(eventHandler);
     }
@@ -510,7 +563,8 @@ class DetailFooter extends HBox {
         this.setPadding(new Insets(20, 35, 10, 35));
 
         backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        backButton.setStyle(
+                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
         backButton.setOnMousePressed(e -> {
             backButton.setScaleX(0.95);
             backButton.setScaleY(0.95);
@@ -520,7 +574,8 @@ class DetailFooter extends HBox {
             backButton.setScaleY(1.0);
         });
         saveButton = new Button("Save");
-        saveButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        saveButton.setStyle(
+                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
         saveButton.setOnMousePressed(e -> {
             saveButton.setScaleX(0.95);
             saveButton.setScaleY(0.95);
@@ -529,9 +584,10 @@ class DetailFooter extends HBox {
             saveButton.setScaleX(1.0);
             saveButton.setScaleY(1.0);
         });
-        
+
         deleteButton = new Button("Delete");
-        deleteButton.setStyle("-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
+        deleteButton.setStyle(
+                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
         deleteButton.setOnMousePressed(e -> {
             deleteButton.setScaleX(0.95);
             deleteButton.setScaleY(0.95);
@@ -540,7 +596,7 @@ class DetailFooter extends HBox {
             deleteButton.setScaleX(1.0);
             deleteButton.setScaleY(1.0);
         });
-        
+
         this.getChildren().addAll(backButton, saveButton, deleteButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
@@ -567,7 +623,7 @@ class DetailFooter extends HBox {
 
     public void setSaveButtonAction(EventHandler<ActionEvent> eventHandler) {
         saveButton.setOnAction(eventHandler);
-        
+
     }
 }
 
@@ -578,29 +634,53 @@ class DetailFooter extends HBox {
  */
 class RecipeList extends GridPane {
     private final int maxColumn = 4; // we will have 4 recipes per column
+    private Label myRecipes;
 
     public RecipeList() {
+        this.getStyleClass().add("recipe-list-page");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeListPage.css").toExternalForm());
+
+        Circle shape1 = new Circle(120);
+        shape1.getStyleClass().add("shape-blue");
+        shape1.setTranslateX(630);
+        shape1.setTranslateY(-300);
+        shape1.setEffect(new GaussianBlur(10));
+
+        Circle shape2 = new Circle(130);
+        shape2.getStyleClass().add("shape-orange");
+        shape2.setTranslateX(630);
+        shape2.setTranslateY(-100);
+        shape2.setEffect(new GaussianBlur(10));
+
+        Circle shape3 = new Circle(60);
+        shape3.getStyleClass().add("shape-yellow");
+        shape3.setTranslateX(630);
+        shape3.setTranslateY(-10);
+        shape3.setEffect(new GaussianBlur(10));
+
         this.setHgap(15); // horizontal gap in the grid
         this.setVgap(15); // vertical gap in the grid
-        this.setStyle("-fx-background-color:#E5F4E3");
         this.setPadding(new Insets(25));
+
+        myRecipes = new Label("My Recipes");
+        myRecipes.getStyleClass().add("my-recipes");
+        this.getChildren().addAll(shape1, shape2, shape3, myRecipes);
     }
 
     public void addRecipeCard(RecipeCard card) {
         for (int i = 1; i <= getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i-1);
+            RecipeCard currentCard = getRecipeCards().get(i - 1);
             this.setRowIndex(currentCard, i / maxColumn);
             this.setColumnIndex(currentCard, i % maxColumn);
         }
 
         this.add(card, 0, 0);
     }
-    
 
     public void deleteRecipeCard(String title) {
         int index = getRecipeCards().size();
-        int row = index / maxColumn;
-        int column = index % maxColumn;
+        // int row = index / maxColumn;
+        // int column = index % maxColumn;
 
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
@@ -616,11 +696,11 @@ class RecipeList extends GridPane {
             this.setColumnIndex(currentCard, i % maxColumn);
         }
     }
-    
+
     public boolean checkRecipeExists(String title) {
         int index = getRecipeCards().size();
         int row = index / maxColumn;
-        int column = index % maxColumn; 
+        int column = index % maxColumn;
 
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
@@ -641,8 +721,6 @@ class RecipeList extends GridPane {
 
 }
 
-
-
 class RecipeCard extends VBox {
     private String recipeTitle;
     private String mealType;
@@ -650,71 +728,46 @@ class RecipeCard extends VBox {
     private RecipeDetailPage recipeDetailPage;
 
     public RecipeCard(String title, String mealType) {
+        this.getStyleClass().add("recipe-card");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeCard.css").toExternalForm());
+
         this.recipeTitle = title;
         this.mealType = mealType;
-        // make labels for title and description
+
         Label titleLabel = new Label(recipeTitle);
-        //Label descriptionLabel = new Label(recipeDescription);
+        titleLabel.getStyleClass().add("title");
+
         Label mealTypeLabel = new Label(mealType);
+        mealTypeLabel.getStyleClass().add("info");
 
-        // card styles
-        this.setPrefSize(300, 200);
-        this.setPadding(new Insets(15));
-        this.setSpacing(10);
-        this.setStyle(
-                "-fx-border-color: transparent;  -fx-background-color: #FFFFFF;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 10, 0, 0, 0);");
+        detailsButton = new Button("Learn more");
+        detailsButton.getStyleClass().add("button");
 
-        // details button
-        detailsButton = new Button("Details");
-
-        detailsButton.setStyle(
-                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
-
-        detailsButton.setOnMousePressed(e -> {
-            detailsButton.setScaleX(0.95);
-            detailsButton.setScaleY(0.95);
-        });
-        detailsButton.setOnMouseReleased(e -> {
-            detailsButton.setScaleX(1.0);
-            detailsButton.setScaleY(1.0);
-        });
-        detailsButton.setAlignment(Pos.BOTTOM_CENTER);
         this.getChildren().addAll(titleLabel, mealTypeLabel, detailsButton);
     }
 
-    // public void setDetailsButtonAction(EventHandler<ActionEvent> event) {
-    //     detailsButton.setOnAction(e -> 
-    //     {Scene newScene = new Scene(recipeDetailPage);
-    //     mainStage.setScene(newScene);
-    //     mainStage.show();
-    //     });
-    // }
-
-    public Button getDetailButton(){
+    public Button getDetailButton() {
         return this.detailsButton;
     }
-    
-    public String getRecipeTitle(){
+
+    public String getRecipeTitle() {
         return this.recipeTitle;
     }
 
-    public String getMealType(){
+    public String getMealType() {
         return this.mealType;
     }
 
-    public RecipeDetailPage getRecipeDetailPage(){
+    public RecipeDetailPage getRecipeDetailPage() {
         return this.recipeDetailPage;
     }
-    
-    public void addRecipeDetail(RecipeDetailPage detailPage){
+
+    public void addRecipeDetail(RecipeDetailPage detailPage) {
         this.recipeDetailPage = detailPage;
     }
 }
 
-
-
-
-class DetailList extends VBox{
+class DetailList extends VBox {
     DetailList() {
         this.setSpacing(5);
         this.setPrefSize(1280, 545);
@@ -732,6 +785,7 @@ class RecipeDetailPage extends BorderPane {
     private int ingredientsSize;
 
     RecipeDetailPage() {
+
         this.setStyle("-fx-background-color: #E5F4E3;");
 
         // Initialize the header and footer
@@ -739,21 +793,21 @@ class RecipeDetailPage extends BorderPane {
         detailFooter = new DetailFooter();
         detailList = new DetailList();
         ScrollPane scroller = new ScrollPane(detailList);
-        scroller.setFitToWidth(true); 
+        scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
-        
+
         this.setTop(header);
         this.setCenter(scroller);
         this.setBottom(detailFooter);
     }
 
-    RecipeDetailPage(List<String> s){
+    RecipeDetailPage(List<String> s) {
         this.setStyle("-fx-background-color: #E5F4E3;");
         header = new Header();
         detailFooter = new DetailFooter();
         detailList = new DetailList();
         ScrollPane scroller = new ScrollPane(detailList);
-        scroller.setFitToWidth(true); 
+        scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
 
         Label title = new Label(Helper._splitTitle(s));
@@ -761,8 +815,8 @@ class RecipeDetailPage extends BorderPane {
 
         String[] ingredList = Helper._splitIngred(s);
         ingredientsSize = 0;
-        for(String i: ingredList){
-            Label ingredients = new Label(i); 
+        for (String i : ingredList) {
+            Label ingredients = new Label(i);
             ingredients.setWrapText(true);
             detailList.getChildren().add(ingredients);
             ingredientsSize += 1;
@@ -770,7 +824,7 @@ class RecipeDetailPage extends BorderPane {
         detailList.getChildren().add(new Label(" "));
         detailList.getChildren().add(new Label("Steps: "));
 
-        for(int i = 2; i < s.size() - 1; i++) {
+        for (int i = 2; i < s.size() - 1; i++) {
             detailList.getChildren().add(new TextField(s.get(i)));
         }
 
@@ -783,15 +837,14 @@ class RecipeDetailPage extends BorderPane {
         return this.detailFooter;
     }
 
-    public List<String> getSteps(){
+    public List<String> getSteps() {
         List<String> steps = new ArrayList<>();
-        for(int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++){
-            steps.add(((TextField)detailList.getChildren().get(i)).getText());
+        for (int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++) {
+            steps.add(((TextField) detailList.getChildren().get(i)).getText());
         }
         return steps;
     }
 }
-
 
 class AppFrame extends BorderPane {
     private Header header;
@@ -852,12 +905,12 @@ class CreateFrame extends BorderPane {
 
     CreateFrame() {
         this.setPadding(new javafx.geometry.Insets(100));
-        //Meal type labels
+        // Meal type labels
         Label breakfastButton = new Label("Breakfast");
         Label lunchButton = new Label("Lunch");
         Label dinnerButton = new Label("Dinner");
-        breakfastButton.setFont(new Font(20)); 
-        lunchButton.setFont(new Font(20)); 
+        breakfastButton.setFont(new Font(20));
+        lunchButton.setFont(new Font(20));
         dinnerButton.setFont(new Font(20));
 
         HBox hbox = new HBox();
@@ -865,7 +918,7 @@ class CreateFrame extends BorderPane {
         hbox.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
         hbox.setAlignment(Pos.CENTER);
 
-        //Center prompt
+        // Center prompt
         Label Title = new Label("Please verbally choose a type of meal.");
         Title.setFont(new Font(30));
         this.setTop(Title);
@@ -874,63 +927,60 @@ class CreateFrame extends BorderPane {
 
         record = new Button("Record");
 
-         //Next button to get to next scnene.
+        // Next button to get to next scnene.
         next = new Button("Next");
         next.setVisible(false);
         next.setDisable(true);
 
-        //Set up vbox for the bottom part of boaderpane
+        // Set up vbox for the bottom part of boaderpane
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
         vbox.setSpacing(30);
         vbox.getChildren().addAll(record, next);
 
-        //Insert vox into bottom of borderpane.
+        // Insert vox into bottom of borderpane.
         this.setBottom(vbox);
     }
 
-    public Button getRecordButton(){
+    public Button getRecordButton() {
         return record;
     }
 
     public void recordPressed(EventHandler<MouseEvent> eventHandler) {
-            record.setOnMousePressed(eventHandler);
+        record.setOnMousePressed(eventHandler);
     }
 
     public void recordUnpressed(EventHandler<MouseEvent> eventHandler) {
-            record.setOnMouseReleased(eventHandler);
+        record.setOnMouseReleased(eventHandler);
     }
 
-    public void nextButton(EventHandler<ActionEvent> eventHandler){
-            next.setOnAction(eventHandler);
+    public void nextButton(EventHandler<ActionEvent> eventHandler) {
+        next.setOnAction(eventHandler);
     }
 
-    public void setMealType(String s){
+    public void setMealType(String s) {
         this.mealType = s;
     }
 
-    //Will let the next button be visible if a meal type has not been selected.
-    public void updateNextButton(){
-        if(mealType == null){
+    // Will let the next button be visible if a meal type has not been selected.
+    public void updateNextButton() {
+        if (mealType == null) {
             next.setVisible(false);
             next.setDisable(true);
-        }
-        else{
+        } else {
             next.setVisible(true);
             next.setDisable(false);
         }
     }
 
-     //Returns the meal type the user picks.
-    public String getMealType(){
+    // Returns the meal type the user picks.
+    public String getMealType() {
         mealType = mealType.toLowerCase();
-        if(mealType.contains("breakfast")){
+        if (mealType.contains("breakfast")) {
             mealType = "breakfast";
-        }
-        else if(mealType.contains("dinner")){
+        } else if (mealType.contains("dinner")) {
             mealType = "dinner";
-        }
-        else{
+        } else {
             mealType = "lunch";
         }
         return mealType;
@@ -945,26 +995,24 @@ class VoiceInputFrame extends BorderPane {
     private Button next;
     private String ingredients;
 
-
-    public VoiceInputFrame(){
+    public VoiceInputFrame() {
 
         this.setPadding(new javafx.geometry.Insets(100));
 
-        //Setting up the prompt to ask the user to ask for ingredients.
+        // Setting up the prompt to ask the user to ask for ingredients.
         prompt = new Label("Please list the ingredients you wish to cook with.");
         prompt.setFont(new Font(30));
         this.setCenter(prompt);
         setAlignment(prompt, Pos.CENTER);
 
-
-        //Record button
+        // Record button
         record = new Button("Record");
-        //Next button to get to next scnene.
+        // Next button to get to next scnene.
         next = new Button("Next");
         next.setVisible(false);
         next.setDisable(true);
 
-        //Set up vbox for the bottom part of boaderpane
+        // Set up vbox for the bottom part of boaderpane
         VBox vbox = new VBox();
         vbox.setAlignment(Pos.CENTER);
         vbox.setSpacing(30);
@@ -974,8 +1022,7 @@ class VoiceInputFrame extends BorderPane {
         setAlignment(vbox, Pos.CENTER);
     }
 
-    
-    public Button getRecordButton(){
+    public Button getRecordButton() {
         return record;
     }
 
@@ -983,10 +1030,10 @@ class VoiceInputFrame extends BorderPane {
         return next;
     }
 
-    public void nextButton(EventHandler<ActionEvent> eventHandler){
-            next.setOnAction(eventHandler);
+    public void nextButton(EventHandler<ActionEvent> eventHandler) {
+        next.setOnAction(eventHandler);
     }
-    
+
     public void recordPressed(EventHandler<MouseEvent> eventHandler) {
         record.setOnMousePressed(eventHandler);
     }
@@ -995,32 +1042,32 @@ class VoiceInputFrame extends BorderPane {
         record.setOnMouseReleased(eventHandler);
     }
 
-    public void updatePrompt(String s){
+    public void updatePrompt(String s) {
         this.prompt.setText(s);
         ingredients = s;
     }
 
-    //This will set the title to indicate you have selcted breakfast, lunch or dinner.
-    public void setTitle(String s){
+    // This will set the title to indicate you have selcted breakfast, lunch or
+    // dinner.
+    public void setTitle(String s) {
         title = new Label("You have select " + s);
         title.setFont(new Font(30));
         this.setTop(title);
         setAlignment(title, Pos.CENTER);
     }
 
-    //Will let the next button be visible if a meal type has not been selected.
-    public void updateNextButton(){
-        if(ingredients == null){
+    // Will let the next button be visible if a meal type has not been selected.
+    public void updateNextButton() {
+        if (ingredients == null) {
             next.setVisible(false);
             next.setDisable(true);
-        }
-        else{
+        } else {
             next.setVisible(true);
             next.setDisable(false);
         }
     }
 
-    public void setIngredients(String s){
+    public void setIngredients(String s) {
         ingredients = s;
     }
 }

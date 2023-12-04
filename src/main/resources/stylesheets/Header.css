@@ -1,0 +1,28 @@
+.header-background {
+    -fx-background-color: #080710;
+    background-color: #080710;
+}
+
+.pantry-pal-button {
+    -fx-font-family: 'Chillight'  !important;
+    font-family: 'Chillight' !important;
+    -fx-font-size: 36px !important; 
+    font-size: 36px !important;
+    -fx-background-color: transparent; 
+    background-color: transparent; 
+    -fx-border-color: transparent; 
+    border-color: transparent; 
+    -fx-text-fill: #fff;
+}
+
+.my-profile-button {
+    -fx-font-family: 'Arial'; 
+    font-family: 'Arial'; 
+    -fx-font-size: 20px;
+    font-size: 20px;
+    -fx-background-color: transparent; 
+    background-color: transparent; 
+    -fx-border-color: transparent; 
+    border-color: transparent; 
+    -fx-text-fill: #fff;
+}
