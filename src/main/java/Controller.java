@@ -109,7 +109,7 @@ public class Controller {
     private void setupRecipeCardsDetailsAction() {
 
         //Returns a list of titles of each recipe in database;
-        List<String> titles = model.getDatabase().getAllTitles();
+        List<String> titles = model.getDatabase().getAllTitles(); //TODO: done
         //System.out.println(titles.get(0));
 
         //A JSONObject to store title, ingredients, and step by step recipe.

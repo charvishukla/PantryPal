@@ -40,13 +40,19 @@ import java.util.Map;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Model {
     private AudioRecorder audioRecorder;
     private Database db;
+    private Authentication authManager;
+    private Logger log = LoggerFactory.getLogger(Model.class);
 
     public Model() {
         this.audioRecorder = new AudioRecorder();
         this.db = new Database();
+        this.authManager = new Authentication();
     }
 
     public String audioToText() {
@@ -392,6 +398,7 @@ class Database{
     private MongoClient client;
     private MongoDatabase database;
     private MongoCollection<Document> recipeCollection;
+    private Logger log = LoggerFactory.getLogger(Database.class);
 
     public Database(){
         this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
@@ -437,6 +444,9 @@ class Database{
             }
             recipeJSON.put("MealType", recipe.getString("MealType"));
             recipeJSON.put("numSteps", stepList.size());
+        }
+        else {
+            log.error(String.format("Title '%s' not found in database", title));
         }
         return recipeJSON;
     }
