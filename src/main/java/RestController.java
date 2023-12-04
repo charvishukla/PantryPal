@@ -12,6 +12,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class RestController {
     Model model;
 
@@ -27,6 +31,15 @@ public class RestController {
         app.routes(() -> {
             path("recipe", () -> {
 
+                post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                });
+                
                 get(ctx -> {
                     if (ctx.queryString() == null) {
                         log.debug("Getting all titles");
@@ -37,6 +50,34 @@ public class RestController {
                         log.debug("Title queried: " + title);
                         ctx.json(model.getDatabase().get(title).toString());
                     }
+                });
+
+                put(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                    JSONArray steps = requestBody.getJSONArray("steps");
+                    // Possibly add something to check type of put, then call appropriate update
+                    List<String> listSteps = new ArrayList<String>();
+                    for (int i = 0; i < steps.length(); i++) {
+                        listSteps.add(steps.getString(i));
+                    }
+                    System.out.println(steps.get(0));
+                    model.getDatabase().updateSteps(title, listSteps);
+                    ctx.json(model.getDatabase().get(title).toString());
+                });
+
+                delete(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                    model.getDatabase().delete(title);
                 });
 
                 path("generate", () -> {
