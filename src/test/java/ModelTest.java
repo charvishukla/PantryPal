@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import java.io.File;
+import java.io.FileWriter;
 
 // @ExtendWith(MockitoExtension.class)
 class ModelTest {
@@ -181,6 +182,14 @@ class ModelTest {
         assertTrue(authentication.checkUserExists(testexistingUsername),
                 "checkUserExists should return true for the test user");
         assertTrue(list.contains(testuser));
+    }
+
+    
+    @Test
+    void testAutomaticLogin(){
+        Authentication authentication = Mockito.mock(Authentication.class);
+        authentication.markAutoLoginStatus("Test");
+        Mockito.verify(authentication, Mockito.times(1)).markAutoLoginStatus("Test");
     }
 
 }
