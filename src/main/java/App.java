@@ -15,6 +15,7 @@ import java.util.ArrayList;
 public class App extends Application {
 
     private Model model;
+    private RestController restController;
     private View view;
     private Controller controller;
 
@@ -28,6 +29,7 @@ public class App extends Application {
         Controller controller = new Controller(model, view);
         **/
         this.model = new Model();
+        // this.restController = new RestController(model);
         this.view = new View(primaryStage);
         this.controller = new Controller(view, model);
         

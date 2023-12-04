@@ -75,6 +75,7 @@ public class Model {
     public JSONObject getNewRecipe(String mealType, String ingredients) {
         String prompt = ChatGPT.formPrompt(mealType, ingredients);
         JSONObject response = ChatGPT.generateRecipe(prompt);
+        response.put("MealType", mealType);
         return response;
     }
     
@@ -153,9 +154,9 @@ class ChatGPT {
             response.put("Ingredients", tidyParts[1]);
             String tidySteps = tidyParts[2].replaceAll("\n+", "\n");
             String[] steps = tidySteps.split("\n");
-            for(int i = 1; i <= steps.length; i++) {
+            for(int i = 0; i < steps.length; i++) {
                 if(!steps[i].isEmpty()) {
-                    response.put(String.valueOf(i), steps[i]);
+                    response.put(String.valueOf(i+1), steps[i]);
                 }
             }
             response.put("numSteps", steps.length);
@@ -408,34 +409,36 @@ class Database{
         }
     }
 
-    public void insert(List<String> recipeDetail) {
+    public void insert(JSONObject recipeJSON) {
         List<Document> stepList = new ArrayList<>();
-        for(int i = 2; i < recipeDetail.size() - 1; i++) {
-            stepList.add(new Document("Step", recipeDetail.get(i)));
+        for(int i = 1; i <= recipeJSON.getInt("numSteps"); i++) {
+            stepList.add(new Document("Step", recipeJSON.get(String.valueOf(i))));
         }
 
         Document recipe = new Document("_id", new ObjectId());
-        recipe.append("Title", recipeDetail.get(0))
-              .append("Ingredients", recipeDetail.get(1))
+        recipe.append("Title", recipeJSON.getString("Title"))
+              .append("Ingredients", recipeJSON.getString("Ingredients"))
               .append("Steps", stepList)
-              .append("MealType", recipeDetail.get(recipeDetail.size()-1));
+              .append("MealType", recipeJSON.getString("MealType"));
 
         recipeCollection.insertOne(recipe);
     }
 
-    public ArrayList<String> get(String title) {
+    public JSONObject get(String title) {
         Document recipe = recipeCollection.find(new Document("Title", title)).first();
-        ArrayList<String> recipeDetail = new ArrayList<>();
+        // ArrayList<String> recipeDetail = new ArrayList<>();
+        JSONObject recipeJSON = new JSONObject();
         if(recipe != null) {
-            recipeDetail.add(recipe.getString("Title"));
-            recipeDetail.add(recipe.getString("Ingredients"));
+            recipeJSON.put("Title", recipe.getString("Title"));
+            recipeJSON.put("Ingredients", recipe.getString("Ingredients"));
             List<Document> stepList = (List<Document>)recipe.get("Steps");
-            for(Document step: stepList) {
-                recipeDetail.add(step.getString("Step"));
+            for (int i = 0; i < stepList.size(); i++) {
+                recipeJSON.put(String.valueOf(i+1), stepList.get(i).getString("Step"));
             }
-            recipeDetail.add(recipe.getString("MealType"));
+            recipeJSON.put("MealType", recipe.getString("MealType"));
+            recipeJSON.put("numSteps", stepList.size());
         }
-        return recipeDetail;
+        return recipeJSON;
     }
 
     public void updateIngredient(String title, String newIngredient) {

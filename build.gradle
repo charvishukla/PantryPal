@@ -39,6 +39,7 @@ dependencies {
     
     implementation 'org.json:json:20231013'
     implementation 'javax:javaee-api:8.0.1'
+    implementation 'io.javalin:javalin:5.6.3'
 
     testImplementation 'org.mockito:mockito-core:3.12.4'
 }

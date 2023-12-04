@@ -111,15 +111,16 @@ public class Controller {
         //Returns a list of titles of each recipe in database;
         List<String> titles = model.getDatabase().getAllTitles();
         //System.out.println(titles.get(0));
-        //An arrayList to store title, ingredients, and step by step recipe.
-        List<String> response = new ArrayList<>();
+
+        //A JSONObject to store title, ingredients, and step by step recipe.
+        JSONObject response;
 
         for(String title : titles){
             //Generate the recipe detail page.
             response = model.getDatabase().get(title);
             RecipeDetailPage deet = new RecipeDetailPage(response);
 
-            RecipeCard newRecipe = new RecipeCard(title, Helper._splitMealType(response));
+            RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
@@ -205,21 +206,21 @@ public class Controller {
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
             e ->    {
-                    RecipeCard recipe = new RecipeCard(response.get(0), mealType);
+                    RecipeCard recipe = new RecipeCard(response.getString("Title"), mealType);
                     recipe.addRecipeDetail(deet);
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
-                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.get(0))) {
+                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
                         model.getDatabase().insert(response);
                     } else {
-                        model.getDatabase().updateSteps(response.get(0), deet.getSteps());
+                        model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps());
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getDeleteButton().setOnAction(
             e ->    {
-                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.get(0));
-                    model.getDatabase().delete(response.get(0));
+                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.getString("Title"));
+                    model.getDatabase().delete(response.getString("Title"));
                     this.view.switchScene(this.view.getAppFrame());
                     });
         this.view.switchScene(deet);

@@ -710,7 +710,7 @@ class RecipeDetailPage extends BorderPane {
         detailList.getChildren().add(new Label("Steps: "));
 
         // Add a text field for each step
-        for(int i = 1; i < json.getInt("numSteps"); i++) {
+        for(int i = 1; i <= json.getInt("numSteps"); i++) {
             detailList.getChildren().add(new TextField(json.getString(String.valueOf(i))));
         }
 
