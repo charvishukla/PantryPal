@@ -29,7 +29,7 @@ public class App extends Application {
         Controller controller = new Controller(model, view);
         **/
         this.model = new Model();
-        // this.restController = new RestController(model);
+        this.restController = new RestController(model);
         this.view = new View(primaryStage);
         this.controller = new Controller(view, model);
         
@@ -41,6 +41,7 @@ public class App extends Application {
         if (model.getDatabase() != null) {
             model.getDatabase().close();
         }
+        System.exit(0);
     }
 
     public static void main(String[] args) {
