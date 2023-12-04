@@ -1,6 +1,5 @@
-/* View.css */
-
-.login-page-background {
+/* Setting the main background color here*/
+.create-account-page-background {
     -fx-background-color: #080710;
     background-color: #080710;
 }
@@ -24,7 +23,7 @@
     );;
 }
 
-/* Styling the main apptitle */
+/* Styling the main apptitle (same as for LoginPage)*/
 .app-title {
     -fx-font-family: 'Arial';
     font-family: 'Arial';
@@ -35,14 +34,13 @@
     -fx-text-fill: #ffffff; /* Change to white or any other color as needed */
 }
 
-
-/* Positioning the login form, also setting the transparent 
+/* Positioning the create account form, also setting the transparent 
 background styles. */
 .grid-pane {
     -fx-background-color: rgba(255, 255, 255, 0.13); 
     background-color: rgba(255, 255, 255, 0.13);
     -fx-padding: 25 25 25 25; 
-    padding: 25 25 25 25; 
+    padding: 25 10 25 10; 
     -fx-background-radius: 10;
     -fx-effect: dropshadow(gaussian, rgba(8, 7, 16, 0.7), 40, 0.0, 0, 0);
     -fx-border-radius: 10;
@@ -54,17 +52,18 @@ background styles. */
     -fx-vgap: 10;
 }
 
-/* styling the "Login" heading.*/
-.label-login {
+/* styling the "Create New Account" heading.*/
+.label-create-account {
     font-family: 'Arial';
     -fx-font-size: 32px;
-    font-size: 26px;
+    font-size: 32px;
     -fx-font-weight: 500;
     font-weight: 500;
     -fx-text-fill: #ffffff; 
 }
 
-/*Styles for labels on each textfield*/
+
+/* Styling all the labels for create account fields*/
 .label-common {
     -fx-font-size: 18px;
     font-size: 18px;
@@ -83,29 +82,28 @@ background styles. */
     padding: 10 10;
 }
 
-/*Buttons: */
-.button-login {
+/*Some minimal styling for create account button*/
+.button-create {
     -fx-background-color: #ffffff;
     background-color: #ffffff;
+    -fx-font-size: 20px;
+    font-size: 20px;
     -fx-text-fill: #080710;
     -fx-font-weight: 600;
     font-weight: 600;
     -fx-background-radius: 3;
-    -fx-padding: 10 10 10 10 ;
-    padding: 10 10 10 10 ;
+    -fx-padding: 15 15 15 15;
+    padding: 10 10 10 10;
 }
 
+/* Styling the "Already have an account?" button as a link*/
 .link-button-style {
     -fx-text-fill: #5DA9E9;
     -fx-underline: true;
     -fx-background-color: transparent;
+    -fx-font-size: 14px;
+    font-size: 14px;
     background-color: transparent;
     -fx-border-color: transparent;
     border-color: transparent;
-    /* -fx-padding: 5 0;* Reduced padding for less height */
 }
-
-.checkbox-style {
-    -fx-text-fill: #ffffff;
-}
-

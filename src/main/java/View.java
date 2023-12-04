@@ -144,88 +144,102 @@ class CreateAccountPage extends HBox {
     Button loginPageButton;
     
     CreateAccountPage(){
-        this.setPadding(new Insets(20, 20, 20, 20));
-        this.setStyle("-fx-background-color: #E5F4E3;");
+        this.getStyleClass().add("create-account-page");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/CreateAccountPage.css").toExternalForm());
+        
+        Circle shape1 = new Circle(120); 
+        shape1.getStyleClass().add("shape-blue");
+        shape1.setTranslateX(630); 
+        shape1.setTranslateY(-300);
+        shape1.setEffect(new GaussianBlur(10));
+        
+        Circle shape2 = new Circle(100);
+        shape2.getStyleClass().add("shape-orange");
+        shape2.setTranslateX(810); 
+        shape2.setTranslateY(291); 
+        shape2.setEffect(new GaussianBlur(10));
+
+        this.setPadding(new Insets(20, 0, 20, 0));
+        this.getStyleClass().add("create-account-page-background");
         this.setAlignment(Pos.CENTER);
         this.setSpacing(20);
 
         Label appTitle = new Label("PantryPal");
-        appTitle.setFont(Font.font("Arial", FontWeight.BOLD, 64));
-        appTitle.setPadding(new Insets(0, 20, 0, 0));
+        appTitle.getStyleClass().add("app-title");
+        appTitle.setMinWidth(Control.USE_PREF_SIZE); 
         appTitle.setMaxWidth(Double.MAX_VALUE);
-        appTitle.setAlignment(Pos.CENTER);
-        appTitle.setPrefWidth(500);
+        appTitle.setTranslateX(-250);
 
         GridPane gridPane = new GridPane();
-        gridPane.setAlignment(Pos.CENTER);
+        gridPane.getStyleClass().add("grid-pane");
+        gridPane.setMinWidth(580);
+        gridPane.setPrefHeight(200);
+        gridPane.setTranslateX(-95);
+        gridPane.setAlignment(Pos.BASELINE_LEFT);
         gridPane.setHgap(10);
         gridPane.setVgap(10);
-        gridPane.setPadding(new Insets(25, 25, 25, 25));
-        gridPane.setStyle("-fx-background-color: #FFFFFF; -fx-border-color: #CCCCCC; -fx-border-radius: 5px;");
 
-        String labelStyle = "-fx-font-size: 18;";
+
         Label createAccountLabel = new Label("Create New Account");
-        createAccountLabel.setStyle("-fx-font-size: 26; -fx-font-weight: bold;");
+        createAccountLabel.getStyleClass().add("label-create-account");
+        
         firstNameLabel = new Label("First Name: "); 
-        firstNameLabel.setStyle(labelStyle);
+        firstNameLabel.getStyleClass().add("label-common");
         firstName = new TextField();
-        
+        firstName.getStyleClass().add("text-field");
+
         lastNameLabel = new Label("Last Name: "); 
-        lastNameLabel.setStyle(labelStyle);
+        lastNameLabel.getStyleClass().add("label-common");
         lastName = new TextField(); 
-        
+        lastName.getStyleClass().add("text-field");
+
         usernameLabel = new Label("Username: "); 
-        usernameLabel.setStyle(labelStyle);
+        usernameLabel.getStyleClass().add("label-common");
         username= new TextField(); 
+        username.getStyleClass().add("text-field");
 
         phoneLabel = new Label("Mobile: ");
-        phoneLabel.setStyle(labelStyle);
+        phoneLabel.getStyleClass().add("label-common");
         phone = new TextField(); 
+        phone.getStyleClass().add("text-field");
         
         passwordLabel = new Label("Enter Password: "); 
-        passwordLabel.setStyle(labelStyle);
+        passwordLabel.getStyleClass().add("label-common");
         password = new TextField(); 
+        password.getStyleClass().add("text-field");
         
         passwordLabel2 = new Label("Re-enter Password: "); 
-        passwordLabel2.setStyle(labelStyle);
+        passwordLabel2.getStyleClass().add("label-common");
         password2 = new TextField(); 
-
+        password2.getStyleClass().add("text-field");
         createAccount = new Button("Create Account");
-        createAccount.setStyle("-fx-background-color: #5DA9E9 ; -fx-border-color: #CCCCCC;");
-        
-        String buttonStyle = "-fx-text-fill: #5DA9E9; -fx-underline: true; -fx-background-color: transparent; -fx-border-color: transparent;";
+        createAccount.getStyleClass().add("button-create;");
         loginPageButton = new Button("Aleady have an account?");
-        loginPageButton.setStyle(buttonStyle);
+        loginPageButton.getStyleClass().add("link-button-style");
 
         gridPane.add(createAccountLabel, 0, 0); 
         
         gridPane.add(firstNameLabel, 0, 1);
         gridPane.add(firstName, 1, 1);
-        
         gridPane.add(lastNameLabel, 0, 2);
         gridPane.add(lastName, 1, 2);
-        
         gridPane.add(usernameLabel, 0, 3);
         gridPane.add(username, 1, 3);
-        
         gridPane.add(phoneLabel, 0, 4);
         gridPane.add(phone, 1, 4);
-        
         gridPane.add(passwordLabel, 0, 5);
         gridPane.add(password, 1, 5);
-        
         gridPane.add(passwordLabel2, 0, 6);
         gridPane.add(password2, 1, 6);
        
         gridPane.add(createAccount, 1, 7); 
         GridPane.setMargin(createAccount, new Insets(10, 0, 0, 0));
         gridPane.add(loginPageButton, 1, 8); 
-
        
         HBox.setHgrow(gridPane, Priority.ALWAYS);
 
         
-        this.getChildren().addAll(appTitle, gridPane);
+        this.getChildren().addAll(shape1, shape2, appTitle, gridPane);
     }
 
     public void setLoginPageButtonAction(EventHandler<ActionEvent> eventHandler) {
@@ -335,21 +349,27 @@ class LoginPage extends HBox {
         
         usernameLabel = new Label("Username:");
         usernameLabel.getStyleClass().add("label-common");
+        
         usernameTextField = new TextField();
+        usernameTextField.getStyleClass().add("text-field");
 
         passwordLabel = new Label("Password:");
         passwordLabel.getStyleClass().add("label-common");
+        
         passwordTextField = new TextField();
-
+        passwordTextField.getStyleClass().add("text-field");
+        
         loginButton = new Button("Login");
         loginButton.getStyleClass().add("button-login");
+        
         forgotPasswordButton = new Button("Forgot Password?");
         forgotPasswordButton.getStyleClass().add("link-button-style");
+        
         createAccountButton = new Button("Don't have an account?");
         createAccountButton.getStyleClass().add("link-button-style");
+        
         autoLoginCheckBox = new CheckBox("Remember me");
         autoLoginCheckBox.getStyleClass().add("checkbox-style");
-
 
         gridPane.add(loginLabel, 1, 0);
         gridPane.add(usernameLabel, 0, 1);
