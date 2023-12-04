@@ -72,9 +72,9 @@ public class Model {
         audioRecorder.stopRecording();
     }
 
-    public List<String> getNewRecipe(String mealType, String ingredients) {
+    public JSONObject getNewRecipe(String mealType, String ingredients) {
         String prompt = ChatGPT.formPrompt(mealType, ingredients);
-        List<String> response = ChatGPT.generateRecipe(prompt);
+        JSONObject response = ChatGPT.generateRecipe(prompt);
         return response;
     }
     

@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
+
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
@@ -198,7 +200,7 @@ public class Controller {
 
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
-        List<String> response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
+        JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
