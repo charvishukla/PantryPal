@@ -70,7 +70,13 @@ public class Controller {
         String username = authManager.SkipLoginIfRemembered();
         if(username != null){
             view.getAppFrame().getHeader().setUsername(username);
-            setupRecipeCardsDetailsAction();
+            try {
+                setupRecipeCardsDetailsAction();
+            }
+            catch (Exception e) {
+                log.error(e.toString());
+                e.printStackTrace();
+            }
             view.switchScene(this.view.getAppFrame());
         }
     }
@@ -78,6 +84,7 @@ public class Controller {
     private List<String> getAllTitles(String username) throws
     IOException, InterruptedException, URISyntaxException {
         // Create the request object
+        username = username.replaceAll(" ", "%20");
         HttpRequest request = HttpRequest
         .newBuilder()
         .uri(URI.create(API_ENDPOINT + "/recipe?title=&user=" + username))
@@ -98,6 +105,26 @@ public class Controller {
         }
 
         return titles;
+    }
+
+    private JSONObject getRecipe(String title, String username) throws
+    IOException, InterruptedException, URISyntaxException {
+        // Create the request object
+        title = title.replaceAll(" ", "%20");
+        username = username.replaceAll(" ", "%20");
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe?title=" + title + "&user=" + username))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject responseJSON = new JSONObject(response.body());
+        return responseJSON;
     }
 
     private void handleFilterBoxClick(ActionEvent event) {
@@ -180,7 +207,13 @@ public class Controller {
             }
             view.switchScene(this.view.getAppFrame());
             view.getAppFrame().getHeader().setUsername(username);
-            setupRecipeCardsDetailsAction();
+            try {
+                setupRecipeCardsDetailsAction();
+            }
+            catch (Exception e) {
+                log.error(e.toString());
+                e.printStackTrace();
+            }
         }else{
             view.getLoginPage().showAlert();
         }
@@ -237,37 +270,32 @@ public class Controller {
     /**
      * 
      */
-    private void setupRecipeCardsDetailsAction() {
-
+    private void setupRecipeCardsDetailsAction() throws 
+    IOException, InterruptedException, URISyntaxException {
+        final String username = this.view.getAppFrame().getHeader().getUsername();
         //Returns a list of titles of each recipe in database;
-        List<String> titles = new ArrayList<String>();
-        try {
-            titles = getAllTitles(this.view.getAppFrame().getHeader().getUsername());
-        }
-        catch (Exception e) {
-            log.error(e.toString());
-        }
-        // JSONArray titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername()); //TODO
+        List<String> titles = getAllTitles(username);
+        // JSONArray titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername());
         //System.out.println(titles.get(0));
 
         //A JSONObject to store title, ingredients, and step by step recipe.
-        JSONObject response;
+        JSONObject recipeJSON;
 
         for(String title : titles){
             //Generate the recipe detail page.
-            response = model.getDatabase().get(title); //TODO
-            Instant oldTime = Instant.parse(response.getString("ImageTime"));
+            recipeJSON = getRecipe(title, username);
+            Instant oldTime = Instant.parse(recipeJSON.getString("ImageTime"));
             if(!Helper._checkImageValid(Instant.now(), oldTime)){
-                String newURL = this.model.getNewImage(title);
-                response.put("Image", newURL);
-                response.put("ImageTime", Instant.now().toString());
-                model.getDatabase().updateImage(title, newURL);
-                model.getDatabase().updateImageTime(title, response.getString("ImageTime"));
+                String newURL = this.model.getNewImage(title); //TODO
+                recipeJSON.put("Image", newURL);
+                recipeJSON.put("ImageTime", Instant.now().toString());
+                model.getDatabase().updateImage(title, newURL); //TODO
+                model.getDatabase().updateImageTime(title, recipeJSON.getString("ImageTime")); //TODO
             }
-            RecipeDetailPage deet = new RecipeDetailPage(response);
+            RecipeDetailPage deet = new RecipeDetailPage(recipeJSON);
 
-            RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"), response.getString("Time"));
-            newRecipe.setImage(response.getString("Image"));
+            RecipeCard newRecipe = new RecipeCard(title, recipeJSON.getString("MealType"), recipeJSON.getString("Time"));
+            newRecipe.setImage(recipeJSON.getString("Image"));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});

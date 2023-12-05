@@ -54,6 +54,7 @@ public class RestController {
                         log.error("Title is null");
                         throw new BadRequestResponse();
                     }
+                    title = title.replaceAll("%20", " ");
                     String username = ctx.queryParam("user");
                     if (username == null || username.equals("")) {
                         log.error("Username is null");
@@ -66,7 +67,7 @@ public class RestController {
                         ctx.json(responseBody.toString());
                     }
                     else {
-                        log.info("Title queried: " + title);
+                        log.debug("Title queried: " + title);
                         String recipeString = model.getDatabase().get(title).toString();
                         if (recipeString.equals("{}")) {
                             throw new NotFoundResponse();
