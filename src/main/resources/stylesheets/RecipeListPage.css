@@ -1,0 +1,43 @@
+.recipe-list-page {
+    -fx-background-color: #080710;
+    background-color: #080710;
+}
+
+/* Styling the circles */
+.shape-pink {
+    -fx-fill: linear-gradient(
+        from 0% 0% to 100% 100%, #b336a2, #f59de9  
+    );;
+    fill: linear-gradient(
+        from 0% 0% to 100% 100%, #b336a2, #f59de9  
+    );;
+}
+
+.shape-blue {
+    -fx-fill: linear-gradient(
+        from 0% 0% to 100% 100%, #1845ad, #23a2f6
+    );;
+    fill: linear-gradient(
+        from 0% 0% to 100% 100%, #1845ad, #23a2f6
+    );;
+}
+
+
+.shape-yellow {
+    -fx-fill: linear-gradient(
+        from 0% 0% to 100% 100%, #d9cc1e, #faf6bb
+    );;
+    fill: linear-gradient(
+        from 0% 0% to 100% 100%, #d9cc1e, #faf6bb
+    );;
+}
+
+.my-recipes {
+    -fx-font-family: 'Chillight'  !important;
+    font-family: 'Chillight' !important;
+    -fx-font-size: 36px;
+    font-size: 36px;
+    -fx-text-fill: #fff;
+    -fx-padding: 25, 0, 35, 0;
+    padding: 25, 0, 35, 0;
+}
