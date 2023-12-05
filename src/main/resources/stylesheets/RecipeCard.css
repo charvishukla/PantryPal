@@ -1,6 +1,6 @@
 .recipe-card {
-    -fx-background-color: #fff;
-    background-color: #fff;
+    -fx-background-color: rgba(255, 255, 255, 0.30);
+    background-color: rgba(255, 255, 255, 0.30);
     -fx-background-radius: 16;
     -fx-padding: 20;
     padding: 20;
@@ -13,18 +13,18 @@
     -fx-text-fill: #141b22; 
 }
 
-.info {
+.meal-type {
     -fx-font-size: 14;
     font-size: 14;
     -fx-text-fill: #a0a0a0;
 }
 
 .button {
-    -fx-background-color:  rgba(255, 255, 255, 0.6);
-    background-color: rgba(255, 255, 255, 0.6);
-    -fx-border-color: #6558d3; 
-    border-color: #6558d3;
-    -fx-text-fill: #6558d3;
+    -fx-background-color:  #fff;
+    background-color: #fff;
+    -fx-border-color: #1845ad; 
+    border-color: #1845ad;
+    -fx-text-fill: #1845ad;
     -fx-font-weight: bold;
     font-weight: bold;
     -fx-padding: 10;
@@ -33,7 +33,7 @@
 }
 
 .button:hover {
-    -fx-background-color: #6558d3;
-    background-color: #6558d3;
+    -fx-background-color: #23a2f6;
+    background-color: #23a2f6;
     -fx-text-fill: white;
 }

@@ -4,7 +4,7 @@
 }
 
 /* Styling the circles */
-.shape-blue {
+.shape-pink {
     -fx-fill: linear-gradient(
         from 0% 0% to 100% 100%, #b336a2, #f59de9  
     );;
@@ -13,7 +13,7 @@
     );;
 }
 
-.shape-orange {
+.shape-blue {
     -fx-fill: linear-gradient(
         from 0% 0% to 100% 100%, #1845ad, #23a2f6
     );;
@@ -32,3 +32,12 @@
     );;
 }
 
+.my-recipes {
+    -fx-font-family: 'Arial'; 
+    font-family: 'Arial'; 
+    -fx-font-size: 36px;
+    font-size: 36px;
+    -fx-text-fill: #fff;
+    -fx-padding: 25, 0, 35, 0;
+    padding: 25, 0, 35, 0;
+}

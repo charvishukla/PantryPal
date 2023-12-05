@@ -465,6 +465,9 @@ class LoginPage extends HBox {
 
 }
 
+/**
+ * Class: Header
+ */
 class Header extends HBox {
     Button homeButton;
     Button profileButton;
@@ -632,22 +635,41 @@ class DetailFooter extends HBox {
  * Extends GridPane to display recipes in a grid layout
  * Each recipe is added to the grid, with a maximum of 4 recipes per row
  */
-class RecipeList extends GridPane {
-    private final int maxColumn = 4; // we will have 4 recipes per column
+
+ class RecipeList extends VBox {
+    private final int maxColumn = 3; // we will have 4 recipes per column
     private Label myRecipes;
+    private GridPane gridPane;
 
     public RecipeList() {
+        // import stylesheet
         this.getStyleClass().add("recipe-list-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeListPage.css").toExternalForm());
 
+        // create heading lable
+        myRecipes = new Label("My Recipes");
+        myRecipes.getStyleClass().add("my-recipes");
+        myRecipes.setTranslateX(470);
+
+        gridPane = new GridPane();
+        gridPane.getStyleClass().add("grid-pane");
+        gridPane.setMinWidth(1240);
+        gridPane.setTranslateX(75);
+        GridPane.setMargin(myRecipes, new Insets(25, 25, 25, 25));
+        gridPane.add(myRecipes, 0, 0);
+        gridPane.setHgap(47);
+        gridPane.setVgap(35);
+    
+
+        // SHAPES FOR STYLE
         Circle shape1 = new Circle(120);
-        shape1.getStyleClass().add("shape-blue");
+        shape1.getStyleClass().add("shape-pink");
         shape1.setTranslateX(630);
-        shape1.setTranslateY(-300);
+        shape1.setTranslateY(50);
         shape1.setEffect(new GaussianBlur(10));
 
         Circle shape2 = new Circle(130);
-        shape2.getStyleClass().add("shape-orange");
+        shape2.getStyleClass().add("shape-blue");
         shape2.setTranslateX(630);
         shape2.setTranslateY(-100);
         shape2.setEffect(new GaussianBlur(10));
@@ -658,30 +680,20 @@ class RecipeList extends GridPane {
         shape3.setTranslateY(-10);
         shape3.setEffect(new GaussianBlur(10));
 
-        this.setHgap(15); // horizontal gap in the grid
-        this.setVgap(15); // vertical gap in the grid
-        this.setPadding(new Insets(25));
-
-        myRecipes = new Label("My Recipes");
-        myRecipes.getStyleClass().add("my-recipes");
-        this.getChildren().addAll(shape1, shape2, shape3, myRecipes);
+        this.getChildren().addAll(myRecipes, gridPane);
     }
 
     public void addRecipeCard(RecipeCard card) {
-        for (int i = 1; i <= getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i - 1);
-            this.setRowIndex(currentCard, i / maxColumn);
-            this.setColumnIndex(currentCard, i % maxColumn);
-        }
-
-        this.add(card, 0, 0);
+    // Add the card first
+        int numCards = getRecipeCards().size() ;
+        int row_idx = numCards / maxColumn; 
+        int col_idx = numCards % maxColumn;
+        
+        this.gridPane.add(card, col_idx, row_idx);
     }
 
     public void deleteRecipeCard(String title) {
         int index = getRecipeCards().size();
-        // int row = index / maxColumn;
-        // int column = index % maxColumn;
-
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
             if (title.equals(currentCard.getRecipeTitle())) {
@@ -692,8 +704,8 @@ class RecipeList extends GridPane {
         // Update indices
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
-            this.setRowIndex(currentCard, i / maxColumn);
-            this.setColumnIndex(currentCard, i % maxColumn);
+            GridPane.setRowIndex(currentCard, i / maxColumn);
+            GridPane.setColumnIndex(currentCard, i % maxColumn);
         }
     }
 
@@ -713,15 +725,19 @@ class RecipeList extends GridPane {
 
     public List<RecipeCard> getRecipeCards() {
         // Assuming all children of RecipeList are RecipeCards
-        return getChildren().stream()
+        return this.gridPane.getChildren().stream()
                 .filter(node -> node instanceof RecipeCard)
                 .map(node -> (RecipeCard) node)
                 .collect(Collectors.toList());
     }
-
 }
 
+/**
+ * Class: RecipeCard
+ */
 class RecipeCard extends VBox {
+    private static final double CARD_WIDTH = 330;
+    private static final double CARD_HEIGHT = 340; 
     private String recipeTitle;
     private String mealType;
     private Button detailsButton;
@@ -730,7 +746,10 @@ class RecipeCard extends VBox {
     public RecipeCard(String title, String mealType) {
         this.getStyleClass().add("recipe-card");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeCard.css").toExternalForm());
-
+        this.setPrefSize(CARD_WIDTH, CARD_HEIGHT);
+        this.setMinSize(CARD_WIDTH, CARD_HEIGHT);
+        this.setMaxSize(CARD_WIDTH, CARD_HEIGHT);
+        this.setPadding(new Insets(10, 10, 10, 10));
         this.recipeTitle = title;
         this.mealType = mealType;
 
@@ -738,7 +757,7 @@ class RecipeCard extends VBox {
         titleLabel.getStyleClass().add("title");
 
         Label mealTypeLabel = new Label(mealType);
-        mealTypeLabel.getStyleClass().add("info");
+        mealTypeLabel.getStyleClass().add("meal-type");
 
         detailsButton = new Button("Learn more");
         detailsButton.getStyleClass().add("button");
