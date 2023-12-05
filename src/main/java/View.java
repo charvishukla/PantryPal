@@ -236,7 +236,7 @@ class CreateAccountPage extends HBox {
         password2 = new TextField();
         password2.getStyleClass().add("text-field");
         createAccount = new Button("Create Account");
-        createAccount.getStyleClass().add("button-create;");
+        createAccount.getStyleClass().add("button-create");
         loginPageButton = new Button("Aleady have an account?");
         loginPageButton.getStyleClass().add("link-button-style");
 
@@ -482,7 +482,6 @@ class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button logoutButton;
-    Button savedRecipesButton;
     String username;
     ComboBox<String> filterBox;
     ComboBox<String> sortingBox;
@@ -501,19 +500,23 @@ class Header extends HBox {
         profileButton.getStyleClass().add("my-profile-button");
         profileButton.setTranslateY(25);
 
-        this.savedRecipesButton = new Button("Saved");
-        savedRecipesButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
-
-        //Filter setup and style
         Label filterLabel = new Label("Filter:");
-        filterLabel.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        filterLabel.getStyleClass().add("filter-label");
+        filterLabel.setTranslateY(25);
+        filterLabel.setTranslateX(-45);
+        
+        
         String[] filter = {"all", "breakfast", "lunch", "dinner"};
         this.filterBox = new ComboBox<String>(FXCollections.observableArrayList(filter));
-        filterBox.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
+        filterBox.getStyleClass().add("filter-box");
         filterBox.getSelectionModel().selectFirst();
+        filterBox.setTranslateY(15);
+        filterLabel.setTranslateX(-35);
+    
+        logoutButton = new Button("Sign Out");
+        logoutButton.getStyleClass().add("logout-button");
+        logoutButton.setTranslateY(15);
+        
 
         //Sorting setup and style
         Label sortingLabel = new Label("Sorting:");
@@ -530,7 +533,8 @@ class Header extends HBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, sortingLabel, sortingBox, savedRecipesButton, profileButton);
+        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox,sortingLabel, sortingBox, logoutButton, profileButton);
+
     }
 
     public void setProfileButtonOnAction(EventHandler<ActionEvent> eventHandler) {
@@ -553,6 +557,11 @@ class Header extends HBox {
     public void setFilterBoxOnAction (EventHandler<ActionEvent> eventHandler) {
         filterBox.setOnAction(eventHandler);
     }
+
+    public void setLogoutButtonOnAction(EventHandler<ActionEvent> eventHandler){
+        logoutButton.setOnAction(eventHandler);
+    }
+
 
     public ComboBox<String> getSortingBox(){
         return this.sortingBox;
@@ -793,6 +802,11 @@ class DetailFooter extends HBox {
         this.gridPane.getChildren().clear();
     }
 
+    public void deleteAll(){
+        deleteAllOnScene();
+        this.recipeCards.clear();
+    }
+
     public boolean checkRecipeExists(String title) {
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
@@ -925,7 +939,7 @@ class RecipeDetailPage extends BorderPane {
 
 
        
-        // initializing 
+    // initializing 
     RecipeDetailPage(JSONObject json){
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
@@ -997,7 +1011,9 @@ class RecipeDetailPage extends BorderPane {
     public List<String> getSteps(){
         List<String> steps = new ArrayList<>();
         for (int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++) {
-            steps.add(((Label) detailList.getChildren().get(i)).getText());
+            if (detailList.getChildren().get(i) instanceof TextField) {
+                steps.add(((TextField) detailList.getChildren().get(i)).getText());
+            }
         }
         return steps;
     }
