@@ -69,6 +69,19 @@ public class Model {
         return message;
     }
 
+    public String audioToText(File file) {
+        String message = "";
+        try {
+            message = Whisper.audioToText(new File("recording.wav"));
+        } catch (IOException e) {
+            e.printStackTrace(); // or handle the exception in an appropriate way
+        } catch (URISyntaxException e) {
+            e.printStackTrace(); // or handle the exception in an appropriate way
+        }
+
+        return message;
+    }
+
     public void startRecording(){
         audioRecorder.startRecording();
     }
@@ -436,6 +449,7 @@ class Database{
         // ArrayList<String> recipeDetail = new ArrayList<>();
         JSONObject recipeJSON = new JSONObject();
         if(recipe != null) {
+            recipeJSON.put("id", recipe.getString("_id"));
             recipeJSON.put("Title", recipe.getString("Title"));
             recipeJSON.put("Ingredients", recipe.getString("Ingredients"));
             List<Document> stepList = (List<Document>)recipe.get("Steps");

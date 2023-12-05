@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import java.io.File;
+
 public class RestController {
     Model model;
 
@@ -99,6 +101,11 @@ public class RestController {
 
         app.ws("ws/audio", ws -> {
             ws.onConnect(ctx -> log.info("Client connected to WebSocket"));
+            ws.onMessage(ctx -> {
+                File file = ctx.messageAsClass(File.class);
+                ctx.send(model.audioToText(file));
+            });
+            ws.onClose(ctx -> log.info("Connection to WebSocket closed"));
         });
 
         app.exception(Exception.class, (e, ctx) -> {
