@@ -45,7 +45,25 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
 
     testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
 }
+
+test {
+    // If you want to always show standard out and standard error
+    testLogging.showStandardStreams = true
+
+    // Alternatively, you can configure it to only show output for failed tests
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat 'full'
+        showExceptions true
+        showCauses true
+        showStackTraces true
+        showStandardStreams = true
+    }
+}
+
 
 application {
     mainClass = 'App'
