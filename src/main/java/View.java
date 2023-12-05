@@ -6,6 +6,9 @@ import javafx.collections.FXCollections;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.json.JSONObject;
+
 // Event Handling
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -707,7 +710,7 @@ class RecipeDetailPage extends BorderPane {
         this.setBottom(detailFooter);
     }
 
-    RecipeDetailPage(List<String> s){
+    RecipeDetailPage(JSONObject json){
         this.setStyle("-fx-background-color: #E5F4E3;");
         header = new Header();
         detailFooter = new DetailFooter();
@@ -716,10 +719,10 @@ class RecipeDetailPage extends BorderPane {
         scroller.setFitToWidth(true); 
         scroller.setFitToHeight(true);
 
-        Label title = new Label(Helper._splitTitle(s));
+        Label title = new Label(json.getString("Title"));
         detailList.getChildren().add(title);
 
-        String[] ingredList = Helper._splitIngred(s);
+        String[] ingredList = json.getString("Ingredients").replaceAll("\n+", "\n").split("\n");
         ingredientsSize = 0;
         for(String i: ingredList){
             Label ingredients = new Label(i); 
@@ -730,8 +733,9 @@ class RecipeDetailPage extends BorderPane {
         detailList.getChildren().add(new Label(" "));
         detailList.getChildren().add(new Label("Steps: "));
 
-        for(int i = 2; i < s.size() - 1; i++) {
-            detailList.getChildren().add(new TextField(s.get(i)));
+        // Add a text field for each step
+        for(int i = 1; i <= json.getInt("numSteps"); i++) {
+            detailList.getChildren().add(new TextField(json.getString(String.valueOf(i))));
         }
 
         this.setTop(header);

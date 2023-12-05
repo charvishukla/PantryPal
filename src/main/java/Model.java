@@ -43,18 +43,37 @@ import java.util.Map;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import java.security.SecureRandom;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Model {
     private AudioRecorder audioRecorder;
     private Database db;
+    private Authentication authManager;
+    private Logger log = LoggerFactory.getLogger(Model.class);
 
     public Model() {
         this.audioRecorder = new AudioRecorder();
         this.db = new Database();
+        this.authManager = new Authentication();
     }
 
     public String audioToText() {
         String message = "";
 
+        try {
+            message = Whisper.audioToText(new File("recording.wav"));
+        } catch (IOException e) {
+            e.printStackTrace(); // or handle the exception in an appropriate way
+        } catch (URISyntaxException e) {
+            e.printStackTrace(); // or handle the exception in an appropriate way
+        }
+
+        return message;
+    }
+
+    public String audioToText(File file) {
+        String message = "";
         try {
             message = Whisper.audioToText(new File("recording.wav"));
         } catch (IOException e) {
@@ -75,14 +94,19 @@ public class Model {
         audioRecorder.stopRecording();
     }
 
-    public List<String> getNewRecipe(String mealType, String ingredients) {
+    public JSONObject getNewRecipe(String mealType, String ingredients) {
         String prompt = ChatGPT.formPrompt(mealType, ingredients);
-        List<String> response = ChatGPT.generateRecipe(prompt);
+        JSONObject response = ChatGPT.generateRecipe(prompt);
+        response.put("MealType", mealType);
         return response;
     }
     
     public Database getDatabase(){
         return db;
+    }
+
+    public AudioRecorder getAudioRecorder() {
+        return audioRecorder;
     }
 
 }
@@ -142,21 +166,22 @@ class ChatGPT {
         return prompt;
     }
 
-    public static List<String> generateRecipe(String prompt) {
-        List<String> response = new ArrayList<>();
+    public static JSONObject generateRecipe(String prompt) {
+        JSONObject response = new JSONObject();
         try{
             String originalResponse = ChatGPT.generate(prompt);
             String[] parts = originalResponse.split("\n\n", 3);
             String[] tidyParts = new String[] {parts[0].replace("Title: ", ""), parts[1], parts[2].replace("Steps:\n", "")};
-            response.add(tidyParts[0]);
-            response.add(tidyParts[1]);
+            response.put("Title", tidyParts[0]);
+            response.put("Ingredients", tidyParts[1]);
             String tidySteps = tidyParts[2].replaceAll("\n+", "\n");
             String[] steps = tidySteps.split("\n");
-            for(String s: steps) {
-                if(!s.isEmpty()) {
-                    response.add(s);
+            for(int i = 0; i < steps.length; i++) {
+                if(!steps[i].isEmpty()) {
+                    response.put(String.valueOf(i+1), steps[i]);
                 }
-            }          
+            }
+            response.put("numSteps", steps.length);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -384,11 +409,12 @@ class Whisper {
     }
 }
 
-class Database{
+class Database {
     private String uri;
     private MongoClient client;
     private MongoDatabase database;
     private MongoCollection<Document> recipeCollection;
+    private Logger log = LoggerFactory.getLogger(Database.class);
 
     public Database(){
         this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
@@ -406,35 +432,42 @@ class Database{
         }
     }
 
-    public void insert(List<String> recipeDetail, String username) {
+    public void insert(JSONObject recipeJSON) {
         List<Document> stepList = new ArrayList<>();
-        for(int i = 2; i < recipeDetail.size() - 1; i++) {
-            stepList.add(new Document("Step", recipeDetail.get(i)));
+        for(int i = 1; i <= recipeJSON.getInt("numSteps"); i++) {
+            stepList.add(new Document("Step", recipeJSON.get(String.valueOf(i))));
         }
 
         Document recipe = new Document("_id", new ObjectId());
-        recipe.append("Title", recipeDetail.get(0))
-              .append("Ingredients", recipeDetail.get(1))
+        recipe.append("Title", recipeJSON.getString("Title"))
+              .append("Ingredients", recipeJSON.getString("Ingredients"))
               .append("Steps", stepList)
-              .append("MealType", recipeDetail.get(recipeDetail.size()-1))
-              .append("User", username);
+              .append("MealType", recipeJSON.getString("MealType"))
+              .append("User", recipeJSON.getString("User"));
 
         recipeCollection.insertOne(recipe);
     }
 
-    public ArrayList<String> get(String title) {
+    public JSONObject get(String title) {
         Document recipe = recipeCollection.find(new Document("Title", title)).first();
-        ArrayList<String> recipeDetail = new ArrayList<>();
+        // ArrayList<String> recipeDetail = new ArrayList<>();
+        JSONObject recipeJSON = new JSONObject();
         if(recipe != null) {
-            recipeDetail.add(recipe.getString("Title"));
-            recipeDetail.add(recipe.getString("Ingredients"));
+            recipeJSON.put("id", recipe.get("_id").toString());
+            recipeJSON.put("Title", recipe.getString("Title"));
+            recipeJSON.put("Ingredients", recipe.getString("Ingredients"));
             List<Document> stepList = (List<Document>)recipe.get("Steps");
-            for(Document step: stepList) {
-                recipeDetail.add(step.getString("Step"));
+            for (int i = 0; i < stepList.size(); i++) {
+                recipeJSON.put(String.valueOf(i+1), stepList.get(i).getString("Step"));
             }
-            recipeDetail.add(recipe.getString("MealType"));
+            recipeJSON.put("MealType", recipe.getString("MealType"));
+            recipeJSON.put("User", recipe.getString("User"));
+            recipeJSON.put("numSteps", stepList.size());
         }
-        return recipeDetail;
+        else {
+            log.error(String.format("Title '%s' not found in database", title));
+        }
+        return recipeJSON;
     }
 
     public void updateIngredient(String title, String newIngredient) {
