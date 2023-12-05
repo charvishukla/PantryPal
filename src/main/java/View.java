@@ -1,5 +1,7 @@
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+
 // Utils 
 import java.util.ArrayList;
 import java.util.List;
@@ -371,6 +373,7 @@ class Header extends HBox {
     Button savedRecipesButton;
     Button logoutButton;
     String username;
+    ComboBox<String> filterBox;
 
     Header() {
         // Style the header background
@@ -390,13 +393,22 @@ class Header extends HBox {
         this.savedRecipesButton = new Button("Saved");
         savedRecipesButton.setStyle(
                 "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+
+        Label filterLabel = new Label("Filter:");
+        filterLabel.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        String[] filter = {"all", "breakfast", "lunch", "dinner"};
+        this.filterBox = new ComboBox<String>(FXCollections.observableArrayList(filter));
+        filterBox.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
+        filterBox.getSelectionModel().selectFirst();
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, savedRecipesButton, profileButton);
+        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, savedRecipesButton, profileButton);
     }
 
     public void setProfileButtonOnAction (EventHandler<ActionEvent> eventHandler) {
@@ -410,6 +422,14 @@ class Header extends HBox {
 
     public String getUsername(){
         return username;
+    }
+
+    public ComboBox<String> getFilterBox(){
+        return this.filterBox;
+    }
+
+    public void setFilterBoxOnAction (EventHandler<ActionEvent> eventHandler) {
+        filterBox.setOnAction(eventHandler);
     }
 
 }

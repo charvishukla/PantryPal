@@ -17,6 +17,9 @@ public class Controller {
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
+
+        //Filter and Sorting
+        this.view.getAppFrame().getHeader().setFilterBoxOnAction(this::handleFilterBoxClick);
         
         // Login Page
         this.view.getLoginPage().setCreateAccountButtonAction(this::handleCreateAccountButtonClick);
@@ -45,6 +48,30 @@ public class Controller {
             view.switchScene(this.view.getAppFrame());
         }
 
+    }
+
+    private void handleFilterBoxClick(ActionEvent event) {
+        String filter = this.view.getAppFrame().getHeader().getFilterBox().getValue();
+        RecipeList recipeList = this.view.getAppFrame().getRecipeList();
+        List<RecipeCard> recipeCards = recipeList.getRecipeCards();
+        if(filter == "all") {
+            for(int i = 0; i < recipeCards.size(); i++) {
+                recipeCards.get(i).setVisible(true);
+                recipeCards.get(i).setManaged(true);
+            }
+        } else {
+            for(int i = 0; i < recipeCards.size(); i++) {
+                RecipeCard temp = recipeCards.get(i);
+                if(temp.getMealType().equals(filter)) {
+                    temp.setVisible(true);
+                    temp.setManaged(true);
+                } else {
+                    temp.setVisible(false);
+                    temp.setManaged(false);
+                }
+                
+            }
+        }
     }
 
     private void handleLoginButtonClick(ActionEvent event) {
