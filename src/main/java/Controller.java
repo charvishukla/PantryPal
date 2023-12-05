@@ -228,6 +228,7 @@ public class Controller {
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
         JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
+        response.put("User", this.view.getAppFrame().getHeader().getUsername());
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
@@ -237,7 +238,7 @@ public class Controller {
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
-                        model.getDatabase().insert(response, this.view.getAppFrame().getHeader().getUsername()); //TODO
+                        model.getDatabase().insert(response); //TODO
                     } else {
                         model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps()); //TODO
                     }

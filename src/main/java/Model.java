@@ -432,7 +432,7 @@ class Database {
         }
     }
 
-    public void insert(JSONObject recipeJSON, String username) {
+    public void insert(JSONObject recipeJSON) {
         List<Document> stepList = new ArrayList<>();
         for(int i = 1; i <= recipeJSON.getInt("numSteps"); i++) {
             stepList.add(new Document("Step", recipeJSON.get(String.valueOf(i))));
@@ -443,7 +443,7 @@ class Database {
               .append("Ingredients", recipeJSON.getString("Ingredients"))
               .append("Steps", stepList)
               .append("MealType", recipeJSON.getString("MealType"))
-              .append("Users", username);
+              .append("User", recipeJSON.getString("User"));
 
         recipeCollection.insertOne(recipe);
     }
@@ -461,6 +461,7 @@ class Database {
                 recipeJSON.put(String.valueOf(i+1), stepList.get(i).getString("Step"));
             }
             recipeJSON.put("MealType", recipe.getString("MealType"));
+            recipeJSON.put("User", recipe.getString("User"));
             recipeJSON.put("numSteps", stepList.size());
         }
         else {

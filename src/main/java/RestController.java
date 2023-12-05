@@ -42,13 +42,20 @@ public class RestController {
                     model.getDatabase().insert(requestBody);
                 });
                 
+                // Get Recipe Title(s)
                 get(ctx -> {
-                    if (ctx.queryString() == null) {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("Title");
+                    String username = requestBody.getString("User");
+                    if (title.equals("")) {
                         log.debug("Getting all titles");
-                        ctx.json(model.getDatabase().getAllTitles());
+                        ctx.json(model.getDatabase().getAllTitles(username));
                     }
                     else {
-                        String title = ctx.queryParam("title");
                         log.debug("Title queried: " + title);
                         ctx.json(model.getDatabase().get(title).toString());
                     }
