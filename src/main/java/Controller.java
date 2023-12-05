@@ -41,9 +41,13 @@ public class Controller {
          * a user.
          */
         Authentication authManager = new Authentication();
-        if(authManager.SkipLoginIfRemembered()){
+        String username = authManager.SkipLoginIfRemembered();
+        if(username != null){
+            view.getAppFrame().getHeader().setUsername(username);
+            setupRecipeCardsDetailsAction();
             view.switchScene(this.view.getAppFrame());
         }
+        
 
     }
 
