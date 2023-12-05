@@ -674,27 +674,3 @@ class UserSession {
     }
 }
 
-// class UserSessionService {
-//     private static UserSessionService instance;
-//     private UserSession currentUserSession;
-
-//     private UserSessionService() {
-//         // Private constructor to enforce singleton pattern
-//     }
-
-//     public static UserSessionService getInstance() {
-//         if (instance == null) {
-//             System.out.println
-//             instance = new UserSessionService();
-//         }
-//         return instance;
-//     }
-
-//     public UserSession getCurrentUserSession() {
-//         return currentUserSession;
-//     }
-
-//     public void setCurrentUserSession(UserSession userSession) {
-//         currentUserSession = userSession;
-//     }
-// }

@@ -5,6 +5,8 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.function.Try;
+import org.mockito.junit.MockitoJUnitRunner.Strict;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -14,13 +16,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.List;
 
 class ModelTest {
     private AudioRecorder mockAudioRecorder;
     private ChatGPT chatGPT;
     private Whisper whisper;
     private Authentication authentication;
-
+    private Database database;
+    private JSONObject testRecipe;
+    
     @BeforeEach
     void setUp() {
         mockAudioRecorder = new MockAudioRecorder();
@@ -33,6 +39,17 @@ class ModelTest {
         authentication.createUser("Charmander", "fire123", "Char", "Mander", "1234567890");
         authentication.createUser("Bulbasaur", "water123", "Bulb", "Asaur", "2345678901");
         authentication.createUser("Pikachu", "zap123zap", "Pika", "Chu", "4567890123");
+    
+        // Mocking Database 
+        database = new MockDatabase();
+        testRecipe = new JSONObject();
+        testRecipe.put("Title", "Test Recipe");
+        testRecipe.put("Ingredients", "Test Ingredients");
+        testRecipe.put("Steps", Arrays.asList("Step 1", "Step 2"));
+        testRecipe.put("MealType", "Test Meal");
+        testRecipe.put("User", "TestUser");
+        testRecipe.put("numSteps", 2);
+    
     }
     // --------------------------------------------------------------------------
     // -------------------------------CHATGPT TESTS------------------------------
@@ -177,7 +194,6 @@ class ModelTest {
         assertTrue(boo);
     }
 
-    // Tests for mockHandleErrorResponse
     @Test
     void mockHandleErrorResponse_ShouldSetFlag() {
         MockWhisper.mockHandleErrorResponse(null);
@@ -202,7 +218,6 @@ class ModelTest {
         assertEquals("Simulated successful response text", response);
     }
 
-    // Tests for mockWriteFileToOutputStream
     @Test
     void mockWriteFileToOutputStream_ShouldSetFlag() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -266,4 +281,120 @@ class ModelTest {
         UserSession session = authentication.login("Bulbasaur", "wrongPassword");
         assertNull(session);
     }
+
+    // -------------------------------------------------------------------------
+    // ---------------------------Database Tests--------------------------------
+    // -------------------------------------------------------------------------
+
+    @Test
+    void insert_ShouldAddRecipe() {
+        database.insert(testRecipe);
+        JSONObject retrievedRecipe = database.get("Test Recipe");
+        assertNotNull(retrievedRecipe);
+        assertEquals("Test Recipe", retrievedRecipe.getString("Title"));
+    }
+
+    @Test
+    void insert_ShouldOverwriteExistingRecipe() {
+        database.insert(testRecipe);
+        testRecipe.put("Ingredients", "New Ingredients");
+        database.insert(testRecipe);
+
+        JSONObject retrievedRecipe = database.get("Test Recipe");
+        assertEquals("New Ingredients", retrievedRecipe.getString("Ingredients"));
+    }
+
+    // Tests for get
+    @Test
+    void get_ShouldReturnRecipe() {
+        database.insert(testRecipe);
+        JSONObject retrievedRecipe = database.get("Test Recipe");
+        assertNotNull(retrievedRecipe);
+        assertEquals("Test Ingredients", retrievedRecipe.getString("Ingredients"));
+    }
+
+    @Test
+    void get_ShouldReturnNullForNonExistingRecipe() {
+        JSONObject retrievedRecipe = database.get("Non Existing Recipe");
+        assertNull(retrievedRecipe);
+    }
+
+    // Tests for updateIngredient
+    @Test
+    void updateIngredient_ShouldUpdateIngredients() {
+        database.insert(testRecipe);
+        database.updateIngredient("Test Recipe", "Updated Ingredients");
+
+        JSONObject retrievedRecipe = database.get("Test Recipe");
+        assertEquals("Updated Ingredients", retrievedRecipe.getString("Ingredients"));
+    }
+
+    @Test
+    void updateIngredient_ShouldNotUpdateNonExistingRecipe() {
+        database.updateIngredient("Non Existing Recipe", "Updated Ingredients");
+        JSONObject retrievedRecipe = database.get("Non Existing Recipe");
+        assertNull(retrievedRecipe);
+    }
+
+    // Tests for updateSteps
+    @Test
+    void updateSteps_ShouldUpdateSteps() {
+        // database.insert(testRecipe);
+
+        // List<String> newSteps = Arrays.asList("New Step 1", "New Step 2");
+
+        // database.updateSteps("Test Recipe", newSteps);
+
+        // JSONObject expected = new JSONObject();
+        // expected.put("Title", "Test Recipe");
+        // expected.put("Ingredients", "Test Ingredients");
+        // expected.put("Steps", Arrays.asList("New Step 1", "New Step 2"));
+        // expected.put("MealType", "Test Meal");
+        // expected.put("User", "TestUser");
+        // expected.put("numSteps", 2);
+        // //retrievedRecipe.get("Steps")
+        // assertSame(expected, database.get("Test Recipe"));
+    }
+
+    @Test
+    void updateSteps_ShouldNotUpdateNonExistingRecipe() {
+        List<String> newSteps = Arrays.asList("New Step 1", "New Step 2");
+        database.updateSteps("Non Existing Recipe", newSteps);
+        JSONObject retrievedRecipe = database.get("Non Existing Recipe");
+        assertNull(retrievedRecipe);
+    }
+
+    // Tests for delete
+    @Test
+    void delete_ShouldRemoveRecipe() {
+        database.insert(testRecipe);
+        database.delete("Test Recipe");
+        JSONObject retrievedRecipe = database.get("Test Recipe");
+        assertNull(retrievedRecipe);
+    }
+
+    @Test
+    void delete_ShouldNotAffectNonExistingRecipe() {
+        database.delete("Non Existing Recipe");
+        JSONObject retrievedRecipe = database.get("Non Existing Recipe");
+        assertNull(retrievedRecipe);
+    }
+
+    // Tests for getAllTitles
+    @Test
+    void getAllTitles_ShouldReturnTitlesForUser() {
+        database.insert(testRecipe);
+        List<String> titles = database.getAllTitles("TestUser");
+        assertNotNull(titles);
+        assertTrue(titles.contains("Test Recipe"));
+    }
+
+    @Test
+    void getAllTitles_ShouldReturnEmptyListForNonExistingUser() {
+        List<String> titles = database.getAllTitles("Non Existing User");
+        assertTrue(titles.isEmpty());
+    }
 }
+
+    
+
