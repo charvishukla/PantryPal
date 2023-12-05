@@ -484,7 +484,8 @@ class Database {
               .append("MealType", recipeJSON.getString("MealType"))
               .append("User", recipeJSON.getString("User"))
               .append("Time", recipeJSON.getString("Time"))
-              .append("Image", recipeJSON.getString("Image"));
+              .append("Image", recipeJSON.getString("Image"))
+              .append("ImageTime", recipeJSON.getString("ImageTime"));
 
         recipeCollection.insertOne(recipe);
     }
@@ -506,6 +507,7 @@ class Database {
             recipeJSON.put("Time", recipe.getString("Time"));
             recipeJSON.put("numSteps", stepList.size());
             recipeJSON.put("Image", recipe.getString("Image"));
+            recipeJSON.put("ImageTime", recipe.getString("ImageTime"));
         }
         else {
             log.error(String.format("Title '%s' not found in database", title));
@@ -527,6 +529,20 @@ class Database {
         }
         Bson filter = eq("Title", title);
         Bson updateOperation = set("Steps", stepList);
+        UpdateResult updateResult = recipeCollection.updateMany(filter, updateOperation);
+        System.out.println(updateResult);
+    }
+
+    public void updateImage(String title, String newURL) {
+        Bson filter = eq("Title", title);
+        Bson updateOperation = set("Image", newURL);
+        UpdateResult updateResult = recipeCollection.updateMany(filter, updateOperation);
+        System.out.println(updateResult);
+    }
+
+    public void updateImageTime(String title, String newTime) {
+        Bson filter = eq("Title", title);
+        Bson updateOperation = set("ImageTime", newTime);
         UpdateResult updateResult = recipeCollection.updateMany(filter, updateOperation);
         System.out.println(updateResult);
     }

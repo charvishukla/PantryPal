@@ -210,6 +210,14 @@ public class Controller {
         for(String title : titles){
             //Generate the recipe detail page.
             response = model.getDatabase().get(title); //TODO
+            Instant oldTime = Instant.parse(response.getString("ImageTime"));
+            if(!Helper._checkImageValid(Instant.now(), oldTime)){
+                String newURL = this.model.getNewImage(title);
+                response.put("Image", newURL);
+                response.put("ImageTime", Instant.now().toString());
+                model.getDatabase().updateImage(title, newURL);
+                model.getDatabase().updateImageTime(title, response.getString("ImageTime"));
+            }
             RecipeDetailPage deet = new RecipeDetailPage(response);
 
             RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"), response.getString("Time"));
@@ -323,6 +331,7 @@ public class Controller {
         response.put("User", this.view.getAppFrame().getHeader().getUsername());
         response.put("Time", Instant.now().toString());
         response.put("Image", this.model.getNewImage(response.getString("Title")));
+        response.put("ImageTime", Instant.now().toString());
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
