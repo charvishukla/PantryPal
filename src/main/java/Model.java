@@ -417,7 +417,7 @@ class Database{
               .append("Ingredients", recipeDetail.get(1))
               .append("Steps", stepList)
               .append("MealType", recipeDetail.get(recipeDetail.size()-1))
-              .append("Users", username);
+              .append("User", username);
 
         recipeCollection.insertOne(recipe);
     }
@@ -463,7 +463,7 @@ class Database{
 
     public List<String> getAllTitles(String username) {
         List<String> recipes = new ArrayList<>();
-        Bson filter = eq("Users", username);
+        Bson filter = eq("User", username);
         try (MongoCursor<Document> cursor = recipeCollection.find(filter).iterator()) {
             while (cursor.hasNext()) {
                 recipes.add(cursor.next().getString("Title"));
@@ -592,23 +592,23 @@ class Authentication{
         }
     }
 
-    public boolean SkipLoginIfRemembered(){
+    public String SkipLoginIfRemembered(){
          try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifyer"))) {
                 String line;
                 if((line = reader.readLine() ) != null){
                     Bson filter = eq("token", line);
                     if(userCollection.find(filter).first() != null){
-                        return true;
+                        return (String) userCollection.find(filter).first().get("username");
                     }
                 }
                 else{
-                    return false;
+                    return null;
                 }
 
         } catch (IOException e) {
-            return false;
+            return null;
         }
-        return false;
+        return null;
     }
 
     private String hashPassword(String password) {

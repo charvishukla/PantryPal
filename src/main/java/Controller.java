@@ -41,9 +41,13 @@ public class Controller {
          * a user.
          */
         Authentication authManager = new Authentication();
-        if(authManager.SkipLoginIfRemembered()){
+        String username = authManager.SkipLoginIfRemembered();
+        if(username != null){
+            view.getAppFrame().getHeader().setUsername(username);
+            setupRecipeCardsDetailsAction();
             view.switchScene(this.view.getAppFrame());
         }
+        
 
     }
 
@@ -51,20 +55,19 @@ public class Controller {
         Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
-        Boolean autoLoginStatus = this.view.getLoginPage().getAutoLoginStatus();
         UserSession loginDetails = authManager.login(username, password);
 
         if (loginDetails != null){
 
             //If user selected remeber me, then we leave a mark in the database to remember. 
-            if(autoLoginStatus == true){
+            if(view.getLoginPage().getAutoLoginStatus() == true){
                 authManager.markAutoLoginStatus(username);
             }
             view.switchScene(this.view.getAppFrame());
-            this.view.getAppFrame().getHeader().setUsername(username);
+            view.getAppFrame().getHeader().setUsername(username);
             setupRecipeCardsDetailsAction();
         }else{
-            this.view.getLoginPage().showAlert();
+            view.getLoginPage().showAlert();
         }
     }
  
@@ -225,6 +228,7 @@ public class Controller {
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
         List<String> response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
+        response.addLast(mealType);
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
