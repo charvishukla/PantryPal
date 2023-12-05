@@ -1,9 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.time.Instant;
 
 import org.json.JSONObject;
 
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
@@ -18,10 +21,12 @@ public class Controller {
         this.model = model;
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
 
         //Filter and Sorting
         this.view.getAppFrame().getHeader().setFilterBoxOnAction(this::handleFilterBoxClick);
+        this.view.getAppFrame().getHeader().setSortingBoxOnAction(this::handleSortingBoxClick);
         
         // Login Page
         this.view.getLoginPage().setCreateAccountButtonAction(this::handleCreateAccountButtonClick);
@@ -60,23 +65,65 @@ public class Controller {
         String filter = this.view.getAppFrame().getHeader().getFilterBox().getValue();
         RecipeList recipeList = this.view.getAppFrame().getRecipeList();
         List<RecipeCard> recipeCards = recipeList.getRecipeCards();
-        if(filter == "all") {
+        recipeList.deleteAllOnScene();
+        if(filter.equals("all")) {
             for(int i = 0; i < recipeCards.size(); i++) {
-                recipeCards.get(i).setVisible(true);
-                recipeCards.get(i).setManaged(true);
+                recipeList.addRecipeCardOnScene(recipeCards.get(i));
             }
         } else {
             for(int i = 0; i < recipeCards.size(); i++) {
                 RecipeCard temp = recipeCards.get(i);
                 if(temp.getMealType().equals(filter)) {
-                    temp.setVisible(true);
-                    temp.setManaged(true);
-                } else {
-                    temp.setVisible(false);
-                    temp.setManaged(false);
+                    recipeList.addRecipeCardOnScene(temp);
                 }
-                
             }
+        }
+    }
+
+    private void handleSortingBoxClick(ActionEvent event) {
+        String sorting = this.view.getAppFrame().getHeader().getSortingBox().getValue();
+        RecipeList recipeList = this.view.getAppFrame().getRecipeList();
+        List<RecipeCard> recipeCards = recipeList.getRecipeCards();
+        if(sorting.equals("Alphabetically")){
+            for (int i = 0; i < recipeCards.size(); i++){
+                int maxIndex = i;
+                for (int j = i + 1; j < recipeCards.size(); j++) {
+                    if(recipeCards.get(j).getTitle().compareToIgnoreCase(recipeCards.get(maxIndex).getTitle()) > 0) {
+                        maxIndex = j;
+                    }
+                }
+                RecipeCard temp = recipeCards.get(maxIndex);
+                recipeCards.set(maxIndex, recipeCards.get(i));
+                recipeCards.set(i, temp);
+            }
+        } else if(sorting.equals("Newest to Oldest")){
+            for (int i = 0; i < recipeCards.size(); i++){
+                int oldestIndex = i;
+                for (int j = i + 1; j < recipeCards.size(); j++) {
+                    if(recipeCards.get(j).getTime().isBefore(recipeCards.get(oldestIndex).getTime())) {
+                        oldestIndex = j;
+                    }
+                }
+                RecipeCard temp = recipeCards.get(oldestIndex);
+                recipeCards.set(oldestIndex, recipeCards.get(i));
+                recipeCards.set(i, temp);
+            }
+        } else {
+            for (int i = 0; i < recipeCards.size(); i++){
+                int newestIndex = i;
+                for (int j = i + 1; j < recipeCards.size(); j++) {
+                    if(recipeCards.get(j).getTime().isAfter(recipeCards.get(newestIndex).getTime())) {
+                        newestIndex = j;
+                    }
+                }
+                RecipeCard temp = recipeCards.get(newestIndex);
+                recipeCards.set(newestIndex, recipeCards.get(i));
+                recipeCards.set(i, temp);
+            }
+        }
+        recipeList.deleteAllOnScene();
+        for (int i = 0; i < recipeCards.size(); i++) {
+            recipeList.addRecipeCardOnScene(recipeCards.get(i));
         }
     }
 
@@ -165,7 +212,7 @@ public class Controller {
             response = model.getDatabase().get(title); //TODO
             RecipeDetailPage deet = new RecipeDetailPage(response);
 
-            RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"));
+            RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"), response.getString("Time"));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
@@ -180,6 +227,20 @@ public class Controller {
                 e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCard(title);
                         model.getDatabase().delete(title); //TODO
                         this.view.switchScene(this.view.getAppFrame());
+                        });
+            deet.getDetailFooter().getAddStepButton().setOnAction(
+                e ->    {
+                        TextField temp = new TextField();
+                        temp.getStyleClass().add("step");
+                        temp.setTranslateX(100);
+                        deet.getDetailList().getChildren().addLast(temp);
+                        });
+            deet.getDetailFooter().getDeleteStepButton().setOnAction(
+                e ->    {
+                        Node last = deet.getDetailList().getChildren().getLast();
+                        if(last instanceof TextField) {
+                            deet.getDetailList().getChildren().remove(last);
+                        }
                         });
         }
     }
@@ -259,11 +320,12 @@ public class Controller {
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
         JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
         response.put("User", this.view.getAppFrame().getHeader().getUsername());
+        response.put("Time", Instant.now().toString());
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
             e ->    {
-                    RecipeCard recipe = new RecipeCard(response.getString("Title"), mealType);
+                    RecipeCard recipe = new RecipeCard(response.getString("Title"), mealType, response.getString("Time"));
                     recipe.addRecipeDetail(deet);
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.getString("Title"))) {
@@ -279,6 +341,20 @@ public class Controller {
                     this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.getString("Title"));
                     model.getDatabase().delete(response.getString("Title")); //TODO
                     this.view.switchScene(this.view.getAppFrame());
+                    });
+        deet.getDetailFooter().getAddStepButton().setOnAction(
+            e ->    {
+                    TextField temp = new TextField();
+                    temp.getStyleClass().add("step");
+                    temp.setTranslateX(100);
+                    deet.getDetailList().getChildren().addLast(temp);
+                    });
+        deet.getDetailFooter().getDeleteStepButton().setOnAction(
+            e ->    {
+                    Node last = deet.getDetailList().getChildren().getLast();
+                    if(last instanceof TextField) {
+                        deet.getDetailList().getChildren().remove(last);
+                    }
                     });
         this.view.switchScene(deet);
     }

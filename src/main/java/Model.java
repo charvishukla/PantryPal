@@ -443,7 +443,8 @@ class Database {
               .append("Ingredients", recipeJSON.getString("Ingredients"))
               .append("Steps", stepList)
               .append("MealType", recipeJSON.getString("MealType"))
-              .append("User", recipeJSON.getString("User"));
+              .append("User", recipeJSON.getString("User"))
+              .append("Time", recipeJSON.getString("Time"));
 
         recipeCollection.insertOne(recipe);
     }
@@ -462,6 +463,7 @@ class Database {
             }
             recipeJSON.put("MealType", recipe.getString("MealType"));
             recipeJSON.put("User", recipe.getString("User"));
+            recipeJSON.put("Time", recipe.getString("Time"));
             recipeJSON.put("numSteps", stepList.size());
         }
         else {
