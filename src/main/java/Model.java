@@ -406,7 +406,7 @@ class Whisper {
     }
 }
 
-class Database{
+class Database {
     private String uri;
     private MongoClient client;
     private MongoDatabase database;
@@ -449,7 +449,7 @@ class Database{
         // ArrayList<String> recipeDetail = new ArrayList<>();
         JSONObject recipeJSON = new JSONObject();
         if(recipe != null) {
-            recipeJSON.put("id", recipe.getString("_id"));
+            recipeJSON.put("id", recipe.get("_id").toString());
             recipeJSON.put("Title", recipe.getString("Title"));
             recipeJSON.put("Ingredients", recipe.getString("Ingredients"));
             List<Document> stepList = (List<Document>)recipe.get("Steps");
