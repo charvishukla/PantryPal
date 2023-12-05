@@ -9,7 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.faces.event.SystemEvent;
+
 import org.json.JSONObject;
+import java.time.Instant;
 
 // Event Handling
 import javafx.event.ActionEvent;
@@ -482,6 +485,7 @@ class Header extends HBox {
     Button savedRecipesButton;
     String username;
     ComboBox<String> filterBox;
+    ComboBox<String> sortingBox;
 
     Header() {
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 36);
@@ -501,6 +505,7 @@ class Header extends HBox {
         savedRecipesButton.setStyle(
                 "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
 
+        //Filter setup and style
         Label filterLabel = new Label("Filter:");
         filterLabel.setStyle(
                 "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
@@ -509,13 +514,23 @@ class Header extends HBox {
         filterBox.setStyle(
                 "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
         filterBox.getSelectionModel().selectFirst();
+
+        //Sorting setup and style
+        Label sortingLabel = new Label("Sorting:");
+        sortingLabel.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        String[] sorting = {"Newest to Oldest", "Oldest to Newest", "Alphabetically"};
+        this.sortingBox = new ComboBox<String>(FXCollections.observableArrayList(sorting));
+        sortingBox.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
+        sortingBox.getSelectionModel().selectFirst();
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, savedRecipesButton, profileButton);
+        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, sortingLabel, sortingBox, savedRecipesButton, profileButton);
     }
 
     public void setProfileButtonOnAction(EventHandler<ActionEvent> eventHandler) {
@@ -537,6 +552,14 @@ class Header extends HBox {
 
     public void setFilterBoxOnAction (EventHandler<ActionEvent> eventHandler) {
         filterBox.setOnAction(eventHandler);
+    }
+
+    public ComboBox<String> getSortingBox(){
+        return this.sortingBox;
+    }
+
+    public void setSortingBoxOnAction (EventHandler<ActionEvent> eventHandler) {
+        sortingBox.setOnAction(eventHandler);
     }
 
 }
@@ -593,6 +616,8 @@ class DetailFooter extends HBox {
     private Button saveButton;
     private Button backButton;
     private Button deleteButton;
+    private Button addStepButton;
+    private Button deleteStepButton;
 
     DetailFooter() {
         this.getStyleClass().add("detail-footer");
@@ -609,8 +634,11 @@ class DetailFooter extends HBox {
         saveButton.getStyleClass().add("button");
         deleteButton = new Button("Delete");
         deleteButton.getStyleClass().add("button");
-
-        this.getChildren().addAll(backButton, saveButton, deleteButton); // adding buttons to footer
+        addStepButton = new Button("Add Step");
+        addStepButton.getStyleClass().add("button");
+        deleteStepButton = new Button("Delete Step");
+        deleteStepButton.getStyleClass().add("button");
+        this.getChildren().addAll(backButton, saveButton, deleteButton, addStepButton, deleteStepButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
 
@@ -626,6 +654,14 @@ class DetailFooter extends HBox {
         return deleteButton;
     }
 
+    public Button getAddStepButton(){
+        return addStepButton;
+    }
+
+    public Button getDeleteStepButton(){
+        return deleteStepButton;
+    }
+
     public void setBackButtonAction(EventHandler<ActionEvent> eventHandler) {
         backButton.setOnAction(eventHandler);
     }
@@ -636,7 +672,14 @@ class DetailFooter extends HBox {
 
     public void setSaveButtonAction(EventHandler<ActionEvent> eventHandler) {
         saveButton.setOnAction(eventHandler);
+    }
 
+    public void setAddStepButtonAction(EventHandler<ActionEvent> eventHandler) {
+        addStepButton.setOnAction(eventHandler);
+    }
+
+    public void setDeleteStepButtonAction(EventHandler<ActionEvent> eventHandler) {
+        deleteStepButton.setOnAction(eventHandler);
     }
 }
 
@@ -645,11 +688,11 @@ class DetailFooter extends HBox {
  * Extends GridPane to display recipes in a grid layout
  * Each recipe is added to the grid, with a maximum of 4 recipes per row
  */
-
  class RecipeList extends VBox {
     private final int maxColumn = 3; // we will have 4 recipes per column
     private Label myRecipes;
     private GridPane gridPane;
+    private List<RecipeCard> recipeCards;
 
     public RecipeList() {
         // import stylesheet
@@ -692,39 +735,65 @@ class DetailFooter extends HBox {
         shape3.setEffect(new GaussianBlur(10));
 
         this.getChildren().addAll(myRecipes, gridPane);
+        recipeCards = new ArrayList<>();
+    }
+
+    public void addRecipeCardOnScene(RecipeCard card) {
+        for (int i = this.gridPane.getChildren().size() - 1; i >= 0; i--){
+            RecipeCard currentCard = (RecipeCard)this.gridPane.getChildren().get(i);
+            int rowIndex = this.gridPane.getRowIndex(currentCard);
+            int colIndex = this.gridPane.getColumnIndex(currentCard);
+            colIndex ++;
+            if(colIndex >= maxColumn) {
+                colIndex = 0;
+                rowIndex ++;
+            }
+            this.gridPane.setRowIndex(currentCard, rowIndex);
+            this.gridPane.setColumnIndex(currentCard, colIndex);
+        }
+
+        this.gridPane.add(card, 0, 0);
     }
 
     public void addRecipeCard(RecipeCard card) {
-    // Add the card first
-        int numCards = getRecipeCards().size() ;
-        int row_idx = numCards / maxColumn; 
-        int col_idx = numCards % maxColumn;
-        
-        this.gridPane.add(card, col_idx, row_idx);
+        addRecipeCardOnScene(card);
+        recipeCards.addLast(card);
     }
 
     public void deleteRecipeCard(String title) {
-        int index = getRecipeCards().size();
-        for (int i = 0; i < getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i);
+        int deletedRowIndex = Integer.MAX_VALUE;
+        int deletedColumnIndex = Integer.MAX_VALUE;;
+        for (int i = 0; i < this.gridPane.getChildren().size(); i++) {
+            RecipeCard currentCard = (RecipeCard)this.gridPane.getChildren().get(i);
             if (title.equals(currentCard.getRecipeTitle())) {
-                this.getChildren().remove(currentCard);
-            }
+                deletedRowIndex = this.gridPane.getRowIndex(currentCard);
+                deletedColumnIndex = this.gridPane.getColumnIndex(currentCard);
+                this.gridPane.getChildren().remove(currentCard);
+                recipeCards.remove(currentCard);
+                break;
+            } 
         }
-
-        // Update indices
-        for (int i = 0; i < getRecipeCards().size(); i++) {
-            RecipeCard currentCard = getRecipeCards().get(i);
-            GridPane.setRowIndex(currentCard, i / maxColumn);
-            GridPane.setColumnIndex(currentCard, i % maxColumn);
+        for (int i = 0; i < this.gridPane.getChildren().size(); i++) {
+            RecipeCard currentCard = (RecipeCard)this.gridPane.getChildren().get(i);
+            int rowIndex = this.gridPane.getRowIndex(currentCard);
+            int colIndex = this.gridPane.getColumnIndex(currentCard);
+            if (rowIndex > deletedRowIndex || (rowIndex == deletedRowIndex && colIndex > deletedColumnIndex)) {
+                colIndex -= 1;
+                if(colIndex < 0) {
+                    colIndex = 2;
+                    rowIndex --;
+                }
+                this.gridPane.setRowIndex(currentCard, rowIndex);
+                this.gridPane.setColumnIndex(currentCard, colIndex);
+            }
         }
     }
 
-    public boolean checkRecipeExists(String title) {
-        int index = getRecipeCards().size();
-        int row = index / maxColumn;
-        int column = index % maxColumn;
+    public void deleteAllOnScene(){
+        this.gridPane.getChildren().clear();
+    }
 
+    public boolean checkRecipeExists(String title) {
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
             if (title.equals(currentCard.getRecipeTitle())) {
@@ -736,10 +805,7 @@ class DetailFooter extends HBox {
 
     public List<RecipeCard> getRecipeCards() {
         // Assuming all children of RecipeList are RecipeCards
-        return this.gridPane.getChildren().stream()
-                .filter(node -> node instanceof RecipeCard)
-                .map(node -> (RecipeCard) node)
-                .collect(Collectors.toList());
+        return this.recipeCards;
     }
 }
 
@@ -755,8 +821,9 @@ class RecipeCard extends VBox {
     private Button detailsButton;
     private ImageView imageView;
     private RecipeDetailPage recipeDetailPage;
+    private Instant time;
 
-    public RecipeCard(String title, String mealType) {
+    public RecipeCard(String title, String mealType, String time) {
         this.getStyleClass().add("recipe-card");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeCard.css").toExternalForm());
        
@@ -768,9 +835,11 @@ class RecipeCard extends VBox {
         this.imageView = new ImageView();
         this.imageView.setFitHeight(240);
         this.imageView.setFitWidth(280);
+        imageView.setPreserveRatio(true);
         
         this.recipeTitle = title;
         this.mealType = mealType;
+        this.time = Instant.parse(time);
 
         Label titleLabel = new Label(recipeTitle);
         titleLabel.getStyleClass().add("title");
@@ -793,7 +862,11 @@ class RecipeCard extends VBox {
         return this.recipeTitle;
     }
 
-    public String getMealType() {
+    public String getTitle(){
+        return this.recipeTitle;
+    }
+
+    public String getMealType(){
         return this.mealType;
     }
 
@@ -803,6 +876,15 @@ class RecipeCard extends VBox {
 
     public void addRecipeDetail(RecipeDetailPage detailPage) {
         this.recipeDetailPage = detailPage;
+    }
+
+    public Instant getTime(){
+        return time;
+    }
+
+    public void setImage(String url){
+        Image image = new Image(url);
+        this.imageView.setImage(image);
     }
 }
 
@@ -826,6 +908,7 @@ class RecipeDetailPage extends BorderPane {
     private DetailFooter detailFooter; // footer
     private int ingredientsSize;
     private ImageView imageView;
+    private Image image;
 
     RecipeDetailPage() {
         // Initialize the header and footer
@@ -844,13 +927,14 @@ class RecipeDetailPage extends BorderPane {
        
         // initializing 
     RecipeDetailPage(JSONObject json){
-         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
         header = new Header();
         detailFooter = new DetailFooter();
         detailList = new DetailList();
-        imageView = new ImageView();
+        image = new Image(json.getString("Image"));
+        imageView = new ImageView(image);
         
         // make scroller
         ScrollPane scroller = new ScrollPane(detailList);
@@ -861,12 +945,11 @@ class RecipeDetailPage extends BorderPane {
         this.imageView.setFitHeight(300);
         this.imageView.setFitWidth(500);
         this.setAlignment(imageView, Pos.CENTER_LEFT);
+        imageView.setPreserveRatio(true);
         detailList.getChildren().add(imageView);
     
         
         Label title = new Label(json.getString("Title"));
-        detailList.getChildren().add(title);
-
         title.getStyleClass().add("recipe-detail-title");
         title.setTranslateX(100);
         detailList.getChildren().add(title);
@@ -907,7 +990,11 @@ class RecipeDetailPage extends BorderPane {
         return this.detailFooter;
     }
 
-    public List<String> getSteps() {
+    public DetailList getDetailList() {
+        return this.detailList;
+    }
+
+    public List<String> getSteps(){
         List<String> steps = new ArrayList<>();
         for (int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++) {
             steps.add(((Label) detailList.getChildren().get(i)).getText());
