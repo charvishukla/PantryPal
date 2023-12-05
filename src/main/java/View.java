@@ -835,6 +835,7 @@ class RecipeCard extends VBox {
         this.imageView = new ImageView();
         this.imageView.setFitHeight(240);
         this.imageView.setFitWidth(280);
+        imageView.setPreserveRatio(true);
         
         this.recipeTitle = title;
         this.mealType = mealType;
@@ -880,6 +881,11 @@ class RecipeCard extends VBox {
     public Instant getTime(){
         return time;
     }
+
+    public void setImage(String url){
+        Image image = new Image(url);
+        this.imageView.setImage(image);
+    }
 }
 
 
@@ -902,6 +908,7 @@ class RecipeDetailPage extends BorderPane {
     private DetailFooter detailFooter; // footer
     private int ingredientsSize;
     private ImageView imageView;
+    private Image image;
 
     RecipeDetailPage() {
         // Initialize the header and footer
@@ -926,7 +933,8 @@ class RecipeDetailPage extends BorderPane {
         header = new Header();
         detailFooter = new DetailFooter();
         detailList = new DetailList();
-        imageView = new ImageView();
+        image = new Image(json.getString("Image"));
+        imageView = new ImageView(image);
         
         // make scroller
         ScrollPane scroller = new ScrollPane(detailList);
@@ -937,6 +945,7 @@ class RecipeDetailPage extends BorderPane {
         this.imageView.setFitHeight(300);
         this.imageView.setFitWidth(500);
         this.setAlignment(imageView, Pos.CENTER_LEFT);
+        imageView.setPreserveRatio(true);
         detailList.getChildren().add(imageView);
     
         

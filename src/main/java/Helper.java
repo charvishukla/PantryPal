@@ -1,4 +1,7 @@
 import java.util.List;
+import java.time.Instant;
+import java.time.Duration;
+
 
 
 public class Helper {
@@ -16,6 +19,11 @@ public class Helper {
     public static String _splitMealType(List<String> s) {
         String mealType = s.get(s.size()-1);
         return mealType;
+    }
+
+    public static boolean _checkImageValid(Instant newTime, Instant Oldtime){
+        Duration duration = Duration.between(newTime, Oldtime);
+        return Math.abs(duration.toHours()) < 1;
     }
 
 }
