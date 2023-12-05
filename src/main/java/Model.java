@@ -23,6 +23,8 @@ import javax.faces.context.FlashWrapper;
 import javax.sound.sampled.*;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.FileReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -39,6 +41,7 @@ import java.net.http.HttpResponse;
 import java.util.Map;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import java.security.SecureRandom;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -429,7 +432,7 @@ class Database {
         }
     }
 
-    public void insert(JSONObject recipeJSON) {
+    public void insert(JSONObject recipeJSON, String username) {
         List<Document> stepList = new ArrayList<>();
         for(int i = 1; i <= recipeJSON.getInt("numSteps"); i++) {
             stepList.add(new Document("Step", recipeJSON.get(String.valueOf(i))));
@@ -439,7 +442,8 @@ class Database {
         recipe.append("Title", recipeJSON.getString("Title"))
               .append("Ingredients", recipeJSON.getString("Ingredients"))
               .append("Steps", stepList)
-              .append("MealType", recipeJSON.getString("MealType"));
+              .append("MealType", recipeJSON.getString("MealType"))
+              .append("Users", username);
 
         recipeCollection.insertOne(recipe);
     }
@@ -489,9 +493,10 @@ class Database {
         System.out.println(result);
     }
 
-    public List<String> getAllTitles() {
+    public List<String> getAllTitles(String username) {
         List<String> recipes = new ArrayList<>();
-        try (MongoCursor<Document> cursor = recipeCollection.find().iterator()) {
+        Bson filter = eq("Users", username);
+        try (MongoCursor<Document> cursor = recipeCollection.find(filter).iterator()) {
             while (cursor.hasNext()) {
                 recipes.add(cursor.next().getString("Title"));
             }
@@ -598,6 +603,44 @@ class Authentication{
             return new UserSession(username);
         }
         return null; // Authentication failed
+    }
+
+    public void markAutoLoginStatus(String username) {
+        long timestamp = System.currentTimeMillis();
+        int random = new SecureRandom().nextInt();
+        String uniqueToken = timestamp + "_" + random;
+
+        Bson filter = eq("username", username);
+        Bson updateOperation = set("token", uniqueToken);
+        userCollection.updateOne(filter, updateOperation);
+
+        try{
+            FileWriter file = new FileWriter("Device Identifyer");
+            file.write(uniqueToken);
+            file.close();
+
+        }catch (IOException e){
+            System.out.println("Error writing to device identifier.");
+        }
+    }
+
+    public boolean SkipLoginIfRemembered(){
+         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifyer"))) {
+                String line;
+                if((line = reader.readLine() ) != null){
+                    Bson filter = eq("token", line);
+                    if(userCollection.find(filter).first() != null){
+                        return true;
+                    }
+                }
+                else{
+                    return false;
+                }
+
+        } catch (IOException e) {
+            return false;
+        }
+        return false;
     }
 
     private String hashPassword(String password) {

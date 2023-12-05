@@ -4,7 +4,6 @@ import java.util.List;
 import org.json.JSONObject;
 
 import javafx.event.ActionEvent;
-import javafx.scene.control.Label;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
@@ -30,16 +29,23 @@ public class Controller {
         this.view.getCreateAccountPage().setCreateAccountButtonAction(this::handleCreateAccountClick);
 
         //Create Frame actions.
-        this.view.getCreateFrame().recordPressed(this::handleCreateFrameRecord);
-        this.view.getCreateFrame().recordUnpressed(this::handleCreateFrameStopRecord);
-        this.view.getCreateFrame().nextButton(this::handleCreateFrameNext);
+        this.view.getCreateFrame().recordPressed(this::MealTypeRecord);
+        this.view.getCreateFrame().recordUnpressed(this::MealTypeStopRecord);
+        this.view.getCreateFrame().nextButton(this::MealTypeNextButton);
 
         //Voice Input Frame actions.
-        this.view.getVoiceInputFrame().recordPressed(this::handleRecordVoiceInput);
-        this.view.getVoiceInputFrame().recordUnpressed(this::handleStopRecordVoiceInput);
-        this.view.getVoiceInputFrame().nextButton(this::handleVoiceInputFrameNext);
+        this.view.getVoiceInputFrame().recordPressed(this::IngredientRecord);
+        this.view.getVoiceInputFrame().recordUnpressed(this::IngredientStopRecord);
+        this.view.getVoiceInputFrame().nextButton(this::IngredientNextButton);
        
-        setupRecipeCardsDetailsAction();
+        /*
+         * Determines if the app has to automatically log in
+         * a user.
+         */
+        Authentication authManager = new Authentication();
+        if(authManager.SkipLoginIfRemembered()){
+            view.switchScene(this.view.getAppFrame());
+        }
 
     }
 
@@ -47,14 +53,23 @@ public class Controller {
         Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
+        Boolean autoLoginStatus = this.view.getLoginPage().getAutoLoginStatus();
         UserSession loginDetails = authManager.login(username, password);
+
         if (loginDetails != null){
+
+            //If user selected remeber me, then we leave a mark in the database to remember. 
+            if(autoLoginStatus == true){
+                authManager.markAutoLoginStatus(username);
+            }
             view.switchScene(this.view.getAppFrame());
             this.view.getAppFrame().getHeader().setUsername(username);
+            setupRecipeCardsDetailsAction();
         }else{
             this.view.getLoginPage().showAlert();
         }
     }
+ 
     /**
      * Create a new account 
      * @param event
@@ -109,7 +124,7 @@ public class Controller {
     private void setupRecipeCardsDetailsAction() {
 
         //Returns a list of titles of each recipe in database;
-        List<String> titles = model.getDatabase().getAllTitles(); //TODO
+        List<String> titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername()); //TODO
         //System.out.println(titles.get(0));
 
         //A JSONObject to store title, ingredients, and step by step recipe.
@@ -145,7 +160,7 @@ public class Controller {
 
     //If recording is started, let the microphone image glow,
     //and let the next button be available.
-    private void handleCreateFrameRecord(MouseEvent event){
+    private void MealTypeRecord(MouseEvent event){
         this.view.getCreateFrame().getRecordButton().setEffect(new Glow(50));
         this.view.getCreateFrame().setMealType(null);
         this.view.getCreateFrame().updateNextButton();
@@ -154,18 +169,27 @@ public class Controller {
 
     //If the recording is stopped, Stop recording and 
     //call on whisper to convert audio to text.
-    private void handleCreateFrameStopRecord(MouseEvent event){
+    private void MealTypeStopRecord(MouseEvent event){
         this.view.getCreateFrame().getRecordButton().setEffect(null);
         this.model.stopRecording();
         mealType = model.audioToText();
         this.view.getCreateFrame().setMealType(mealType);
-        mealType = this.view.getCreateFrame().getMealType();
-        this.view.getCreateFrame().updateNextButton();
+        
+        if(this.view.getCreateFrame().getMealType().equals("TryAgain")){
+            this.view.getCreateFrame().setMealType(null);
+            this.view.getCreateFrame().updateNextButton();
+            this.view.getCreateFrame().setTitle("Please try to state your meal type again.");
+        }
+        else{
+            this.view.getCreateFrame().setMealType(mealType);
+            mealType = this.view.getCreateFrame().getMealType();
+            this.view.getCreateFrame().updateNextButton();
+        } 
     }
 
-     //If next is clicked, switches from create frame to voice input frame.
+    //If next is clicked, switches from create frame to voice input frame.
     //And update the next frame to display what meal type you selected.
-    private void handleCreateFrameNext(ActionEvent event){
+    private void MealTypeNextButton(ActionEvent event){
         this.view.switchScene(this.view.getVoiceInputFrame());
         this.view.getVoiceInputFrame().setTitle(this.view.getCreateFrame().getMealType());
         this.view.getCreateFrame().setMealType(null);
@@ -177,24 +201,26 @@ public class Controller {
     }
 
     //If the record button is clicked. 
-    private void handleRecordVoiceInput(MouseEvent event) {
+    private void IngredientRecord(MouseEvent event) {
         this.view.getVoiceInputFrame().getRecordButton().setEffect(new Glow(50));
-        this.model.startRecording(); 
+        this.model.startRecording();
+        this.view.getVoiceInputFrame().setIngredients(null); 
+        this.view.getVoiceInputFrame().updateNextButton();
     }
 
     //If the recording is stopped, Stop recoding and 
     //call on whisper to convert audio to text.
-    private void handleStopRecordVoiceInput(MouseEvent event){
+    private void IngredientStopRecord(MouseEvent event){
          this.view.getVoiceInputFrame().getRecordButton().setEffect(null);
          this.model.stopRecording();
          ingredients = model.audioToText();
-         this.view.getVoiceInputFrame().updatePrompt("Prompt recieved: " + ingredients);
+         this.view.getVoiceInputFrame().updatePrompt("Prompt received: " + ingredients);
          this.view.getVoiceInputFrame().updateNextButton();
     }    
 
     //If next is clicked, switches from voice input frame to recipe genati
     //And update the next frame to display what meal type you selected.
-    private void handleVoiceInputFrameNext(ActionEvent event){
+    private void IngredientNextButton(ActionEvent event){
         this.view.getVoiceInputFrame().updatePrompt("Please list the ingredients you wish to cook with.");
         this.view.getVoiceInputFrame().setIngredients(null);
         this.view.getVoiceInputFrame().updateNextButton();
@@ -211,7 +237,7 @@ public class Controller {
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
-                        model.getDatabase().insert(response); //TODO
+                        model.getDatabase().insert(response, this.view.getAppFrame().getHeader().getUsername()); //TODO
                     } else {
                         model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps()); //TODO
                     }
@@ -224,6 +250,5 @@ public class Controller {
                     this.view.switchScene(this.view.getAppFrame());
                     });
         this.view.switchScene(deet);
-
     }
 }

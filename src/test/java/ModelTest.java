@@ -69,7 +69,7 @@ class ModelTest {
             stepJSON.put("item1", "item1");
             stepJSON.put("item2", "item2");
             stepJSON.put("item3", "item3");
-            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepJSON);
+            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepJSON, "User");
         } catch (Exception e) {
             assertTrue(true);
         }
