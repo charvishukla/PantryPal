@@ -830,18 +830,17 @@ class ServerDownPage extends VBox {
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("server-down-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/ServerDown.css").toExternalForm());
-        
+        this.setPadding(new Insets(10, 10, 10, 10));
         label1 = new Label("Whoops!"); 
         label1.getStyleClass().add("label-common");
         image = new Image("/resources/cat.jpg");
         imageView = new ImageView(image);
         label2 = new Label("Looks like this page went on Vacation!");
         label2.getStyleClass().add("label-common");
-        label3 = new Label("Try again later");
-
+        label3 = new Label("Please wait and then try re-launching the app.");
+        label3.getStyleClass().add("label3");
 
         this.getChildren().addAll(label1, imageView, label2, label3);
-        
     }
 }
 
