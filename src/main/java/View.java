@@ -802,6 +802,11 @@ class DetailFooter extends HBox {
         this.gridPane.getChildren().clear();
     }
 
+    public void deleteAll(){
+        deleteAllOnScene();
+        this.recipeCards.clear();
+    }
+
     public boolean checkRecipeExists(String title) {
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
@@ -1006,7 +1011,9 @@ class RecipeDetailPage extends BorderPane {
     public List<String> getSteps(){
         List<String> steps = new ArrayList<>();
         for (int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++) {
-            steps.add(((Label) detailList.getChildren().get(i)).getText());
+            if (detailList.getChildren().get(i) instanceof TextField) {
+                steps.add(((TextField) detailList.getChildren().get(i)).getText());
+            }
         }
         return steps;
     }
