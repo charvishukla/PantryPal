@@ -643,6 +643,7 @@ class DetailFooter extends HBox {
 
     public RecipeList() {
         // import stylesheet
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 36);
         this.getStyleClass().add("recipe-list-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeListPage.css").toExternalForm());
 
@@ -736,20 +737,28 @@ class DetailFooter extends HBox {
  * Class: RecipeCard
  */
 class RecipeCard extends VBox {
+    
     private static final double CARD_WIDTH = 330;
-    private static final double CARD_HEIGHT = 340; 
+    private static final double CARD_HEIGHT = 360; 
     private String recipeTitle;
     private String mealType;
     private Button detailsButton;
+    private ImageView imageView;
     private RecipeDetailPage recipeDetailPage;
 
     public RecipeCard(String title, String mealType) {
         this.getStyleClass().add("recipe-card");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeCard.css").toExternalForm());
+       
         this.setPrefSize(CARD_WIDTH, CARD_HEIGHT);
         this.setMinSize(CARD_WIDTH, CARD_HEIGHT);
         this.setMaxSize(CARD_WIDTH, CARD_HEIGHT);
         this.setPadding(new Insets(10, 10, 10, 10));
+        
+        this.imageView = new ImageView();
+        this.imageView.setFitHeight(240);
+        this.imageView.setFitWidth(280);
+        
         this.recipeTitle = title;
         this.mealType = mealType;
 
@@ -762,7 +771,7 @@ class RecipeCard extends VBox {
         detailsButton = new Button("Learn more");
         detailsButton.getStyleClass().add("button");
 
-        this.getChildren().addAll(titleLabel, mealTypeLabel, detailsButton);
+        this.getChildren().addAll(imageView, titleLabel, mealTypeLabel, detailsButton);
     }
 
     public Button getDetailButton() {
