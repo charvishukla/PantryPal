@@ -230,7 +230,10 @@ public class Controller {
                         });
             deet.getDetailFooter().getAddStepButton().setOnAction(
                 e ->    {
-                        deet.getDetailList().getChildren().addLast(new TextField());
+                        TextField temp = new TextField();
+                        temp.getStyleClass().add("step");
+                        temp.setTranslateX(100);
+                        deet.getDetailList().getChildren().addLast(temp);
                         });
             deet.getDetailFooter().getDeleteStepButton().setOnAction(
                 e ->    {
@@ -341,7 +344,10 @@ public class Controller {
                     });
         deet.getDetailFooter().getAddStepButton().setOnAction(
             e ->    {
-                    deet.getDetailList().getChildren().addLast(new TextField());
+                    TextField temp = new TextField();
+                    temp.getStyleClass().add("step");
+                    temp.setTranslateX(100);
+                    deet.getDetailList().getChildren().addLast(temp);
                     });
         deet.getDetailFooter().getDeleteStepButton().setOnAction(
             e ->    {

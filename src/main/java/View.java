@@ -920,7 +920,7 @@ class RecipeDetailPage extends BorderPane {
        
         // initializing 
     RecipeDetailPage(JSONObject json){
-         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
         header = new Header();
@@ -941,8 +941,6 @@ class RecipeDetailPage extends BorderPane {
     
         
         Label title = new Label(json.getString("Title"));
-        detailList.getChildren().add(title);
-
         title.getStyleClass().add("recipe-detail-title");
         title.setTranslateX(100);
         detailList.getChildren().add(title);
