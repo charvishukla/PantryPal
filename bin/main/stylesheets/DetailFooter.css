@@ -1,0 +1,35 @@
+.detail-footer {
+    -fx-background-color: black;
+    background-color: black;
+}
+
+.button {
+    -fx-pref-height: 40px;
+    -fx-pref-width: 100px;
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-cursor: hand;
+    cursor: hand;
+    -fx-border-color: #dedbdb;
+    border-color: #dedbdb;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 30px;
+    border-radius: 30px;
+    -fx-text-fill: #dedbdb;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-font-size: 14px; 
+    font-size: 14px; 
+    -fx-letter-spacing: 4px; 
+    letter-spacing: 4px; 
+    -fx-background-radius: 30px;
+    -fx-padding: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+.button:hover {
+    -fx-background-color: #f59de9;
+    background-color: #f59de9;
+    -fx-text-fill: white;
+}
