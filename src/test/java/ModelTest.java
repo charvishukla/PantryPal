@@ -336,26 +336,6 @@ class ModelTest {
         assertNull(retrievedRecipe);
     }
 
-    // Tests for updateSteps
-    @Test
-    void updateSteps_ShouldUpdateSteps() {
-        // database.insert(testRecipe);
-
-        // List<String> newSteps = Arrays.asList("New Step 1", "New Step 2");
-
-        // database.updateSteps("Test Recipe", newSteps);
-
-        // JSONObject expected = new JSONObject();
-        // expected.put("Title", "Test Recipe");
-        // expected.put("Ingredients", "Test Ingredients");
-        // expected.put("Steps", Arrays.asList("New Step 1", "New Step 2"));
-        // expected.put("MealType", "Test Meal");
-        // expected.put("User", "TestUser");
-        // expected.put("numSteps", 2);
-        // //retrievedRecipe.get("Steps")
-        // assertSame(expected, database.get("Test Recipe"));
-    }
-
     @Test
     void updateSteps_ShouldNotUpdateNonExistingRecipe() {
         List<String> newSteps = Arrays.asList("New Step 1", "New Step 2");
