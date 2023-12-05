@@ -1,0 +1,41 @@
+.recipe-detail-page {
+    -fx-background-color : #0000;
+    background-color : #0000;
+}
+
+.recipe-detail-title {
+    -fx-font-family: 'Chillight' !important;
+    font-family: 'Chillight' !important;
+    -fx-text-fill: #fff;
+    -fx-font-size: 36px !important; 
+    font-size: 36px !important;
+}
+
+.ingredientsList {
+    -fx-font-family: 'Arial';
+    font-family: 'Arial';
+    -fx-text-fill: #fff;
+    -fx-font-size: 14px !important; 
+    font-size: 14px !important;
+
+}
+
+.steps-label {
+    -fx-font-family: 'Chillight'  !important;
+    font-family: 'Chillight' !important;
+    -fx-text-fill: #fff;
+    -fx-font-size: 20px !important; 
+    font-size: 20px !important;
+}
+
+.recipe-steps {
+    -fx-font-family: 'Arial';
+    font-family: 'Arial';
+    -fx-text-fill: #fff;
+    -fx-font-size: 14px !important; 
+    font-size: 14px !important;
+}
+
+.step {
+    -fx-text-fill: #fff;
+}
