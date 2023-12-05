@@ -2,10 +2,15 @@
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+
 // Utils 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.json.JSONObject;
+
 // Event Handling
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -474,7 +479,9 @@ class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button logoutButton;
+    Button savedRecipesButton;
     String username;
+    ComboBox<String> filterBox;
 
     Header() {
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 36);
@@ -490,13 +497,25 @@ class Header extends HBox {
         profileButton.getStyleClass().add("my-profile-button");
         profileButton.setTranslateY(25);
 
+        this.savedRecipesButton = new Button("Saved");
+        savedRecipesButton.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+
+        Label filterLabel = new Label("Filter:");
+        filterLabel.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        String[] filter = {"all", "breakfast", "lunch", "dinner"};
+        this.filterBox = new ComboBox<String>(FXCollections.observableArrayList(filter));
+        filterBox.setStyle(
+                "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
+        filterBox.getSelectionModel().selectFirst();
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, profileButton);
+        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, savedRecipesButton, profileButton);
     }
 
     public void setProfileButtonOnAction(EventHandler<ActionEvent> eventHandler) {
@@ -510,6 +529,14 @@ class Header extends HBox {
 
     public String getUsername(){
         return username;
+    }
+
+    public ComboBox<String> getFilterBox(){
+        return this.filterBox;
+    }
+
+    public void setFilterBoxOnAction (EventHandler<ActionEvent> eventHandler) {
+        filterBox.setOnAction(eventHandler);
     }
 
 }
@@ -813,11 +840,13 @@ class RecipeDetailPage extends BorderPane {
         this.setBottom(detailFooter);
     }
 
-    RecipeDetailPage(List<String> s) {
-        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
+
+       
+        // initializing 
+    RecipeDetailPage(JSONObject json){
+         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
-        // initializing 
         header = new Header();
         detailFooter = new DetailFooter();
         detailList = new DetailList();
@@ -833,15 +862,16 @@ class RecipeDetailPage extends BorderPane {
         this.imageView.setFitWidth(500);
         this.setAlignment(imageView, Pos.CENTER_LEFT);
         detailList.getChildren().add(imageView);
+    
+        
+        Label title = new Label(json.getString("Title"));
+        detailList.getChildren().add(title);
 
-        // title
-        Label title = new Label(Helper._splitTitle(s));
         title.getStyleClass().add("recipe-detail-title");
         title.setTranslateX(100);
         detailList.getChildren().add(title);
 
-
-        String[] ingredList = Helper._splitIngred(s);
+        String[] ingredList = json.getString("Ingredients").replaceAll("\n+", "\n").split("\n");
         ingredientsSize = 0;
         for (String i : ingredList) {
             Label ingredients = new Label(i);
@@ -859,9 +889,10 @@ class RecipeDetailPage extends BorderPane {
         stepsLabel.setTranslateX(100);
         stepsLabel.getStyleClass().add("steps-label");
         detailList.getChildren().add(stepsLabel);
-
-        for (int i = 2; i < s.size() - 1; i++) {
-            Label step = new Label (s.get(i));
+        
+        // Add a text field for each step
+        for(int i = 1; i <= json.getInt("numSteps"); i++) {
+            TextField step = new TextField(json.getString(String.valueOf(i)));
             step.getStyleClass().add("step");
             step.setTranslateX(100);
             detailList.getChildren().add(step);

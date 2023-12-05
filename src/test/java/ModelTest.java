@@ -1,6 +1,7 @@
 import static com.mongodb.client.model.Filters.eq;
 import org.junit.jupiter.api.BeforeEach;
 import org.bson.Document;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -64,11 +65,11 @@ class ModelTest {
     @Test
     void testInsert() {
         try {
-            List<String> stepList = new ArrayList<>();
-            stepList.add("item1");
-            stepList.add("item2");
-            stepList.add("item3");
-            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepList, "User");
+            JSONObject stepJSON = new JSONObject();
+            stepJSON.put("item1", "item1");
+            stepJSON.put("item2", "item2");
+            stepJSON.put("item3", "item3");
+            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepJSON);
         } catch (Exception e) {
             assertTrue(true);
         }
@@ -79,10 +80,11 @@ class ModelTest {
     @Test
     void testGet() {
         String title = "hey";
-        ArrayList<String> arr = new ArrayList<>();
-        arr.add("hey");
-        when(mockedDatabase.get(title)).thenReturn(arr);
-        assertEquals(mockedDatabase.get(title), arr);
+        
+        JSONObject json = new JSONObject();
+        json.put("test", "test");
+        when(mockedDatabase.get(title)).thenReturn(json);
+        assertEquals(mockedDatabase.get(title), json);
     }
 
     // Test method for updating steps in the database

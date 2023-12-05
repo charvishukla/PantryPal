@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONObject;
+
 import javafx.event.ActionEvent;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
@@ -17,6 +19,9 @@ public class Controller {
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
+
+        //Filter and Sorting
+        this.view.getAppFrame().getHeader().setFilterBoxOnAction(this::handleFilterBoxClick);
         
         // Login Page
         this.view.getLoginPage().setCreateAccountButtonAction(this::handleCreateAccountButtonClick);
@@ -41,30 +46,57 @@ public class Controller {
          * a user.
          */
         Authentication authManager = new Authentication();
-        if(authManager.SkipLoginIfRemembered()){
+        String username = authManager.SkipLoginIfRemembered();
+        if(username != null){
+            view.getAppFrame().getHeader().setUsername(username);
+            setupRecipeCardsDetailsAction();
             view.switchScene(this.view.getAppFrame());
         }
+        
 
+    }
+
+    private void handleFilterBoxClick(ActionEvent event) {
+        String filter = this.view.getAppFrame().getHeader().getFilterBox().getValue();
+        RecipeList recipeList = this.view.getAppFrame().getRecipeList();
+        List<RecipeCard> recipeCards = recipeList.getRecipeCards();
+        if(filter == "all") {
+            for(int i = 0; i < recipeCards.size(); i++) {
+                recipeCards.get(i).setVisible(true);
+                recipeCards.get(i).setManaged(true);
+            }
+        } else {
+            for(int i = 0; i < recipeCards.size(); i++) {
+                RecipeCard temp = recipeCards.get(i);
+                if(temp.getMealType().equals(filter)) {
+                    temp.setVisible(true);
+                    temp.setManaged(true);
+                } else {
+                    temp.setVisible(false);
+                    temp.setManaged(false);
+                }
+                
+            }
+        }
     }
 
     private void handleLoginButtonClick(ActionEvent event) {
         Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
-        Boolean autoLoginStatus = this.view.getLoginPage().getAutoLoginStatus();
         UserSession loginDetails = authManager.login(username, password);
 
         if (loginDetails != null){
 
             //If user selected remeber me, then we leave a mark in the database to remember. 
-            if(autoLoginStatus == true){
+            if(view.getLoginPage().getAutoLoginStatus() == true){
                 authManager.markAutoLoginStatus(username);
             }
             view.switchScene(this.view.getAppFrame());
-            this.view.getAppFrame().getHeader().setUsername(username);
+            view.getAppFrame().getHeader().setUsername(username);
             setupRecipeCardsDetailsAction();
         }else{
-            this.view.getLoginPage().showAlert();
+            view.getLoginPage().showAlert();
         }
     }
  
@@ -122,17 +154,18 @@ public class Controller {
     private void setupRecipeCardsDetailsAction() {
 
         //Returns a list of titles of each recipe in database;
-        List<String> titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername());
+        List<String> titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername()); //TODO
         //System.out.println(titles.get(0));
-        //An arrayList to store title, ingredients, and step by step recipe.
-        List<String> response = new ArrayList<>();
+
+        //A JSONObject to store title, ingredients, and step by step recipe.
+        JSONObject response;
 
         for(String title : titles){
             //Generate the recipe detail page.
-            response = model.getDatabase().get(title);
+            response = model.getDatabase().get(title); //TODO
             RecipeDetailPage deet = new RecipeDetailPage(response);
 
-            RecipeCard newRecipe = new RecipeCard(title, Helper._splitMealType(response));
+            RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
@@ -140,12 +173,12 @@ public class Controller {
             deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
             deet.getDetailFooter().getSaveButton().setOnAction(
                 e ->    {
-                        model.getDatabase().updateSteps(title, deet.getSteps());
+                        model.getDatabase().updateSteps(title, deet.getSteps()); //TODO
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getDeleteButton().setOnAction(
                 e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCard(title);
-                        model.getDatabase().delete(title);
+                        model.getDatabase().delete(title); //TODO
                         this.view.switchScene(this.view.getAppFrame());
                         });
         }
@@ -224,26 +257,27 @@ public class Controller {
 
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
-        List<String> response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
+        JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
+        response.put("User", this.view.getAppFrame().getHeader().getUsername());
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
             e ->    {
-                    RecipeCard recipe = new RecipeCard(response.get(0), mealType);
+                    RecipeCard recipe = new RecipeCard(response.getString("Title"), mealType);
                     recipe.addRecipeDetail(deet);
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
-                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.get(0))) {
+                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
-                        model.getDatabase().insert(response, this.view.getAppFrame().getHeader().getUsername());
+                        model.getDatabase().insert(response); //TODO
                     } else {
-                        model.getDatabase().updateSteps(response.get(0), deet.getSteps());
+                        model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps()); //TODO
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getDeleteButton().setOnAction(
             e ->    {
-                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.get(0));
-                    model.getDatabase().delete(response.get(0));
+                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.getString("Title"));
+                    model.getDatabase().delete(response.getString("Title")); //TODO
                     this.view.switchScene(this.view.getAppFrame());
                     });
         this.view.switchScene(deet);
