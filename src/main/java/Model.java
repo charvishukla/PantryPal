@@ -116,6 +116,8 @@ class ChatGPT {
     private static final String API_KEY = "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";
     private static final String MODEL = "gpt-3.5-turbo";
 
+    private static Logger log = LoggerFactory.getLogger(ChatGPT.class);
+
     public static String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
 
@@ -183,7 +185,7 @@ class ChatGPT {
             }
             response.put("numSteps", steps.length);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
     
         return response;
@@ -494,12 +496,12 @@ class Database {
         System.out.println(result);
     }
 
-    public List<String> getAllTitles(String username) {
-        List<String> recipes = new ArrayList<>();
+    public JSONArray getAllTitles(String username) {
+        JSONArray recipes = new JSONArray();
         Bson filter = eq("User", username);
         try (MongoCursor<Document> cursor = recipeCollection.find(filter).iterator()) {
             while (cursor.hasNext()) {
-                recipes.add(cursor.next().getString("Title"));
+                recipes.put(cursor.next().getString("Title"));
             }
         }
         return recipes;
@@ -616,7 +618,7 @@ class Authentication{
         userCollection.updateOne(filter, updateOperation);
 
         try{
-            FileWriter file = new FileWriter("Device Identifyer");
+            FileWriter file = new FileWriter("Device Identifier");
             file.write(uniqueToken);
             file.close();
 
@@ -626,7 +628,7 @@ class Authentication{
     }
 
     public String SkipLoginIfRemembered(){
-         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifyer"))) {
+         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifier"))) {
                 String line;
                 if((line = reader.readLine() ) != null){
                     Bson filter = eq("token", line);

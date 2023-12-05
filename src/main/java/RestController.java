@@ -4,6 +4,7 @@ import static io.javalin.apibuilder.ApiBuilder.*;
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.NotFoundResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,23 +45,37 @@ public class RestController {
                 
                 // Get Recipe Title(s)
                 get(ctx -> {
-                    if (ctx.body().equals("")) {
-                        log.error("Empty request body");
+                    if (ctx.queryString() == null) {
+                        log.error("Query string is null");
                         throw new BadRequestResponse();
                     }
-                    JSONObject requestBody = new JSONObject(ctx.body());
-                    String title = requestBody.getString("Title");
-                    String username = requestBody.getString("User");
+                    String title = ctx.queryParam("title");
+                    if (title == null) {
+                        log.error("Title is null");
+                        throw new BadRequestResponse();
+                    }
+                    String username = ctx.queryParam("user");
+                    if (username == null || username.equals("")) {
+                        log.error("Username is null");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject responseBody = new JSONObject();
                     if (title.equals("")) {
                         log.debug("Getting all titles");
-                        ctx.json(model.getDatabase().getAllTitles(username));
+                        responseBody.put("data", model.getDatabase().getAllTitles(username));
+                        ctx.json(responseBody.toString());
                     }
                     else {
-                        log.debug("Title queried: " + title);
-                        ctx.json(model.getDatabase().get(title).toString());
+                        log.info("Title queried: " + title);
+                        String recipeString = model.getDatabase().get(title).toString();
+                        if (recipeString.equals("{}")) {
+                            throw new NotFoundResponse();
+                        }
+                        ctx.json(recipeString);
                     }
                 });
 
+                // Edit recipe
                 put(ctx -> {
                     if (ctx.body().equals("")) {
                         log.error("Empty request body");
@@ -79,6 +94,7 @@ public class RestController {
                     ctx.json(model.getDatabase().get(title).toString());
                 });
 
+                // Delete recipe
                 delete(ctx -> {
                     if (ctx.body().equals("")) {
                         log.error("Empty request body");
@@ -117,6 +133,7 @@ public class RestController {
 
         app.exception(Exception.class, (e, ctx) -> {
             log.error(e.toString());
+            e.printStackTrace();
             // JSONObject responseBody = new JSONObject();
             // responseBody.put("error", "Bad Request");
             // ctx.status(401).json(responseBody.toString());
@@ -125,6 +142,7 @@ public class RestController {
 
         app.exception(JSONException.class, (e, ctx) -> {
             log.error(e.toString());
+            e.printStackTrace();
             throw new BadRequestResponse();
         });
 

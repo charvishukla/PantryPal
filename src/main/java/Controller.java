@@ -1,21 +1,37 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javafx.event.ActionEvent;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Controller {
     private View view;
     private Model model;
     private String mealType;
     private String ingredients;
+    private HttpClient client;
+    private Logger log = LoggerFactory.getLogger(Controller.class);
+
+    private static final String API_ENDPOINT = "http://127.0.0.1:7000";
 
     public Controller(View view, Model model) {
         this.view = view;
         this.model = model;
+        this.client = HttpClient.newHttpClient();
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
@@ -52,8 +68,31 @@ public class Controller {
             setupRecipeCardsDetailsAction();
             view.switchScene(this.view.getAppFrame());
         }
-        
+    }
 
+    private List<String> getAllTitles(String username) throws
+    IOException, InterruptedException, URISyntaxException {
+        // Create the request object
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe?title=&user=" + username))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject responseJSON = new JSONObject(response.body());
+        JSONArray arr = responseJSON.getJSONArray("data");
+
+        List<String> titles = new ArrayList<String>();
+        for (int i = 0; i < arr.length(); i++) {
+            titles.add(arr.getString(i));
+        }
+
+        return titles;
     }
 
     private void handleFilterBoxClick(ActionEvent event) {
@@ -154,7 +193,14 @@ public class Controller {
     private void setupRecipeCardsDetailsAction() {
 
         //Returns a list of titles of each recipe in database;
-        List<String> titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername()); //TODO
+        List<String> titles = new ArrayList<String>();
+        try {
+            titles = getAllTitles(this.view.getAppFrame().getHeader().getUsername());
+        }
+        catch (Exception e) {
+            log.error(e.toString());
+        }
+        // JSONArray titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername()); //TODO
         //System.out.println(titles.get(0));
 
         //A JSONObject to store title, ingredients, and step by step recipe.

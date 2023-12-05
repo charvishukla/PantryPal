@@ -972,7 +972,7 @@ class VoiceInputFrame extends BorderPane {
 
     //This will set the title to indicate you have selcted breakfast, lunch or dinner.
     public void setTitle(String s){
-        title = new Label("You have select " + s);
+        title = new Label("You have selected " + s);
         title.setFont(new Font(30));
         this.setTop(title);
         setAlignment(title, Pos.CENTER);
