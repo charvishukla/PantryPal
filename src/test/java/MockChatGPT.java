@@ -43,9 +43,9 @@ class MockChatGPT extends ChatGPT {
         JSONObject response = new JSONObject();
         try {
             response.put("Title", "Mock Recipe Title");
-            response.put("Ingredients", "Ingredient 1, Ingredient 2");
-            response.put("Steps", "Step 1. Do something\nStep 2. Do something else");
-            response.put("numSteps", 2);
+        response.put("Ingredients", "Ingredient 1, Ingredient 2");
+        response.put("Steps", "Step 1. Do something\nStep 2. Do something else");
+        response.put("numSteps", 2);
         } catch (Exception e) {
             e.printStackTrace();
         }

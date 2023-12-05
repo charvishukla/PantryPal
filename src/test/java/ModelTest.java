@@ -35,11 +35,13 @@ import java.io.PrintStream;
 
 
 class ModelTest {
-     private MockAudioRecorder mockAudioRecorder;
+     private AudioRecorder mockAudioRecorder;
+     private ChatGPT chatGPT;
 
     @BeforeEach
     void setUp() {
         mockAudioRecorder = new MockAudioRecorder();
+        chatGPT = new MockChatGPT();
     }
     //--------------------------------------------------------------------------
     //-------------------------------CHATGPT TESTS------------------------------
@@ -127,44 +129,39 @@ class ModelTest {
     @Test
     void startRecording_ShouldSetIsRecordingToTrue() {
         mockAudioRecorder.startRecording();
-        assertTrue(mockAudioRecorder.isRecording());
+        assertTrue(mockAudioRecorder.isRecording);
     }
 
     @Test
     void startRecording_ShouldPrintCorrectMessage() {
-        // Capture standard output (System.out) to verify the print statement
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 
         mockAudioRecorder.startRecording();
         assertEquals("Mock startRecording called\n", outContent.toString());
 
-        // Reset System.out to its original stream
         System.setOut(System.out);
     }
 
     @Test
     void stopRecording_ShouldSetIsRecordingToFalse() {
-        // Start and then stop recording
-        mockAudioRecorder.startRecording();
+        mockAudioRecorder.startRecording(); // Ensure recording is started
         mockAudioRecorder.stopRecording();
-
         assertFalse(mockAudioRecorder.isRecording());
     }
 
     @Test
     void stopRecording_ShouldPrintCorrectMessage() {
-        // Capture standard output (System.out) to verify the print statement
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
-
         mockAudioRecorder.stopRecording();
         assertEquals("Mock stopRecording called\n", outContent.toString());
-
-        // Reset System.out to its original stream
         System.setOut(System.out);
     }
 
+    //--------------------------------------------------------------------------
+    //------------------------------WHISPER TESTS-------------------------------
+    //--------------------------------------------------------------------------
 }
 
 

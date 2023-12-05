@@ -1,6 +1,6 @@
 
 public class MockAudioRecorder extends AudioRecorder {
-    private boolean isRecording = false;
+      private boolean isRecording = false;
 
     @Override
     public void startRecording() {

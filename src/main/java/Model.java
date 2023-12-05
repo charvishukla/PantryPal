@@ -227,6 +227,7 @@ class AudioRecorder {
 
     private static AudioFormat audioFormat = new AudioFormat(44100, 16, 2, true, true);
     TargetDataLine targetDataLine;
+    boolean isRecording = true;
 
     public void startRecording() {
         Thread t = new Thread(
@@ -237,7 +238,7 @@ class AudioRecorder {
                         // the format of the TargetDataLine
                         DataLine.Info dataLineInfo = new DataLine.Info(
                             TargetDataLine.class, audioFormat);
-
+                        isRecording = true;
                         // the TargetDataLine used to capture audio data from the microphone
                         targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                         targetDataLine.open(audioFormat);
@@ -253,20 +254,25 @@ class AudioRecorder {
                                 audioInputStream,
                                 AudioFileFormat.Type.WAVE,
                                 audioFile);
-
+                        
                     } catch (Exception ex) {
                         ex.printStackTrace();
+                        isRecording = false;
                     }
                 }
             }
         );
-
+        isRecording = true;
         t.start();
     }
 
     public void stopRecording() {
         targetDataLine.stop();
         targetDataLine.close();
+    }
+
+    public boolean isRecording(){
+        return isRecording;
     }
     
 }
