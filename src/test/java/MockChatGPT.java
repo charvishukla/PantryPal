@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 class MockChatGPT extends ChatGPT {
-
-    
     /**
      * Simplified implementation of the generate method.
      * Returns a mock response for demonstration purposes.

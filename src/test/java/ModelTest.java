@@ -6,66 +6,48 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.function.Try;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Mockito.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.constraints.AssertTrue;
-
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.client.result.UpdateResult;
-import static com.mongodb.client.model.Updates.set;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 import java.io.File;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-
 class ModelTest {
-     private AudioRecorder mockAudioRecorder;
-     private ChatGPT chatGPT;
-     private Whisper whisper;
-     private MongoClient mockClient;
-     private MongoDatabase mockDatabase;
-     private MongoCollection<Document> mockCollection;
-     private MongoCollection<Document> mockUserCollection;
-     private Authentication auth;
+    private AudioRecorder mockAudioRecorder;
+    private ChatGPT chatGPT;
+    private Whisper whisper;
+    private Authentication authentication;
+
     @BeforeEach
     void setUp() {
         mockAudioRecorder = new MockAudioRecorder();
         chatGPT = new MockChatGPT();
         whisper = new MockWhisper();
         MockWhisper.resetMockFlags();
-
+        // Mocking authentication
+        authentication = new MockAuthentication();
+        // Populating the Database:
+        authentication.createUser("Charmander", "fire123", "Char", "Mander", "1234567890");
+        authentication.createUser("Bulbasaur", "water123", "Bulb", "Asaur", "2345678901");
+        authentication.createUser("Pikachu", "zap123zap", "Pika", "Chu", "4567890123");
     }
-    //--------------------------------------------------------------------------
-    //-------------------------------CHATGPT TESTS------------------------------
-    //--------------------------------------------------------------------------
-    
+    // --------------------------------------------------------------------------
+    // -------------------------------CHATGPT TESTS------------------------------
+    // --------------------------------------------------------------------------
+
     @Test
     void testGenerateWithValidPrompt() {
         String prompt = "test prompt";
         String expected = "Successfully invoked ChatGPT API for the prompt: " + prompt;
         String actual = "";
         try {
-              actual = MockChatGPT.generate(prompt);
+            actual = MockChatGPT.generate(prompt);
         } catch (Exception e) {
-            System.out.println("Method generate() failed with an exception: "+ e );
+            System.out.println("Method generate() failed with an exception: " + e);
         }
         System.out.println(expected);
         assertEquals(expected, actual);
@@ -77,20 +59,20 @@ class ModelTest {
         String expected = "Successfully invoked ChatGPT API for the prompt: " + prompt;
         String actual = "";
         try {
-              actual = MockChatGPT.generate(prompt);
+            actual = MockChatGPT.generate(prompt);
         } catch (Exception e) {
-            System.out.println("Method generate() failed with an exception: "+ e );
+            System.out.println("Method generate() failed with an exception: " + e);
         }
         System.out.println(expected);
         assertEquals(expected, actual);
     }
 
-    
     @Test
     void testFormPromptWithValidInputs() {
         String mealType = "dinner";
         String ingredients = "chicken, rice";
-        String expected = "formPrompt(): What is a step-by-step " + mealType + " recipe I can make using " + ingredients + "? Please provide a Title, ingredients, and steps.";
+        String expected = "formPrompt(): What is a step-by-step " + mealType + " recipe I can make using " + ingredients
+                + "? Please provide a Title, ingredients, and steps.";
         String actual = MockChatGPT.formPrompt(mealType, ingredients);
         System.out.println(expected);
         assertEquals(expected, actual);
@@ -100,7 +82,8 @@ class ModelTest {
     void testFormPromptWithEmptyInputs() {
         String mealType = "";
         String ingredients = "";
-        String expected = "formPrompt(): What is a step-by-step " + mealType + " recipe I can make using " + ingredients + "? Please provide a Title, ingredients, and steps.";
+        String expected = "formPrompt(): What is a step-by-step " + mealType + " recipe I can make using " + ingredients
+                + "? Please provide a Title, ingredients, and steps.";
         String actual = MockChatGPT.formPrompt(mealType, ingredients);
         System.out.println(expected);
         assertEquals(expected, actual);
@@ -132,10 +115,9 @@ class ModelTest {
         assertEquals(expected.toString(), actual.toString());
     }
 
-    //--------------------------------------------------------------------------
-    //-------------------------AUDIORECORDER TESTS------------------------------
-    //--------------------------------------------------------------------------
-   
+    // --------------------------------------------------------------------------
+    // -------------------------AUDIORECORDER TESTS------------------------------
+    // --------------------------------------------------------------------------
 
     @Test
     void startRecording_ShouldSetIsRecordingToTrue() {
@@ -170,9 +152,9 @@ class ModelTest {
         System.setOut(System.out);
     }
 
-    //--------------------------------------------------------------------------
-    //------------------------------WHISPER TESTS-------------------------------
-    //--------------------------------------------------------------------------
+    // --------------------------------------------------------------------------
+    // ------------------------------WHISPER TESTS-------------------------------
+    // --------------------------------------------------------------------------
 
     @Test
     void audioToText_ShouldReturnMockedText() {
@@ -186,7 +168,6 @@ class ModelTest {
         assertEquals("Mocked text for file: testfile.mp3", response);
     }
 
-    
     void audioToText_ShouldHandleNullFile() {
         Boolean boo = false;
         try {
@@ -237,9 +218,53 @@ class ModelTest {
         String expectedOutput = "Mock data for file: testfile.mp3";
         assertEquals(expectedOutput, outputStream.toString());
     }
-     //-------------------------------------------------------------------------
-    //------------------------------DataBaseTests-------------------------------
-    //--------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // ------------------------------AuthenticationTests------------------------
+    // -------------------------------------------------------------------------
+
+    @Test
+    void createUser_ShouldReturnTrueForNewUser() {
+        boolean result = authentication.createUser("cse110programmer", "ilovepython", "Yeet", "YeetLastname", "0987654321");
+        assertTrue(result);
+    }
+
+    @Test
+    void createUser_ShouldReturnFalseForExistingUser() {
+        boolean result = authentication.createUser("Pikachu", "zap123zap", "Pika", "Chu", "4567890123");
+        assertFalse(result);
+    }
+
+    @Test
+    void checkUserExists_ShouldReturnTrueForExistingUser() {
+        assertTrue(authentication.checkUserExists("Charmander"));
+    }
+
+    @Test
+    void checkUserExists_ShouldReturnFalseForNonExistingUser() {
+        assertFalse(authentication.checkUserExists("Charizard"));
+    }
+
+    
+    @Test
+    void verifyUser_ShouldReturnTrueForCorrectCredentials() {
+        assertTrue(authentication.verifyUser("Charmander", "fire123"));
+    }
+
+    @Test
+    void verifyUser_ShouldReturnFalseForIncorrectCredentials() {
+        assertFalse(authentication.verifyUser("Charmander", "wrongPassword"));
+    }
+
+    @Test
+    void login_ShouldReturnUserSessionForCorrectCredentials() {
+        UserSession session = authentication.login("Bulbasaur", "water123");
+        assertNotNull(session);
+        assertEquals("Bulbasaur", session.getUsername());
+    }
+
+    @Test
+    void login_ShouldReturnNullForIncorrectCredentials() {
+        UserSession session = authentication.login("Bulbasaur", "wrongPassword");
+        assertNull(session);
+    }
 }
-
-
