@@ -68,7 +68,7 @@ class ModelTest {
             stepList.add("item1");
             stepList.add("item2");
             stepList.add("item3");
-            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepList);
+            ((Database) Mockito.doThrow(new Exception()).when(mockDatabase)).insert(stepList, "User");
         } catch (Exception e) {
             assertTrue(true);
         }
