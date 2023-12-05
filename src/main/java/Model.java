@@ -100,6 +100,16 @@ public class Model {
         response.put("MealType", mealType);
         return response;
     }
+
+    public String getNewImage(String prompt) {
+        String url = "";
+        try {
+            url = ChatGPT.generateImage(prompt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
     
     public Database getDatabase(){
         return db;
@@ -113,8 +123,10 @@ public class Model {
 
 class ChatGPT {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/chat/completions";
+    private static final String DALLE_ENDPOINT = "https://api.openai.com/v1/images/generations";
     private static final String API_KEY = "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";
     private static final String MODEL = "gpt-3.5-turbo";
+    private static final String DALLE_MODEL = "dall-e-3";
 
     public static String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
@@ -159,6 +171,33 @@ class ChatGPT {
         }
 
         return generatedText;
+    }
+
+    public static String generateImage(String prompt) throws
+    IOException, InterruptedException, URISyntaxException {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("model", DALLE_MODEL);
+        requestBody.put("prompt", prompt);
+        requestBody.put("n", 1);
+        requestBody.put("size", "1024x1024");
+        requestBody.put("response_format", "url");
+
+        HttpRequest request = HttpRequest
+            .newBuilder()
+            .uri(URI.create(DALLE_ENDPOINT))
+            .header("Content-Type", "application/json")
+            .header("Authorization", String.format("Bearer %s", API_KEY))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JSONObject responseJson = new JSONObject(response.body());
+        JSONArray dataArray = responseJson.getJSONArray("data");
+        JSONObject firstItem = dataArray.getJSONObject(0);
+        return firstItem.getString("url");
     }
 
     public static String formPrompt(String mealType, String ingredients) {
@@ -444,7 +483,8 @@ class Database {
               .append("Steps", stepList)
               .append("MealType", recipeJSON.getString("MealType"))
               .append("User", recipeJSON.getString("User"))
-              .append("Time", recipeJSON.getString("Time"));
+              .append("Time", recipeJSON.getString("Time"))
+              .append("Image", recipeJSON.getString("Image"));
 
         recipeCollection.insertOne(recipe);
     }
@@ -465,6 +505,7 @@ class Database {
             recipeJSON.put("User", recipe.getString("User"));
             recipeJSON.put("Time", recipe.getString("Time"));
             recipeJSON.put("numSteps", stepList.size());
+            recipeJSON.put("Image", recipe.getString("Image"));
         }
         else {
             log.error(String.format("Title '%s' not found in database", title));
