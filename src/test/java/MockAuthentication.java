@@ -1,0 +1,3 @@
+class MockAuthentication extends Authentication {
+    
+}
