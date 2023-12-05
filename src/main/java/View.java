@@ -479,7 +479,6 @@ class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button logoutButton;
-    Button savedRecipesButton;
     String username;
     ComboBox<String> filterBox;
 
@@ -497,10 +496,6 @@ class Header extends HBox {
         profileButton.getStyleClass().add("my-profile-button");
         profileButton.setTranslateY(25);
 
-        this.savedRecipesButton = new Button("Saved");
-        savedRecipesButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
-
         Label filterLabel = new Label("Filter:");
         filterLabel.setStyle(
                 "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
@@ -511,11 +506,15 @@ class Header extends HBox {
         filterBox.getSelectionModel().selectFirst();
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
+        
+        logoutButton = new Button("Sign Out");
+        logoutButton.getStyleClass().add("logout-button");
+        
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, savedRecipesButton, profileButton);
+        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox,logoutButton,profileButton);
     }
 
     public void setProfileButtonOnAction(EventHandler<ActionEvent> eventHandler) {
@@ -538,6 +537,11 @@ class Header extends HBox {
     public void setFilterBoxOnAction (EventHandler<ActionEvent> eventHandler) {
         filterBox.setOnAction(eventHandler);
     }
+
+    public void setLogoutButtonOnAction(EventHandler<ActionEvent> eventHandler){
+        logoutButton.setOnAction(eventHandler);
+    }
+
 
 }
 
@@ -842,7 +846,7 @@ class RecipeDetailPage extends BorderPane {
 
 
        
-        // initializing 
+    // initializing 
     RecipeDetailPage(JSONObject json){
          Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");

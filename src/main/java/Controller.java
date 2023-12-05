@@ -19,6 +19,7 @@ public class Controller {
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
+        this.view.getAppFrame().getHeader().setLogoutButtonOnAction(this::handleLogoutButtonClick);
 
         //Filter and Sorting
         this.view.getAppFrame().getHeader().setFilterBoxOnAction(this::handleFilterBoxClick);
@@ -54,6 +55,10 @@ public class Controller {
         }
         
 
+    }
+
+    private void handleLogoutButtonClick(ActionEvent event){
+        view.switchScene(this.view.getLoginPage());
     }
 
     private void handleFilterBoxClick(ActionEvent event) {
