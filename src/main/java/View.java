@@ -560,45 +560,20 @@ class DetailFooter extends HBox {
     private Button deleteButton;
 
     DetailFooter() {
+        this.getStyleClass().add("detail-footer");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/DetailFooter.css").toExternalForm());
+
         this.setPrefSize(1280, 90);
-        this.setStyle("-fx-background-color: #FFFFFF; ");
+
         this.setSpacing(15);
         this.setPadding(new Insets(20, 35, 10, 35));
 
         backButton = new Button("Back");
-        backButton.setStyle(
-                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
-        backButton.setOnMousePressed(e -> {
-            backButton.setScaleX(0.95);
-            backButton.setScaleY(0.95);
-        });
-        backButton.setOnMouseReleased(e -> {
-            backButton.setScaleX(1.0);
-            backButton.setScaleY(1.0);
-        });
+        backButton.getStyleClass().add("button");
         saveButton = new Button("Save");
-        saveButton.setStyle(
-                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
-        saveButton.setOnMousePressed(e -> {
-            saveButton.setScaleX(0.95);
-            saveButton.setScaleY(0.95);
-        });
-        saveButton.setOnMouseReleased(e -> {
-            saveButton.setScaleX(1.0);
-            saveButton.setScaleY(1.0);
-        });
-
+        saveButton.getStyleClass().add("button");
         deleteButton = new Button("Delete");
-        deleteButton.setStyle(
-                "-fx-background-color: #ADD8E6;  -fx-font-family: 'Verdana';  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 0); -fx-padding: 7px; -fx-border-color: #D5D5D5; -fx-border-width: 0.5px; -fx-border-radius: 7.5px; -fx-background-radius: 7.5px;");
-        deleteButton.setOnMousePressed(e -> {
-            deleteButton.setScaleX(0.95);
-            deleteButton.setScaleY(0.95);
-        });
-        deleteButton.setOnMouseReleased(e -> {
-            deleteButton.setScaleX(1.0);
-            deleteButton.setScaleY(1.0);
-        });
+        deleteButton.getStyleClass().add("button");
 
         this.getChildren().addAll(backButton, saveButton, deleteButton); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
@@ -654,7 +629,7 @@ class DetailFooter extends HBox {
 
         gridPane = new GridPane();
         gridPane.getStyleClass().add("grid-pane");
-        gridPane.setMinWidth(1240);
+        gridPane.setPrefWidth(1240);
         gridPane.setTranslateX(75);
         GridPane.setMargin(myRecipes, new Insets(25, 25, 25, 25));
         gridPane.add(myRecipes, 0, 0);
@@ -799,7 +774,7 @@ class DetailList extends VBox {
     DetailList() {
         this.setSpacing(5);
         this.setPrefSize(1280, 545);
-        this.setStyle("-fx-background-color: #F0F8FF;");
+        this.setStyle("-fx-background-color: black;");
     }
 }
 
@@ -811,11 +786,9 @@ class RecipeDetailPage extends BorderPane {
     private Header header; // header
     private DetailFooter detailFooter; // footer
     private int ingredientsSize;
+    private ImageView imageView;
 
     RecipeDetailPage() {
-
-        this.setStyle("-fx-background-color: #E5F4E3;");
-
         // Initialize the header and footer
         header = new Header();
         detailFooter = new DetailFooter();
@@ -823,37 +796,63 @@ class RecipeDetailPage extends BorderPane {
         ScrollPane scroller = new ScrollPane(detailList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
-
         this.setTop(header);
         this.setCenter(scroller);
         this.setBottom(detailFooter);
     }
 
     RecipeDetailPage(List<String> s) {
-        this.setStyle("-fx-background-color: #E5F4E3;");
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
+        this.getStyleClass().add("recipe-detail-page");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
+        // initializing 
         header = new Header();
         detailFooter = new DetailFooter();
         detailList = new DetailList();
+        imageView = new ImageView();
+        
+        // make scroller
         ScrollPane scroller = new ScrollPane(detailList);
         scroller.setFitToWidth(true);
         scroller.setFitToHeight(true);
 
+        //image view 
+        this.imageView.setFitHeight(300);
+        this.imageView.setFitWidth(500);
+        this.setAlignment(imageView, Pos.CENTER_LEFT);
+        detailList.getChildren().add(imageView);
+
+        // title
         Label title = new Label(Helper._splitTitle(s));
+        title.getStyleClass().add("recipe-detail-title");
+        title.setTranslateX(100);
         detailList.getChildren().add(title);
+
 
         String[] ingredList = Helper._splitIngred(s);
         ingredientsSize = 0;
         for (String i : ingredList) {
             Label ingredients = new Label(i);
+            ingredients.getStyleClass().add("ingredientsList");
+            ingredients.setAlignment(Pos.BASELINE_CENTER);
+            ingredients.setTranslateX(100);
             ingredients.setWrapText(true);
             detailList.getChildren().add(ingredients);
             ingredientsSize += 1;
         }
-        detailList.getChildren().add(new Label(" "));
-        detailList.getChildren().add(new Label("Steps: "));
+
+        detailList.getChildren().add(new Label(" ")); // ??
+
+        Label stepsLabel = new Label("Steps: ");
+        stepsLabel.setTranslateX(100);
+        stepsLabel.getStyleClass().add("steps-label");
+        detailList.getChildren().add(stepsLabel);
 
         for (int i = 2; i < s.size() - 1; i++) {
-            detailList.getChildren().add(new TextField(s.get(i)));
+            Label step = new Label (s.get(i));
+            step.getStyleClass().add("step");
+            step.setTranslateX(100);
+            detailList.getChildren().add(step);
         }
 
         this.setTop(header);
@@ -868,7 +867,7 @@ class RecipeDetailPage extends BorderPane {
     public List<String> getSteps() {
         List<String> steps = new ArrayList<>();
         for (int i = 3 + ingredientsSize; i < detailList.getChildren().size(); i++) {
-            steps.add(((TextField) detailList.getChildren().get(i)).getText());
+            steps.add(((Label) detailList.getChildren().get(i)).getText());
         }
         return steps;
     }
@@ -882,7 +881,9 @@ class AppFrame extends BorderPane {
 
     AppFrame() {
         header = new Header(); // Initialise the header Object
+        BorderPane borderPane = new BorderPane();
         recipeList = new RecipeList(); // Create a recipeList Object to hold the recipes
+        borderPane.setCenter(recipeList);
         footer = new Footer(); // Initialise the Footer Object
         detailFooter = new DetailFooter();
 

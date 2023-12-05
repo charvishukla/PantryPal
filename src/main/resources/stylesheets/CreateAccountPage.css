@@ -82,19 +82,41 @@ background styles. */
     padding: 10 10;
 }
 
-/*Some minimal styling for create account button*/
 .button-create {
-    -fx-background-color: #ffffff;
-    background-color: #ffffff;
-    -fx-font-size: 20px;
-    font-size: 20px;
-    -fx-text-fill: #080710;
-    -fx-font-weight: 600;
-    font-weight: 600;
-    -fx-background-radius: 3;
-    -fx-padding: 15 15 15 15;
-    padding: 10 10 10 10;
+    -fx-pref-height: 50px;
+    -fx-pref-width: 200px;
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-cursor: hand;
+    cursor: hand;
+    -fx-border-color: #dedbdb;
+    border-color: #dedbdb;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 30px;
+    border-radius: 30px;
+    -fx-text-fill: #dedbdb;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-font-size: 14px; 
+    font-size: 14px; 
+    -fx-letter-spacing: 4px; 
+    letter-spacing: 4px; 
+    -fx-background-radius: 30px;
+    -fx-padding: 0 0 0 0;
+    padding: 0 0 0 0;
 }
+
+.button-create:hover {
+    -fx-border-color: transparent;
+    border-color: transparent;
+    -fx-background-color: #23a2f6;
+    background-color: #23a2f6;
+    -fx-text-fill: #fff;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
+   
+}
+
 
 /* Styling the "Already have an account?" button as a link*/
 .link-button-style {
