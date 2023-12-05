@@ -424,7 +424,7 @@ class Database {
 
     public Database(){
         this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
-
+        
         // Initialize MongoClient without try-with-resources
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");

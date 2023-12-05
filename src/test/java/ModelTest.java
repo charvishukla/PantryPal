@@ -1,4 +1,3 @@
-import static com.mongodb.client.model.Filters.eq;
 import org.junit.jupiter.api.BeforeEach;
 import org.assertj.core.api.BooleanArrayAssert;
 import org.bson.Document;
