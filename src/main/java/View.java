@@ -393,7 +393,9 @@ class LoginPage extends HBox {
         createAccountButton.getStyleClass().add("link-button-style");
 
         autoLoginCheckBox = new CheckBox("Remember me");
+
         autoLoginCheckBox.getStyleClass().add("checkbox-style");
+
 
         gridPane.add(loginLabel, 1, 0);
         gridPane.add(usernameLabel, 0, 1);
@@ -472,6 +474,7 @@ class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button logoutButton;
+    String username;
 
     Header() {
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 36);
@@ -502,6 +505,11 @@ class Header extends HBox {
 
     public void setUsername(String username) {
         this.profileButton.setText(username);
+        this.username = username;
+    }
+
+    public String getUsername(){
+        return username;
     }
 
 }
@@ -749,7 +757,8 @@ class RecipeCard extends VBox {
         this.getChildren().addAll(imageView, titleLabel, mealTypeLabel, detailsButton);
     }
 
-    public Button getDetailButton() {
+    public Button getDetailButton(){
+
         return this.detailsButton;
     }
 
@@ -770,13 +779,16 @@ class RecipeCard extends VBox {
     }
 }
 
+
 class DetailList extends VBox {
+
     DetailList() {
         this.setSpacing(5);
         this.setPrefSize(1280, 545);
         this.setStyle("-fx-background-color: black;");
     }
 }
+
 
 /**
  * here, we need to fetch the recipe details from MongoDB
@@ -925,12 +937,10 @@ class AppFrame extends BorderPane {
 }
 
 class CreateFrame extends BorderPane {
-    Button breakfastButton;
-    Button lunchButton;
-    Button dinnerButton;
     private Button next;
     private String mealType;
     private Button record;
+    private Label Title;
 
     CreateFrame() {
         this.setPadding(new javafx.geometry.Insets(100));
@@ -947,8 +957,9 @@ class CreateFrame extends BorderPane {
         hbox.getChildren().addAll(breakfastButton, lunchButton, dinnerButton);
         hbox.setAlignment(Pos.CENTER);
 
-        // Center prompt
-        Label Title = new Label("Please verbally choose a type of meal.");
+
+        //Center prompt
+        Title = new Label("Please verbally choose a type of meal.");
         Title.setFont(new Font(30));
         this.setTop(Title);
         setAlignment(Title, Pos.CENTER);
@@ -1009,10 +1020,19 @@ class CreateFrame extends BorderPane {
             mealType = "breakfast";
         } else if (mealType.contains("dinner")) {
             mealType = "dinner";
-        } else {
+        }
+        else if(mealType.contains("lunch")){
             mealType = "lunch";
         }
+        else{
+            mealType = "TryAgain";
+        }
         return mealType;
+    }
+
+    public void setTitle(String s){
+        Title.setText(s);
+        Title.setFont(new Font(30));
     }
 }
 
