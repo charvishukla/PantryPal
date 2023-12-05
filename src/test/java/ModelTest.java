@@ -1,9 +1,11 @@
 import static com.mongodb.client.model.Filters.eq;
 import org.junit.jupiter.api.BeforeEach;
+import org.assertj.core.api.BooleanArrayAssert;
 import org.bson.Document;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.function.Try;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -42,6 +44,7 @@ class ModelTest {
     void setUp() {
         mockAudioRecorder = new MockAudioRecorder();
         chatGPT = new MockChatGPT();
+        MockWhisper.resetMockFlags();
     }
     //--------------------------------------------------------------------------
     //-------------------------------CHATGPT TESTS------------------------------
@@ -162,6 +165,70 @@ class ModelTest {
     //--------------------------------------------------------------------------
     //------------------------------WHISPER TESTS-------------------------------
     //--------------------------------------------------------------------------
+
+    @Test
+    void audioToText_ShouldReturnMockedText() {
+        String response = "";
+        try {
+            response = MockWhisper.audioToText(new File("testfile.mp3"));
+        } catch (Exception e) {
+            response = "AudioToText failed";
+            e.printStackTrace();
+        }
+        assertEquals("Mocked text for file: testfile.mp3", response);
+    }
+
+    
+    void audioToText_ShouldHandleNullFile() {
+        Boolean boo = false;
+        try {
+            MockWhisper.audioToText(null);
+        } catch (Exception IOException) {
+            boo = true;
+        }
+        assertTrue(boo);
+    }
+
+    // Tests for mockHandleErrorResponse
+    @Test
+    void mockHandleErrorResponse_ShouldSetFlag() {
+        MockWhisper.mockHandleErrorResponse(null);
+        assertTrue(MockWhisper.isMockHandleErrorResponseCalled);
+    }
+
+    @Test
+    void mockHandleErrorResponse_ShouldNotThrowException() {
+        assertDoesNotThrow(() -> MockWhisper.mockHandleErrorResponse(null));
+    }
+
+    // Tests for mockHandleSuccessResponse
+    @Test
+    void mockHandleSuccessResponse_ShouldSetFlag() {
+        MockWhisper.mockHandleSuccessResponse(null);
+        assertTrue(MockWhisper.isMockHandleSuccessResponseCalled);
+    }
+
+    @Test
+    void mockHandleSuccessResponse_ShouldReturnMockedText() {
+        String response = MockWhisper.mockHandleSuccessResponse(null);
+        assertEquals("Simulated successful response text", response);
+    }
+
+    // Tests for mockWriteFileToOutputStream
+    @Test
+    void mockWriteFileToOutputStream_ShouldSetFlag() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        MockWhisper.mockWriteFileToOutputStream(outputStream, new File("testfile.mp3"), "boundary");
+        assertTrue(MockWhisper.isMockWriteFileToOutputStreamCalled);
+    }
+
+    @Test
+    void mockWriteFileToOutputStream_ShouldWriteToOutputStream() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        MockWhisper.mockWriteFileToOutputStream(outputStream, new File("testfile.mp3"), "boundary");
+        String expectedOutput = "Mock data for file: testfile.mp3";
+        assertEquals(expectedOutput, outputStream.toString());
+    }
 }
 
 
