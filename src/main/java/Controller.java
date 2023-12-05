@@ -228,9 +228,10 @@ public class Controller {
                 model.getDatabase().updateImageTime(title, response.getString("ImageTime"));
             }
             RecipeDetailPage deet = new RecipeDetailPage(response);
+            deet.disableRefresh();
 
-            RecipeCard newRecipe = new RecipeCard(title, response.getString("MealType"), response.getString("Time"));
-            newRecipe.setImage(response.getString("Image"));
+            RecipeCard newRecipe = new RecipeCard(title, deet.getResponse().getString("MealType"), deet.getResponse().getString("Time"));
+            newRecipe.setImage(deet.getResponse().getString("Image"));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
@@ -342,25 +343,27 @@ public class Controller {
         response.put("Image", this.model.getNewImage(response.getString("Title")));
         response.put("ImageTime", Instant.now().toString());
         RecipeDetailPage deet = new RecipeDetailPage(response);
+        deet.enableRefresh();
         deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
         deet.getDetailFooter().getSaveButton().setOnAction(
             e ->    {
-                    RecipeCard recipe = new RecipeCard(response.getString("Title"), mealType, response.getString("Time"));
-                    recipe.setImage(response.getString("Image"));
+                    RecipeCard recipe = new RecipeCard(deet.getResponse().getString("Title"), mealType, deet.getResponse().getString("Time"));
+                    recipe.setImage(deet.getResponse().getString("Image"));
+                    deet.disableRefresh();
                     recipe.addRecipeDetail(deet);
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
-                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(response.getString("Title"))) {
+                    if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(deet.getResponse().getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
-                        model.getDatabase().insert(response); //TODO
+                        model.getDatabase().insert(deet.getResponse()); //TODO
                     } else {
-                        model.getDatabase().updateSteps(response.getString("Title"), deet.getSteps()); //TODO
+                        model.getDatabase().updateSteps(deet.getResponse().getString("Title"), deet.getSteps()); //TODO
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getDeleteButton().setOnAction(
             e ->    {
-                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(response.getString("Title"));
-                    model.getDatabase().delete(response.getString("Title")); //TODO
+                    this.view.getAppFrame().getRecipeList().deleteRecipeCard(deet.getResponse().getString("Title"));
+                    model.getDatabase().delete(deet.getResponse().getString("Title")); //TODO
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -376,6 +379,16 @@ public class Controller {
                     if(last instanceof TextField) {
                         deet.getDetailList().getChildren().remove(last);
                     }
+                    });
+        deet.getRefreshButton().setOnAction(
+            e ->    {
+                    JSONObject newResponse = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
+                    newResponse.put("User", this.view.getAppFrame().getHeader().getUsername());
+                    newResponse.put("Time", Instant.now().toString());
+                    newResponse.put("Image", this.model.getNewImage(newResponse.getString("Title")));
+                    newResponse.put("ImageTime", Instant.now().toString());
+                    deet.updateResponse(newResponse);
+                    deet.update();
                     });
         this.view.switchScene(deet);
     }

@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import javax.faces.event.SystemEvent;
 
 import org.json.JSONObject;
+
+import com.google.gson.JsonObject;
+
 import java.time.Instant;
 
 // Event Handling
@@ -910,6 +913,14 @@ class DetailList extends VBox {
         this.setPrefSize(1280, 545);
         this.setStyle("-fx-background-color: black;");
     }
+
+    public void deleteAllSteps() {
+        for(int i = this.getChildren().size() - 1; i >= 0; i--){
+            if(this.getChildren().get(i) instanceof TextField) {
+                this.getChildren().remove(i);
+            }
+        }
+    }
 }
 
 
@@ -923,6 +934,8 @@ class RecipeDetailPage extends BorderPane {
     private int ingredientsSize;
     private ImageView imageView;
     private Image image;
+    private Button refresh;
+    private JSONObject response;
 
     RecipeDetailPage() {
         // Initialize the header and footer
@@ -941,6 +954,7 @@ class RecipeDetailPage extends BorderPane {
        
     // initializing 
     RecipeDetailPage(JSONObject json){
+        this.response = json;
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
@@ -967,6 +981,12 @@ class RecipeDetailPage extends BorderPane {
         title.getStyleClass().add("recipe-detail-title");
         title.setTranslateX(100);
         detailList.getChildren().add(title);
+
+        //Refresh recipe
+        refresh = new Button("Refresh");
+        refresh.getStyleClass().add("button");
+        refresh.setStyle("-fx-padding: 10 20 10 20");
+        header.getChildren().add(refresh);
 
         String[] ingredList = json.getString("Ingredients").replaceAll("\n+", "\n").split("\n");
         ingredientsSize = 0;
@@ -1016,6 +1036,40 @@ class RecipeDetailPage extends BorderPane {
             }
         }
         return steps;
+    }
+
+    public Button getRefreshButton(){
+        return refresh;
+    }
+
+    public JSONObject getResponse(){
+        return this.response;
+    }
+
+    public void updateResponse(JSONObject response){
+        this.response = response;
+    }
+
+    public void update(){
+        this.detailList.deleteAllSteps();
+        for(int i = 1; i <= this.response.getInt("numSteps"); i++) {
+            TextField step = new TextField(this.response.getString(String.valueOf(i)));
+            step.getStyleClass().add("step");
+            step.setTranslateX(100);
+            detailList.getChildren().add(step);
+        }
+        this.image = new Image(this.response.getString("Image"));
+        this.imageView.setImage(this.image);
+    }
+
+    public void enableRefresh(){
+        refresh.setVisible(true);
+        refresh.setDisable(false);
+    }
+
+    public void disableRefresh(){
+        refresh.setVisible(false);
+        refresh.setDisable(true);
     }
 }
 
