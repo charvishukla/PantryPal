@@ -82,9 +82,11 @@ public class View {
         this.createAccountPage = new CreateAccountPage();
         this.mainStage = primaryStage;
 
+
+        
         // Setting the initial scene to be the login page.
         this.currentScene = new Scene(this.loginPage, 1280, 720);
-
+        
         // src/main/resources/stylesheets/LoginPage.css
         // Configuring the main stage with the initial scene and showing it.
         mainStage.setScene(currentScene);
@@ -927,6 +929,31 @@ class DetailList extends VBox {
 }
 
 
+class ServerDownPage extends VBox {
+    private Label label1; 
+    private Label label2; 
+    private Label label3;
+    private ImageView imageView; 
+    private Image image; 
+
+    ServerDownPage(){
+        Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
+        this.getStyleClass().add("server-down-page");
+        this.getStylesheets().add(getClass().getResource("/stylesheets/ServerDown.css").toExternalForm());
+        this.setPadding(new Insets(10, 10, 10, 10));
+        label1 = new Label("Whoops!"); 
+        label1.getStyleClass().add("label-common");
+        image = new Image("/resources/cat.jpg");
+        imageView = new ImageView(image);
+        label2 = new Label("Looks like this page went on Vacation!");
+        label2.getStyleClass().add("label-common");
+        label3 = new Label("Please wait and then try re-launching the app.");
+        label3.getStyleClass().add("label3");
+
+        this.getChildren().addAll(label1, imageView, label2, label3);
+    }
+}
+
 /**
  * here, we need to fetch the recipe details from MongoDB
  */
@@ -958,6 +985,7 @@ class RecipeDetailPage extends BorderPane {
     // initializing 
     RecipeDetailPage(JSONObject json){
         this.response = json;
+
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
