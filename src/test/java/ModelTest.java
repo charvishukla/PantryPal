@@ -138,38 +138,38 @@ class ModelTest {
     // -------------------------AUDIORECORDER TESTS------------------------------
     // --------------------------------------------------------------------------
 
-    // @Test
-    // void startRecording_ShouldSetIsRecordingToTrue() {
-    //     mockAudioRecorder.startRecording();
-    //     assertTrue(mockAudioRecorder.isRecording);
-    // }
+    @Test
+    void startRecording_ShouldSetIsRecordingToTrue() {
+        mockAudioRecorder.startRecording();
+        assertTrue(mockAudioRecorder.isRecording);
+    }
 
-    // @Test
-    // void startRecording_ShouldPrintCorrectMessage() {
-    //     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    //     System.setOut(new PrintStream(outContent));
+    @Test
+    void startRecording_ShouldPrintCorrectMessage() {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
 
-    //     mockAudioRecorder.startRecording();
-    //     assertEquals("Mock startRecording called\n", outContent.toString());
+        mockAudioRecorder.startRecording();
+        assertEquals("Mock startRecording called", outContent.toString());
 
-    //     System.setOut(System.out);
-    // }
+        System.setOut(System.out);
+    }
 
-    // @Test
-    // void stopRecording_ShouldSetIsRecordingToFalse() {
-    //     mockAudioRecorder.startRecording(); // Ensure recording is started
-    //     mockAudioRecorder.stopRecording();
-    //     assertFalse(mockAudioRecorder.isRecording());
-    // }
+    @Test
+    void stopRecording_ShouldSetIsRecordingToFalse() {
+        mockAudioRecorder.startRecording(); // Ensure recording is started
+        mockAudioRecorder.stopRecording();
+        assertFalse(mockAudioRecorder.isRecording());
+    }
 
-    // @Test
-    // void stopRecording_ShouldPrintCorrectMessage() {
-    //     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
-    //     System.setOut(new PrintStream(outContent));
-    //     mockAudioRecorder.stopRecording();
-    //     assertEquals("Mock stopRecording called\n", outContent.toString());
-    //     System.setOut(System.out);
-    // }
+    @Test
+    void stopRecording_ShouldPrintCorrectMessage() {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+        mockAudioRecorder.stopRecording();
+        assertEquals("Mock stopRecording called", outContent.toString());
+        System.setOut(System.out);
+    }
 
     // --------------------------------------------------------------------------
     // ------------------------------WHISPER TESTS-------------------------------

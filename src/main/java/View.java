@@ -501,12 +501,12 @@ class Header extends HBox {
 
         this.profileButton = new Button("My Profile");
         profileButton.getStyleClass().add("my-profile-button");
-        profileButton.setTranslateY(25);
+        profileButton.setTranslateY(15);
 
         Label filterLabel = new Label("Filter:");
         filterLabel.getStyleClass().add("filter-label");
         filterLabel.setTranslateY(25);
-        filterLabel.setTranslateX(-45);
+        filterLabel.setTranslateX(-65);
         
         
         String[] filter = {"all", "breakfast", "lunch", "dinner"};
@@ -514,7 +514,7 @@ class Header extends HBox {
         filterBox.getStyleClass().add("filter-box");
         filterBox.getSelectionModel().selectFirst();
         filterBox.setTranslateY(15);
-        filterLabel.setTranslateX(-35);
+        filterBox.setTranslateX(-55);
     
         logoutButton = new Button("Sign Out");
         logoutButton.getStyleClass().add("logout-button");
@@ -523,13 +523,16 @@ class Header extends HBox {
 
         //Sorting setup and style
         Label sortingLabel = new Label("Sorting:");
-        sortingLabel.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        sortingLabel.getStyleClass().add("sorting-label");
+        sortingLabel.setTranslateY(25);
+        sortingLabel.setTranslateX(-45);
+        
         String[] sorting = {"Newest to Oldest", "Oldest to Newest", "Alphabetically"};
         this.sortingBox = new ComboBox<String>(FXCollections.observableArrayList(sorting));
-        sortingBox.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
+        sortingBox.getStyleClass().add("sorting-box");
         sortingBox.getSelectionModel().selectFirst();
+        sortingBox.setTranslateY(15);
+        sortingBox.setTranslateX(-35);
         // A Region is used as a "spacer"
         // occupies all available space between the buttons
         Region spacer = new Region();
@@ -984,8 +987,9 @@ class RecipeDetailPage extends BorderPane {
 
         //Refresh recipe
         refresh = new Button("Refresh");
-        refresh.getStyleClass().add("button");
-        refresh.setStyle("-fx-padding: 10 20 10 20");
+        refresh.getStyleClass().add("refresh-button");
+        refresh.setTranslateY(15);
+        
         header.getChildren().add(refresh);
 
         String[] ingredList = json.getString("Ingredients").replaceAll("\n+", "\n").split("\n");
