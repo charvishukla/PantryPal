@@ -63,14 +63,14 @@ public class Controller {
 
     }
 
-    private void handleLogoutButtonClick(ActionEvent event){
+    public void handleLogoutButtonClick(ActionEvent event){
         this.view.getAppFrame().getRecipeList().deleteAll();
         view.switchScene(this.view.getLoginPage());
         File identifyer = new File("Device Identifyer");
         identifyer.delete();
     }
 
-    private void handleFilterBoxClick(ActionEvent event) {
+    public void handleFilterBoxClick(ActionEvent event) {
         String filter = this.view.getAppFrame().getHeader().getFilterBox().getValue();
         RecipeList recipeList = this.view.getAppFrame().getRecipeList();
         List<RecipeCard> recipeCards = recipeList.getRecipeCards();
@@ -89,7 +89,7 @@ public class Controller {
         }
     }
 
-    private void handleSortingBoxClick(ActionEvent event) {
+    public void handleSortingBoxClick(ActionEvent event) {
         String sorting = this.view.getAppFrame().getHeader().getSortingBox().getValue();
         RecipeList recipeList = this.view.getAppFrame().getRecipeList();
         List<RecipeCard> recipeCards = recipeList.getRecipeCards();
@@ -136,7 +136,7 @@ public class Controller {
         }
     }
 
-    private void handleLoginButtonClick(ActionEvent event) {
+    public void handleLoginButtonClick(ActionEvent event) {
         Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();

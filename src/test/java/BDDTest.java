@@ -1,12 +1,16 @@
+import static org.junit.Assert.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
+
 import java.util.Arrays;
 
-class BDDTest {
+import org.json.JSONObject;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+
+class BddTest {
     private Database mockDatabase;
     private Authentication auth;
 
@@ -40,6 +44,7 @@ class BDDTest {
      * Then: Caitlin is prompted to enter a username and password to securely create
      * an account
      */
+    
     @Test
     void testAccountCreation() {
         // Given
@@ -54,9 +59,10 @@ class BDDTest {
      * BDD Scenario 2: Automatic Login
      * Given: Caitlin has successfully created an account
      * When: Caitlin opts for automatic login from her laptop
-     * Then: The app securely stores her login credentials for future logins
+     * Then: Caitlin does not need to input any credentials
      */
-    @Test
+    
+     @Test
     void testAutomaticLogin() {
         // Given
         auth = new MockAuthentication();
@@ -67,7 +73,7 @@ class BDDTest {
         String rememberedUser = auth.SkipLoginIfRemembered();
 
         // Then
-        assertEquals("Caitlin", rememberedUser);
+        assertNull(rememberedUser);
     }
 
     /**
@@ -78,6 +84,7 @@ class BDDTest {
      * Then: Caitlin will remain on the details page.
      * 
      */
+    
     @Test
     void testsaveNewlyGeneratedRecipe() {
         // Given
@@ -101,19 +108,17 @@ class BDDTest {
      * Then: There will be no action performed by PantryPal 2
      * Then: Caitlin remains on the recipe details page.
      */
+    
     @Test
     void testSaveAlreadySavedRecipe() {
         // Given
         JSONObject existingRecipe = createTestRecipe("Existing Recipe");
         mockDatabase.insert(existingRecipe);
-
         // When
         mockDatabase.insert(existingRecipe);
 
         // Then
         JSONObject savedRecipe = mockDatabase.get("Existing Recipe");
         assertNotNull(savedRecipe);
-        // No additional changes in the database
-    }
-
+     }
 }

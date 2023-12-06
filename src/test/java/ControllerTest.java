@@ -1,85 +1,106 @@
 // import org.junit.jupiter.api.BeforeEach;
 // import org.junit.jupiter.api.Test;
-// import org.mockito.InjectMocks;
-// import org.mockito.Mock;
-// import org.mockito.MockitoAnnotations;
-// import java.lang.reflect.Field;
-// import java.io.File;
-// import java.io.IOException;
-// import java.net.URISyntaxException;
-// import java.util.ArrayList;
+// import org.json.JSONObject;
+
+// import java.time.Instant;
+// import java.util.Arrays;
 // import java.util.List;
 
 // import static org.junit.jupiter.api.Assertions.*;
-// import static org.mockito.ArgumentMatchers.*;
-// import static org.mockito.Mockito.*;
 
-// import javafx.event.ActionEvent;
+// class ControllerTest{
+//   MockController controller = new MockController();
 
+//     @Test
+//     void sortRecipeCardsByTitle_SortedAlphabetically() {
+//         List<RecipeCard> cards = Arrays.asList(
+//             new RecipeCard("Banana Bread", "Dessert", Instant.now().toString()),
+//             new RecipeCard("Apple Pie", "Dessert", Instant.now().toString()),
+//             new RecipeCard("Chocolate Cake", "Dessert", Instant.now().toString())
+//         );
 
-// class ControllerTest {
-//     @InjectMocks
-//     private Controller controller;
-//     private View mockView;
-//     private Model mockModel;
+//         controller.sortRecipeCardsByTitle(cards);
 
-//     @BeforeEach
-//     void setUp() {
-//         MockitoAnnotations.openMocks(this);
-//         mockModel = mock(Model.class);
-//         mockView = mock(View.class);
-//         //List<RecipeCard> l = mock(List.class);
-//         //controller = new Controller(mockView, mockModel);
+//         assertEquals("Apple Pie", cards.get(0).getTitle());
+//         assertEquals("Banana Bread", cards.get(1).getTitle());
+//         assertEquals("Chocolate Cake", cards.get(2).getTitle());
 //     }
-    
-    
-//     /* US 1 BDD Scenario 1 - no recipes displayed */
-//     // @Test
-//     // public void testNoRecipesDisplayedOnHomepage() {
 
-//     //     ActionEvent mockEvent = mock(ActionEvent.class);
-//     //     List<RecipeCard> recipeCards = new ArrayList<RecipeCard>();
+//     @Test
+//     void sortRecipeCardsByTitle_CaseInsensitiveSorting() {
+//         List<RecipeCard> cards = Arrays.asList(
+//             new RecipeCard("banana Bread", "Dessert", Instant.now().toString()),
+//             new RecipeCard("apple Pie", "Dessert", Instant.now().toString()),
+//             new RecipeCard("chocolate Cake", "Dessert", Instant.now().toString())
+//         );
 
-//     //     when(mockView.getAppFrame().getRecipeList().getRecipeCards()).thenReturn(recipeCards);
+//         controller.sortRecipeCardsByTitle(cards);
 
-//     //     // controller.handleCreateButtonClick(mockEvent);
+//         assertEquals("apple Pie", cards.get(0).getTitle());
+//         assertEquals("banana Bread", cards.get(1).getTitle());
+//         assertEquals("chocolate Cake", cards.get(2).getTitle());
+//     }
 
-//     //     // assertFalse(this.mockView.getAppFrame().getRecipeList().getRecipeCards().isEmpty());
-//     // }
+//     @Test
+//     void sortRecipeCardsByMealType_SortedByMealType() {
+//         List<RecipeCard> cards = Arrays.asList(
+//             new RecipeCard("Banana Bread", "Snack", Instant.now().toString()),
+//             new RecipeCard("Apple Pie", "Dessert", Instant.now().toString()),
+//             new RecipeCard("Chocolate Cake", "Breakfast", Instant.now().toString())
+//         );
 
-//     // @Test
-//     // public void testCreateButton() {
-//     //     when(mockView.switchScene()).thenReturn(true);
-//     // }
+//         controller.sortRecipeCardsByMealType(cards);
 
-//     /* US 1 BDD Scenario 2 - at least one recipe displayed */
-//     /*@Test
-//     public void testRecipesDisplayedOnHomepage() {
+//         assertEquals("Apple Pie", cards.get(0).getTitle());
+//         assertEquals("Chocolate Cake", cards.get(1).getTitle());
+//         assertEquals("Banana Bread", cards.get(2).getTitle());
+//     }
 
-//         assertFalse(controller.getView().getAppFrame().getRecipeList().getRecipeCards().isEmpty());
+//     @Test
+//     void sortRecipeCardsByMealType_SameMealType() {
+//         List<RecipeCard> cards = Arrays.asList(
+//             new RecipeCard("Banana Bread", "Dessert", Instant.now().toString()),
+//             new RecipeCard("Apple Pie", "Dessert", Instant.now().toString()),
+//             new RecipeCard("Chocolate Cake", "Dessert", Instant.now().toString())
+//         );
 
-//     }*/
+//         controller.sortRecipeCardsByMealType(cards);
 
-//     /* US 2 BDD Scenario 1 - A new recipe is created */
-//     // @Test
-//     // public void testCreateNewRecipe() {
-        
-//     //     RecipeCard recipeCard = mock(RecipeCard.class);
+//         // Assuming the original order is preserved as all have the same meal type
+//         assertEquals("Banana Bread", cards.get(0).getTitle());
+//         assertEquals("Apple Pie", cards.get(1).getTitle());
+//         assertEquals("Chocolate Cake", cards.get(2).getTitle());
+//     }
 
-//     //     when(this.mockView.getAppFrame().getRecipeList().addRecipeCard(recipeCard)).thenReturn(recipeCard);
+//     @Test
+//     void sortRecipeCardsByTime_SortedByTime() {
+//         List<RecipeCard> cards = Arrays.asList(
+//             new RecipeCard("Banana Bread", "Dessert", Instant.now().minusSeconds(300).toString()),
+//             new RecipeCard("Apple Pie", "Dessert", Instant.now().minusSeconds(600).toString()),
+//             new RecipeCard("Chocolate Cake", "Dessert", Instant.now().toString())
+//         );
 
-//     //     controller.handleCreateButtonClick(mockEvent);
+//         controller.sortRecipeCardsByTime(cards);
 
-//     //     int initialSize = this.mockView.getAppFrame().getRecipeList().getRecipeCards().size();
+//         assertEquals("Apple Pie", cards.get(0).getTitle());
+//         assertEquals("Banana Bread", cards.get(1).getTitle());
+//         assertEquals("Chocolate Cake", cards.get(2).getTitle());
+//     }
 
-//     //     controller.handleCreateButtonClick(mockEvent);
+//     @Test
+//     void sortRecipeCardsByTime_ReverseChronologicalOrder() {
+//         List<RecipeCard> cards = Arrays.asList(
+//             new RecipeCard("Banana Bread", "Dessert", Instant.now().minusSeconds(300).toString()),
+//             new RecipeCard("Apple Pie", "Dessert", Instant.now().minusSeconds(100).toString()),
+//             new RecipeCard("Chocolate Cake", "Dessert", Instant.now().minusSeconds(200).toString())
+//         );
 
-//     //     int finalSize = this.mockView.getAppFrame().getRecipeList().getRecipeCards().size();
+//         controller.sortRecipeCardsByTime(cards);
 
-//     //     assertEquals(initialSize + 1, finalSize);
-        
-//     // }
-    
-    
-    
+//         assertEquals("Banana Bread", cards.get(0).getTitle());
+//         assertEquals("Chocolate Cake", cards.get(1).getTitle());
+//         assertEquals("Apple Pie", cards.get(2).getTitle());
+//     }
+
+
 // }
