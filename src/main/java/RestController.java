@@ -1,5 +1,9 @@
 import io.javalin.*;
 import static io.javalin.apibuilder.ApiBuilder.*;
+import io.javalin.http.UploadedFile;
+import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
@@ -113,7 +117,7 @@ public class RestController {
                             throw new BadRequestResponse();
                         }
                         JSONObject requestBody = new JSONObject(ctx.body());
-                        String mealType = requestBody.getString("mealtype");
+                        String mealType = requestBody.getString("mealType");
                         String ingredients = requestBody.getString("ingredients");
                         log.info("Getting new recipe");
                         ctx.json(model.getNewRecipe(mealType, ingredients).toString());
@@ -163,6 +167,42 @@ public class RestController {
                     });
                 });
             });
+
+            path("whisper", () -> {
+                post(ctx -> {
+                    UploadedFile file = ctx.uploadedFile("recording.wav");                     
+                    String output = "Error";
+                    if (file != null) {
+                        File serverFile = new File(String.valueOf(Math.random()) + file.filename());
+                        try (InputStream inputStream = file.content();
+                            FileOutputStream outputStream = new FileOutputStream(serverFile)) {
+                            inputStream.transferTo(outputStream);                            
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            ctx.status(500).result("Error while writing file");
+                        }
+                        output = model.audioToText(serverFile);
+                        serverFile.delete();
+                        ctx.status(200).json(output);
+                    } else {
+                        ctx.status(400).result("No file found");
+                    }
+                });
+            });
+
+            path("share", () -> {
+                get(ctx -> {
+                    if (ctx.queryString() == null) {
+                        log.error("Query string is null");
+                        throw new BadRequestResponse();
+                    }
+                    String id = ctx.queryParam("id");
+                    if (id == null) {
+                        log.error("Title is null");
+                        throw new BadRequestResponse();
+                    }
+                });
+            });
         });
 
         app.ws("ws/audio", ws -> {
@@ -198,10 +238,6 @@ public class RestController {
                 log.info("Stopped PantryPal Server");
             });
         });
-    }
-
-    public static void postStuff(Context ctx) {
-        System.out.println("psted");
     }
 
     // public static void getNewRecipe(Context ctx) {

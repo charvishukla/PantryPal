@@ -470,7 +470,7 @@ class Database {
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
         this.recipeCollection = database.getCollection("Recipe");
-        System.out.println("Successfully connected to MongoDB! :)");
+        // System.out.println("Successfully connected to MongoDB! :)");
     }
 
     public void close() {
@@ -586,7 +586,7 @@ class Authentication{
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
         this.userCollection = database.getCollection("Users");
-        System.out.println("Successfully connected to MongoDB! :)");
+        // System.out.println("Successfully connected to MongoDB! :)");
     }
 
     public Authentication(MongoClient client, MongoDatabase database, MongoCollection<Document> userCollection){
