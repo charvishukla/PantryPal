@@ -50,17 +50,12 @@ dependencies {
 }
 
 test {
-    // If you want to always show standard out and standard error
-    testLogging.showStandardStreams = true
-
     // Alternatively, you can configure it to only show output for failed tests
     testLogging {
         events 'passed', 'skipped', 'failed'
         exceptionFormat 'full'
         showExceptions true
         showCauses true
-        showStackTraces true
-        showStandardStreams = true
     }
 }
 

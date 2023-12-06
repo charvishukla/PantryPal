@@ -635,6 +635,7 @@ class DetailFooter extends HBox {
     private Button deleteButton;
     private Button addStepButton;
     private Button deleteStepButton;
+    private Button share;
 
     DetailFooter() {
         this.getStyleClass().add("detail-footer");
@@ -655,7 +656,9 @@ class DetailFooter extends HBox {
         addStepButton.getStyleClass().add("button");
         deleteStepButton = new Button("Delete Step");
         deleteStepButton.getStyleClass().add("button");
-        this.getChildren().addAll(backButton, saveButton, deleteButton, addStepButton, deleteStepButton); // adding buttons to footer
+        share = new Button("Share");
+        share.getStyleClass().add("button");
+        this.getChildren().addAll(backButton, saveButton, deleteButton, addStepButton, deleteStepButton, share); // adding buttons to footer
         this.setAlignment(Pos.CENTER); // aligning the buttons to center
     }
 
@@ -679,6 +682,10 @@ class DetailFooter extends HBox {
         return deleteStepButton;
     }
 
+    public Button getShareButton(){
+        return share;
+    }
+
     public void setBackButtonAction(EventHandler<ActionEvent> eventHandler) {
         backButton.setOnAction(eventHandler);
     }
@@ -697,6 +704,10 @@ class DetailFooter extends HBox {
 
     public void setDeleteStepButtonAction(EventHandler<ActionEvent> eventHandler) {
         deleteStepButton.setOnAction(eventHandler);
+    }
+
+    public void setShareButtonAction(EventHandler<ActionEvent> eventHandler){
+        share.setOnAction(eventHandler);
     }
 }
 
