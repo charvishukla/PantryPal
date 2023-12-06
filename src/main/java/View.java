@@ -944,7 +944,7 @@ class RecipeDetailPage extends BorderPane {
         //image view 
         this.imageView.setFitHeight(300);
         this.imageView.setFitWidth(500);
-        this.setAlignment(imageView, Pos.CENTER_LEFT);
+        setAlignment(imageView, Pos.CENTER_LEFT);
         imageView.setPreserveRatio(true);
         detailList.getChildren().add(imageView);
     

@@ -123,6 +123,7 @@ public class RestController {
             });
 
             path("image", () -> {
+                // Get new image (post)
                 post(ctx -> {
                     if (ctx.body().equals("")) {
                         log.error("Empty request body");
@@ -132,6 +133,34 @@ public class RestController {
                     String title = requestBody.getString("title");
                     String url = model.getNewImage(title);
                     ctx.json(url);
+                });
+
+                // Update image url
+                put(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                    String url = requestBody.getString("url");
+                    model.getDatabase().updateImage(title, url);
+                    ctx.json(url);
+                });
+
+                path("time", () -> {
+                    // Update image timestamp
+                    put(ctx -> {
+                        if (ctx.body().equals("")) {
+                            log.error("Empty request body");
+                            throw new BadRequestResponse();
+                        }
+                        JSONObject requestBody = new JSONObject(ctx.body());
+                        String title = requestBody.getString("title");
+                        String timestamp = requestBody.getString("timestamp");
+                        model.getDatabase().updateImageTime(title, timestamp);
+                        ctx.json(timestamp);
+                    });
                 });
             });
         });

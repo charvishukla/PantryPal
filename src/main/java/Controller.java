@@ -147,6 +147,60 @@ public class Controller {
         return url;
     }
 
+    private String updateImageURL(String title, String newURL) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title).put("url", newURL);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/image"))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private String updateImageTimestamp(String title, String timestamp) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title).put("timestamp", timestamp);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/image/time"))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private String updateSteps(String title, List<String> stepsList) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title);
+        JSONArray steps = new JSONArray(stepsList);
+        requestBody.put("steps", steps);
+
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe"))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
     private void handleFilterBoxClick(ActionEvent event) {
         String filter = this.view.getAppFrame().getHeader().getFilterBox().getValue();
         RecipeList recipeList = this.view.getAppFrame().getRecipeList();
@@ -304,13 +358,21 @@ public class Controller {
         for(String title : titles){
             //Generate the recipe detail page.
             recipeJSON = getRecipe(title, username);
-            Instant oldTime = Instant.parse(recipeJSON.getString("ImageTime"));
+            Instant oldTime;
+            try {
+                oldTime = Instant.parse(recipeJSON.getString("ImageTime"));
+            }
+            catch (Exception e) {
+                log.error(e.toString());
+                oldTime = Instant.MIN;
+            }
             if(!Helper._checkImageValid(Instant.now(), oldTime)){
                 String newURL = getNewImageURL(title);
+                System.out.println("Stale image. new url: " + newURL);
                 recipeJSON.put("Image", newURL);
                 recipeJSON.put("ImageTime", Instant.now().toString());
-                model.getDatabase().updateImage(title, newURL); //TODO
-                model.getDatabase().updateImageTime(title, recipeJSON.getString("ImageTime")); //TODO
+                updateImageURL(title, newURL);
+                updateImageTimestamp(title, recipeJSON.getString("ImageTime"));
             }
             RecipeDetailPage deet = new RecipeDetailPage(recipeJSON);
 
