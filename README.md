@@ -54,6 +54,7 @@ Please look at the [commit history](https://github.com/ucsd-cse110-fa23/cse-110-
 
 ## Authors 
 
+Delaware Wade, Hao Chen, Matthew Hsu, Nicole Hernandez, Baljot Sekhon, Charvi Shukla.
 
 
 
