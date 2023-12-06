@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.Instant;
 
+import org.eclipse.jetty.http.HttpParser.HttpHandler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -125,6 +126,25 @@ public class Controller {
         
         JSONObject responseJSON = new JSONObject(response.body());
         return responseJSON;
+    }
+
+    private String getNewImageURL(String prompt) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", prompt);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/image"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        String url = response.body();
+
+        return url;
     }
 
     private void handleFilterBoxClick(ActionEvent event) {
@@ -286,7 +306,7 @@ public class Controller {
             recipeJSON = getRecipe(title, username);
             Instant oldTime = Instant.parse(recipeJSON.getString("ImageTime"));
             if(!Helper._checkImageValid(Instant.now(), oldTime)){
-                String newURL = this.model.getNewImage(title); //TODO
+                String newURL = getNewImageURL(title);
                 recipeJSON.put("Image", newURL);
                 recipeJSON.put("ImageTime", Instant.now().toString());
                 model.getDatabase().updateImage(title, newURL); //TODO

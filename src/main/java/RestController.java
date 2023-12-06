@@ -107,7 +107,7 @@ public class RestController {
                 });
 
                 path("generate", () -> {
-                    get(ctx -> {
+                    post(ctx -> {
                         if (ctx.body().equals("")) {
                             log.error("Empty request body");
                             throw new BadRequestResponse();
@@ -120,6 +120,19 @@ public class RestController {
                     });
                 });
 
+            });
+
+            path("image", () -> {
+                post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                    String url = model.getNewImage(title);
+                    ctx.json(url);
+                });
             });
         });
 
