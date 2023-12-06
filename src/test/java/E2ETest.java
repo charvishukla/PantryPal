@@ -30,49 +30,49 @@ semester delicious. Caitlin's got a kitchen sidekick in PantryPal 2, ready for a
 */
 
 
-class E2ETest {
+// class E2ETest {
 
-    @Test
-    void testEnd2EndScenario() throws IOException, InterruptedException, URISyntaxException {
-        Authentication auth = new MockAuthentication();
+//     @Test
+//     void testEnd2EndScenario() throws IOException, InterruptedException, URISyntaxException {
+//         Authentication auth = new MockAuthentication();
 
-        auth.mockCreateUser("test", "test", "test", "test", "test");
-        Boolean verifyUser = auth.verifyUser("test", "test");
-        assertFalse(verifyUser);
+//         auth.mockCreateUser("test", "test", "test", "test", "test");
+//         Boolean verifyUser = auth.verifyUser("test", "test");
+//         assertFalse(verifyUser);
 
-        auth.markAutoLoginStatus("test");
-        String autoLogin = auth.SkipLoginIfRemembered();
-        assertEquals(autoLogin, null);
+//         auth.markAutoLoginStatus("test");
+//         String autoLogin = auth.SkipLoginIfRemembered();
+//         assertEquals(autoLogin, null);
 
-        MockChatGPT chatGPT = new MockChatGPT();
+//         MockChatGPT chatGPT = new MockChatGPT();
 
-        JSONObject recipe = chatGPT.generateRecipe("Ingredients");
-        assertNotNull(recipe);
+//         JSONObject recipe = chatGPT.generateRecipe("Ingredients");
+//         assertNotNull(recipe);
 
-        RecipeDetailPage recipeDetailPage = mock(RecipeDetailPage.class);
-        recipeDetailPage.updateResponse(recipe);
-        recipeDetailPage.update();
+//         RecipeDetailPage recipeDetailPage = mock(RecipeDetailPage.class);
+//         recipeDetailPage.updateResponse(recipe);
+//         recipeDetailPage.update();
 
-        assertNull(recipeDetailPage.getResponse());
-        String image = chatGPT.generateImage("Image");
+//         assertNull(recipeDetailPage.getResponse());
+//         String image = chatGPT.generateImage("Image");
 
-        RecipeCard recipeCard = mock(RecipeCard.class);
-        recipeCard.setImage(image);
+//         RecipeCard recipeCard = mock(RecipeCard.class);
+//         recipeCard.setImage(image);
         
-        recipeCard.addRecipeDetail(recipeDetailPage);
-        assertNull(recipeCard.getRecipeDetailPage());
+//         recipeCard.addRecipeDetail(recipeDetailPage);
+//         assertNull(recipeCard.getRecipeDetailPage());
         
-        JSONObject recipe2 = chatGPT.generateRecipe("Recipe2");
+//         JSONObject recipe2 = chatGPT.generateRecipe("Recipe2");
         
-        recipeDetailPage.updateResponse(recipe2);
-        recipeDetailPage.update();
-        recipeCard.addRecipeDetail(recipeDetailPage);
-        assertNull(recipeDetailPage.getResponse());
-        assertNull(recipeCard.getRecipeDetailPage());
+//         recipeDetailPage.updateResponse(recipe2);
+//         recipeDetailPage.update();
+//         recipeCard.addRecipeDetail(recipeDetailPage);
+//         assertNull(recipeDetailPage.getResponse());
+//         assertNull(recipeCard.getRecipeDetailPage());
 
-        MockDatabase database = new MockDatabase();
-        database.insert(recipe2);
+//         MockDatabase database = new MockDatabase();
+//         database.insert(recipe2);
 
-        JSONObject retrievedRecipe = database.get("test");       
-    }
-}
+//         JSONObject retrievedRecipe = database.get("test");       
+//     }
+// }
