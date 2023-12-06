@@ -9,6 +9,10 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
+import io.javalin.http.Context;
+import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
+
 
 class BddTest {
     private Database mockDatabase;
@@ -123,6 +127,7 @@ class BddTest {
         assertNotNull(savedRecipe);
      }
 
+<<<<<<< HEAD
      /*  
      * BDD Scenario 5: I am able to see or get the mealtag of each recipe
      * Given: Caitlin is on the recipe list page
@@ -146,4 +151,23 @@ class BddTest {
      @Test
      void 
      */
+=======
+     /**BDD Scenario 1: Refreshing The Recipe
+      *○ Given: Caitlin is viewing a recipe on PantryPal 2
+      *○ And: The initial set of ingredients is preserved
+      *○ When: Caitlin clicks on the refresh button
+      *○ Then: The app regenerates an alternative recipe
+    */
+    @Test
+    void testRegenerateRecipe(){
+        JSONObject oldRecipe = createTestRecipe("Old Recipe");
+
+        RecipeDetailPage recipeDetail = mock(RecipeDetailPage.class);
+
+        recipeDetail.updateResponse(oldRecipe);
+        recipeDetail.update();
+        assertNull(recipeDetail.getResponse());
+
+    }
+>>>>>>> f0956e22c4e7deca5370ce463c0a7a0c20347037
 }
