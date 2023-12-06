@@ -47,15 +47,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Model {
-    private AudioRecorder audioRecorder;
     private Database db;
     private Authentication authManager;
     private Logger log = LoggerFactory.getLogger(Model.class);
+    private List<UserSession> userList;
 
     public Model() {
-        this.audioRecorder = new AudioRecorder();
         this.db = new Database();
         this.authManager = new Authentication();
+        this.userList = new ArrayList<>();
     }
 
     public String audioToText() {
@@ -85,15 +85,6 @@ public class Model {
         return message;
     }
 
-    public void startRecording(){
-        audioRecorder.startRecording();
-    }
-
-    //To stop the recoding process. 
-    public void stopRecording(){
-        audioRecorder.stopRecording();
-    }
-
     public JSONObject getNewRecipe(String mealType, String ingredients) {
         String prompt = ChatGPT.formPrompt(mealType, ingredients);
         JSONObject response = ChatGPT.generateRecipe(prompt);
@@ -115,16 +106,16 @@ public class Model {
         return db;
     }
 
-    public AudioRecorder getAudioRecorder() {
-        return audioRecorder;
-    }
-
     public String skipLogin(){
         return authManager.SkipLoginIfRemembered();
     }
 
-    public UserSession login(String username, String password) {
-        return authManager.login(username, password);
+    public boolean login(String username, String password) {
+        UserSession us = authManager.login(username, password);
+        if (us != null) {
+            return true;
+        } 
+        return false;
     }
 
     public void markAutoLogin(String username) {
@@ -137,6 +128,15 @@ public class Model {
 
     public boolean createUser(String username, String password, String firstName, String lastName, String phone) {
         return authManager.createUser(username, password, firstName, lastName, phone);
+    }
+
+    public boolean sessionExist(String username) {
+        for(UserSession us: userList) {
+            if (us.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
@@ -282,60 +282,6 @@ class Recipe {
     public void setMealType(String mealType) {
         this.mealType = mealType;
     } 
-}
-
-class AudioRecorder {
-
-    private static AudioFormat audioFormat = new AudioFormat(44100, 16, 2, true, true);
-    TargetDataLine targetDataLine;
-    boolean isRecording = true;
-
-    public void startRecording() {
-        Thread t = new Thread(
-            new Runnable(){
-                @Override
-                public void run(){
-                    try {
-                        // the format of the TargetDataLine
-                        DataLine.Info dataLineInfo = new DataLine.Info(
-                            TargetDataLine.class, audioFormat);
-                        isRecording = true;
-                        // the TargetDataLine used to capture audio data from the microphone
-                        targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
-                        targetDataLine.open(audioFormat);
-                        targetDataLine.start();
-
-                        // the AudioInputStream that will be used to write the audio data to a file
-                        AudioInputStream audioInputStream = new AudioInputStream(
-                                targetDataLine);
-
-                        // the file that will contain the audio data
-                        File audioFile = new File("recording.wav");
-                        AudioSystem.write(
-                                audioInputStream,
-                                AudioFileFormat.Type.WAVE,
-                                audioFile);
-                        
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        isRecording = false;
-                    }
-                }
-            }
-        );
-        isRecording = true;
-        t.start();
-    }
-
-    public void stopRecording() {
-        targetDataLine.stop();
-        targetDataLine.close();
-    }
-
-    public boolean isRecording(){
-        return isRecording;
-    }
-    
 }
 
 class Whisper {
@@ -539,6 +485,31 @@ class Database {
         }
         else {
             log.error(String.format("Title '%s' not found in database", title));
+        }
+        return recipeJSON;
+    }
+
+    public JSONObject getByID(String id) {
+        Document recipe = recipeCollection.find(new Document("_id", new ObjectId(id))).first();
+        // ArrayList<String> recipeDetail = new ArrayList<>();
+        JSONObject recipeJSON = new JSONObject();
+        if(recipe != null) {
+            recipeJSON.put("id", recipe.get("_id").toString());
+            recipeJSON.put("Title", recipe.getString("Title"));
+            recipeJSON.put("Ingredients", recipe.getString("Ingredients"));
+            List<Document> stepList = (List<Document>)recipe.get("Steps");
+            for (int i = 0; i < stepList.size(); i++) {
+                recipeJSON.put(String.valueOf(i+1), stepList.get(i).getString("Step"));
+            }
+            recipeJSON.put("MealType", recipe.getString("MealType"));
+            recipeJSON.put("User", recipe.getString("User"));
+            recipeJSON.put("Time", recipe.getString("Time"));
+            recipeJSON.put("numSteps", stepList.size());
+            recipeJSON.put("Image", recipe.getString("Image"));
+            recipeJSON.put("ImageTime", recipe.getString("ImageTime"));
+        }
+        else {
+            log.error(String.format("ID '%s' not found in database", id));
         }
         return recipeJSON;
     }

@@ -53,6 +53,7 @@ public class RestController {
                         log.error("Query string is null");
                         throw new BadRequestResponse();
                     }
+                    String id = ctx.queryParam("id");
                     String title = ctx.queryParam("title");
                     if (title == null) {
                         log.error("Title is null");
@@ -65,6 +66,15 @@ public class RestController {
                         throw new BadRequestResponse();
                     }
                     JSONObject responseBody = new JSONObject();
+                    if (id != null) {
+                        if (!id.equals("")) {
+                            String recipeString = model.getDatabase().getByID(id).toString();
+                            if (recipeString.equals("{}")) {
+                                throw new NotFoundResponse();
+                            }
+                            ctx.json(recipeString);
+                        }
+                    }
                     if (title.equals("")) {
                         log.debug("Getting all titles");
                         responseBody.put("data", model.getDatabase().getAllTitles(username));
@@ -190,6 +200,85 @@ public class RestController {
                 });
             });
 
+            path("auth", () -> {
+                path("skip", () -> {
+                    get(ctx -> {
+                        String username = model.skipLogin();
+                        String exist = "true";
+                        if (username == null) {
+                            username = "";
+                            exist = "false";
+                        }
+                        JSONObject result = new JSONObject().put("username", username).put("exist", exist);
+                        ctx.json(result.toString());
+                    });
+                });
+                path("login", () -> {
+                    post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String username = requestBody.getString("username");
+                    String password = requestBody.getString("password");
+                    String exist = String.valueOf(model.login(username, password));
+                    ctx.json(exist);
+                    });
+                });
+                path("session", () -> {
+                    post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String username = requestBody.getString("username");
+                    String exist = String.valueOf(model.sessionExist(username));
+                    ctx.json(exist);
+                    });
+                });
+                path("auto", () -> {
+                    post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String username = requestBody.getString("username");
+                    model.markAutoLogin(username);
+                    });
+                });
+                path("check", () -> {
+                    post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String username = requestBody.getString("username");
+                    String exist = String.valueOf(model.checkUserExist(username));
+                    ctx.json(exist);
+                    });
+                });
+                path("create", () -> {
+                    post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String username = requestBody.getString("username");
+                    String confirmPassword = requestBody.getString("confirmPassword");
+                    String firstName = requestBody.getString("firstName");
+                    String lastName = requestBody.getString("lastName");
+                    String phone = requestBody.getString("phone");
+                    String exist = String.valueOf(model.createUser(username, confirmPassword, firstName, lastName, phone));
+                    ctx.json(exist);
+                    });
+                });
+            });
+
             path("share", () -> {
                 get(ctx -> {
                     if (ctx.queryString() == null) {
@@ -197,10 +286,12 @@ public class RestController {
                         throw new BadRequestResponse();
                     }
                     String id = ctx.queryParam("id");
-                    if (id == null) {
-                        log.error("Title is null");
+                    if (id == null || id.equals("")) {
+                        log.error("ID is null");
                         throw new BadRequestResponse();
                     }
+                    String recipeString = model.getDatabase().getByID(id).toString();
+                    ctx.json(recipeString);
                 });
             });
         });

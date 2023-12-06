@@ -32,7 +32,7 @@ public class App extends Application {
             this.model = new Model();
             this.restController = new RestController(model);
             this.view = new View(primaryStage);
-            this.controller = new Controller(view, model);
+            this.controller = new Controller(view);
         }
         catch (Exception e) {
             e.printStackTrace();
