@@ -36,6 +36,7 @@ class BddTest {
         recipe.put("MealType", "Test Meal");
         recipe.put("User", "TestUser");
         recipe.put("numSteps", 2);
+        recipe.put("Image", "https://fakeurl");
 
         return recipe;
     }
@@ -106,7 +107,8 @@ class BddTest {
     }
 
     /**
-     * BDD Scenario 3: Save a recipe that is already saved.
+
+     * BDD Scenario 4: Save a recipe that is already saved
      * Given: Caitlin open an old recipe detail page.
      * When: Caitlin clicks save on the bottom of the recipe details page.
      * Then: There will be no action performed by PantryPal 2
@@ -117,7 +119,7 @@ class BddTest {
     void testSaveAlreadySavedRecipe() {
         // Given
         JSONObject existingRecipe = createTestRecipe("Existing Recipe");
-        mockDatabase.insert(existingRecipe);
+        //mockDatabase.insert(existingRecipe);
         // When
         mockDatabase.insert(existingRecipe);
 
@@ -125,6 +127,30 @@ class BddTest {
         JSONObject savedRecipe = mockDatabase.get("Existing Recipe");
         assertNotNull(savedRecipe);
      }
+
+     /*  
+     * BDD Scenario 5: I am able to see or get the mealtag of each recipe
+     * Given: Caitlin is on the recipe list page
+     * When: There are recipes stored in the app
+     * Then: Caitlin will see the meal type for each recipe
+     */
+
+    @Test()
+    void testMealType() {
+        // Given
+        JSONObject existingRecipe = createTestRecipe("Existing Recipe");
+        // When
+        mockDatabase.insert(existingRecipe);
+        // Then
+        JSONObject savedRecipe = mockDatabase.get("Existing Recipe");
+        assertEquals("Test Meal", savedRecipe.getString("MealType"));
+     }
+
+
+     /*
+     @Test
+     void 
+     */
 
      /**BDD Scenario 1: Refreshing The Recipe
       *○ Given: Caitlin is viewing a recipe on PantryPal 2
