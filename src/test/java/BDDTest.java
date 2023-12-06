@@ -107,7 +107,8 @@ class BddTest {
     }
 
     /**
-     * BDD Scenario 4: Save a recipe that is already saved.
+
+     * BDD Scenario 4: Save a recipe that is already saved
      * Given: Caitlin open an old recipe detail page.
      * When: Caitlin clicks save on the bottom of the recipe details page.
      * Then: There will be no action performed by PantryPal 2
@@ -150,6 +151,7 @@ class BddTest {
      @Test
      void 
      */
+
      /**BDD Scenario 1: Refreshing The Recipe
       *○ Given: Caitlin is viewing a recipe on PantryPal 2
       *○ And: The initial set of ingredients is preserved
