@@ -1,9 +1,14 @@
 import io.javalin.*;
 import static io.javalin.apibuilder.ApiBuilder.*;
+import io.javalin.http.UploadedFile;
+import java.io.InputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import io.javalin.http.Context;
 import io.javalin.http.HttpResponseException;
 import io.javalin.http.BadRequestResponse;
+import io.javalin.http.NotFoundResponse;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,23 +49,38 @@ public class RestController {
                 
                 // Get Recipe Title(s)
                 get(ctx -> {
-                    if (ctx.body().equals("")) {
-                        log.error("Empty request body");
+                    if (ctx.queryString() == null) {
+                        log.error("Query string is null");
                         throw new BadRequestResponse();
                     }
-                    JSONObject requestBody = new JSONObject(ctx.body());
-                    String title = requestBody.getString("Title");
-                    String username = requestBody.getString("User");
+                    String title = ctx.queryParam("title");
+                    if (title == null) {
+                        log.error("Title is null");
+                        throw new BadRequestResponse();
+                    }
+                    title = title.replaceAll("%20", " ");
+                    String username = ctx.queryParam("user");
+                    if (username == null || username.equals("")) {
+                        log.error("Username is null");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject responseBody = new JSONObject();
                     if (title.equals("")) {
                         log.debug("Getting all titles");
-                        ctx.json(model.getDatabase().getAllTitles(username));
+                        responseBody.put("data", model.getDatabase().getAllTitles(username));
+                        ctx.json(responseBody.toString());
                     }
                     else {
                         log.debug("Title queried: " + title);
-                        ctx.json(model.getDatabase().get(title).toString());
+                        String recipeString = model.getDatabase().get(title).toString();
+                        if (recipeString.equals("{}")) {
+                            throw new NotFoundResponse();
+                        }
+                        ctx.json(recipeString);
                     }
                 });
 
+                // Edit recipe
                 put(ctx -> {
                     if (ctx.body().equals("")) {
                         log.error("Empty request body");
@@ -79,6 +99,7 @@ public class RestController {
                     ctx.json(model.getDatabase().get(title).toString());
                 });
 
+                // Delete recipe
                 delete(ctx -> {
                     if (ctx.body().equals("")) {
                         log.error("Empty request body");
@@ -90,19 +111,97 @@ public class RestController {
                 });
 
                 path("generate", () -> {
-                    get(ctx -> {
+                    post(ctx -> {
                         if (ctx.body().equals("")) {
                             log.error("Empty request body");
                             throw new BadRequestResponse();
                         }
                         JSONObject requestBody = new JSONObject(ctx.body());
-                        String mealType = requestBody.getString("mealtype");
+                        String mealType = requestBody.getString("mealType");
                         String ingredients = requestBody.getString("ingredients");
                         log.info("Getting new recipe");
                         ctx.json(model.getNewRecipe(mealType, ingredients).toString());
                     });
                 });
 
+            });
+
+            path("image", () -> {
+                // Get new image (post)
+                post(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                    String url = model.getNewImage(title);
+                    ctx.json(url);
+                });
+
+                // Update image url
+                put(ctx -> {
+                    if (ctx.body().equals("")) {
+                        log.error("Empty request body");
+                        throw new BadRequestResponse();
+                    }
+                    JSONObject requestBody = new JSONObject(ctx.body());
+                    String title = requestBody.getString("title");
+                    String url = requestBody.getString("url");
+                    model.getDatabase().updateImage(title, url);
+                    ctx.json(url);
+                });
+
+                path("time", () -> {
+                    // Update image timestamp
+                    put(ctx -> {
+                        if (ctx.body().equals("")) {
+                            log.error("Empty request body");
+                            throw new BadRequestResponse();
+                        }
+                        JSONObject requestBody = new JSONObject(ctx.body());
+                        String title = requestBody.getString("title");
+                        String timestamp = requestBody.getString("timestamp");
+                        model.getDatabase().updateImageTime(title, timestamp);
+                        ctx.json(timestamp);
+                    });
+                });
+            });
+
+            path("whisper", () -> {
+                post(ctx -> {
+                    UploadedFile file = ctx.uploadedFile("recording.wav");                     
+                    String output = "Error";
+                    if (file != null) {
+                        File serverFile = new File(String.valueOf(Math.random()) + file.filename());
+                        try (InputStream inputStream = file.content();
+                            FileOutputStream outputStream = new FileOutputStream(serverFile)) {
+                            inputStream.transferTo(outputStream);                            
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            ctx.status(500).result("Error while writing file");
+                        }
+                        output = model.audioToText(serverFile);
+                        serverFile.delete();
+                        ctx.status(200).json(output);
+                    } else {
+                        ctx.status(400).result("No file found");
+                    }
+                });
+            });
+
+            path("share", () -> {
+                get(ctx -> {
+                    if (ctx.queryString() == null) {
+                        log.error("Query string is null");
+                        throw new BadRequestResponse();
+                    }
+                    String id = ctx.queryParam("id");
+                    if (id == null) {
+                        log.error("Title is null");
+                        throw new BadRequestResponse();
+                    }
+                });
             });
         });
 
@@ -117,6 +216,7 @@ public class RestController {
 
         app.exception(Exception.class, (e, ctx) -> {
             log.error(e.toString());
+            e.printStackTrace();
             // JSONObject responseBody = new JSONObject();
             // responseBody.put("error", "Bad Request");
             // ctx.status(401).json(responseBody.toString());
@@ -125,6 +225,7 @@ public class RestController {
 
         app.exception(JSONException.class, (e, ctx) -> {
             log.error(e.toString());
+            e.printStackTrace();
             throw new BadRequestResponse();
         });
 
@@ -137,10 +238,6 @@ public class RestController {
                 log.info("Stopped PantryPal Server");
             });
         });
-    }
-
-    public static void postStuff(Context ctx) {
-        System.out.println("psted");
     }
 
     // public static void getNewRecipe(Context ctx) {

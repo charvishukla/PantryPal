@@ -975,7 +975,7 @@ class RecipeDetailPage extends BorderPane {
         //image view 
         this.imageView.setFitHeight(300);
         this.imageView.setFitWidth(500);
-        this.setAlignment(imageView, Pos.CENTER_LEFT);
+        setAlignment(imageView, Pos.CENTER_LEFT);
         imageView.setPreserveRatio(true);
         detailList.getChildren().add(imageView);
     
@@ -1288,10 +1288,9 @@ class VoiceInputFrame extends BorderPane {
         ingredients = s;
     }
 
-    // This will set the title to indicate you have selcted breakfast, lunch or
-    // dinner.
-    public void setTitle(String s) {
-        title = new Label("You have select " + s);
+    //This will set the title to indicate you have selected breakfast, lunch or dinner.
+    public void setTitle(String s){
+        title = new Label("You have selected " + s);
         title.setFont(new Font(30));
         this.setTop(title);
         setAlignment(title, Pos.CENTER);

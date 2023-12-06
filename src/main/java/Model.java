@@ -119,6 +119,26 @@ public class Model {
         return audioRecorder;
     }
 
+    public String skipLogin(){
+        return authManager.SkipLoginIfRemembered();
+    }
+
+    public UserSession login(String username, String password) {
+        return authManager.login(username, password);
+    }
+
+    public void markAutoLogin(String username) {
+        authManager.markAutoLoginStatus(username);
+    }
+
+    public boolean checkUserExist(String username) {
+        return authManager.checkUserExists(username);
+    }
+
+    public boolean createUser(String username, String password, String firstName, String lastName, String phone) {
+        return authManager.createUser(username, password, firstName, lastName, phone);
+    }
+
 }
 
 class ChatGPT {
@@ -127,6 +147,8 @@ class ChatGPT {
     private static final String API_KEY = "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";
     private static final String MODEL = "gpt-3.5-turbo";
     private static final String DALLE_MODEL = "dall-e-3";
+
+    private static Logger log = LoggerFactory.getLogger(ChatGPT.class);
 
     public static String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
@@ -222,7 +244,7 @@ class ChatGPT {
             }
             response.put("numSteps", steps.length);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
     
         return response;
@@ -468,7 +490,7 @@ class Database {
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
         this.recipeCollection = database.getCollection("Recipe");
-        System.out.println("Successfully connected to MongoDB! :)");
+        // System.out.println("Successfully connected to MongoDB! :)");
     }
 
     public void close() {
@@ -559,12 +581,12 @@ class Database {
         System.out.println(result);
     }
 
-    public List<String> getAllTitles(String username) {
-        List<String> recipes = new ArrayList<>();
+    public JSONArray getAllTitles(String username) {
+        JSONArray recipes = new JSONArray();
         Bson filter = eq("User", username);
         try (MongoCursor<Document> cursor = recipeCollection.find(filter).iterator()) {
             while (cursor.hasNext()) {
-                recipes.add(cursor.next().getString("Title"));
+                recipes.put(cursor.next().getString("Title"));
             }
         }
         return recipes;
@@ -584,7 +606,7 @@ class Authentication{
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
         this.userCollection = database.getCollection("Users");
-        System.out.println("Successfully connected to MongoDB! :)");
+        // System.out.println("Successfully connected to MongoDB! :)");
     }
 
     public Authentication(MongoClient client, MongoDatabase database, MongoCollection<Document> userCollection){
@@ -681,7 +703,7 @@ class Authentication{
         userCollection.updateOne(filter, updateOperation);
 
         try{
-            FileWriter file = new FileWriter("Device Identifyer");
+            FileWriter file = new FileWriter("Device Identifier");
             file.write(uniqueToken);
             file.close();
 
@@ -691,7 +713,7 @@ class Authentication{
     }
 
     public String SkipLoginIfRemembered(){
-         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifyer"))) {
+         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifier"))) {
                 String line;
                 if((line = reader.readLine() ) != null){
                     Bson filter = eq("token", line);

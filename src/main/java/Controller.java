@@ -2,8 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.Instant;
 
+import org.eclipse.jetty.http.HttpParser.HttpHandler;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.File;
+import java.nio.file.Files;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -11,15 +14,31 @@ import javafx.scene.control.TextField;
 import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.io.IOException;
+import java.nio.file.Paths;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Controller {
     private View view;
     private Model model;
     private String mealType;
     private String ingredients;
+    private HttpClient client;
+    private Logger log = LoggerFactory.getLogger(Controller.class);
+
+    private static final String API_ENDPOINT = "http://127.0.0.1:7000";
 
     public Controller(View view, Model model) {
         this.view = view;
         this.model = model;
+        this.client = HttpClient.newHttpClient();
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
 
@@ -52,21 +71,211 @@ public class Controller {
          * Determines if the app has to automatically log in
          * a user.
          */
-        Authentication authManager = new Authentication();
-        String username = authManager.SkipLoginIfRemembered();
+        String username = this.model.skipLogin();
         if(username != null){
             view.getAppFrame().getHeader().setUsername(username);
-            setupRecipeCardsDetailsAction();
+            try {
+                setupRecipeCardsDetailsAction();
+            }
+            catch (Exception e) {
+                log.error(e.toString());
+                e.printStackTrace();
+            }
             view.switchScene(this.view.getAppFrame());
         }
+    }
+
+    private List<String> getAllTitles(String username) throws
+    IOException, InterruptedException, URISyntaxException {
+        // Create the request object
+        username = username.replaceAll(" ", "%20");
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe?title=&user=" + username))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
         
+        JSONObject responseJSON = new JSONObject(response.body());
+        JSONArray arr = responseJSON.getJSONArray("data");
+
+        List<String> titles = new ArrayList<String>();
+        for (int i = 0; i < arr.length(); i++) {
+            titles.add(arr.getString(i));
+        }
+
+        return titles;
+    }
+
+    private JSONObject getRecipe(String title, String username) throws
+    IOException, InterruptedException, URISyntaxException {
+        // Create the request object
+        title = title.replaceAll(" ", "%20");
+        username = username.replaceAll(" ", "%20");
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe?title=" + title + "&user=" + username))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject responseJSON = new JSONObject(response.body());
+        return responseJSON;
+    }
+
+    private String getNewImageURL(String prompt) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", prompt);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/image"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        String url = response.body();
+
+        return url;
+    }
+
+    private String updateImageURL(String title, String newURL) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title).put("url", newURL);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/image"))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private String updateImageTimestamp(String title, String timestamp) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title).put("timestamp", timestamp);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/image/time"))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private String updateSteps(String title, List<String> stepsList) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title);
+        JSONArray steps = new JSONArray(stepsList);
+        requestBody.put("steps", steps);
+
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe"))
+        .header("Content-Type", "application/json")
+        .PUT(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private void deleteRecipe(String title) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("title", title);
+
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe"))
+        .header("Content-Type", "application/json")
+        .method("DELETE", HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        client.send(request,HttpResponse.BodyHandlers.ofString());
+    }
+
+    private void insertRecipe(JSONObject json) throws 
+    IOException, InterruptedException, URISyntaxException {
+
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(json.toString()))
+        .build();
+
+        client.send(request,HttpResponse.BodyHandlers.ofString());
+    }
+
+    private JSONObject getNewRecipe(String mealType, String ingredients) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("mealType", mealType).put("ingredients", ingredients);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe/generate"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        JSONObject responseBody = new JSONObject(response.body());
+
+        return responseBody;
+    }
+
+    private String audioToText() throws 
+    IOException, InterruptedException, URISyntaxException {
+        String boundary = "MyBoundary";
+        String formData = "--" + boundary + "\r\n" +
+            "Content-Disposition: form-data; name=\"recording.wav\"; filename=\"recording.wav\"\r\n" +
+            "Content-Type: audio/wav\r\n\r\n" +
+            new String(Files.readAllBytes(Paths.get("recording.wav"))) +
+            "\r\n--" + boundary + "--\r\n";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(API_ENDPOINT + "/whisper"))
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofString(formData))
+                .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
 
     }
 
     private void handleLogoutButtonClick(ActionEvent event){
         this.view.getAppFrame().getRecipeList().deleteAll();
         view.switchScene(this.view.getLoginPage());
-        File identifyer = new File("Device Identifyer");
+        File identifyer = new File("Device Identifier");
         identifyer.delete();
     }
 
@@ -137,20 +346,25 @@ public class Controller {
     }
 
     private void handleLoginButtonClick(ActionEvent event) {
-        Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
-        UserSession loginDetails = authManager.login(username, password);
+        UserSession loginDetails = this.model.login(username, password);
 
         if (loginDetails != null){
 
             //If user selected remeber me, then we leave a mark in the database to remember. 
             if(view.getLoginPage().getAutoLoginStatus() == true){
-                authManager.markAutoLoginStatus(username);
+                this.model.markAutoLogin(username);
             }
             view.switchScene(this.view.getAppFrame());
             view.getAppFrame().getHeader().setUsername(username);
-            setupRecipeCardsDetailsAction();
+            try {
+                setupRecipeCardsDetailsAction();
+            }
+            catch (Exception e) {
+                log.error(e.toString());
+                e.printStackTrace();
+            }
         }else{
             view.getLoginPage().showAlert();
         }
@@ -161,7 +375,6 @@ public class Controller {
      * @param event
      */
     private void handleCreateAccountClick(ActionEvent event) {
-        Authentication authManager = new Authentication();
         String username = this.view.getCreateAccountPage().getUsername();
         String password = this.view.getCreateAccountPage().getPassword();
         String confirmPassword = this.view.getCreateAccountPage().getConfirmPassword();
@@ -174,12 +387,12 @@ public class Controller {
             return;
         }
         
-        if (authManager.checkUserExists(username)){
+        if (this.model.checkUserExist(username)){
             this.view.getCreateAccountPage().showAlert("Username already exists");
             return;
         }
 
-        if (authManager.createUser(username, confirmPassword, firstName, lastName, phone)){
+        if (this.model.createUser(username, confirmPassword, firstName, lastName, phone)){
             this.view.switchScene(this.view.getLoginPage());
             return;
         }else{
@@ -207,31 +420,40 @@ public class Controller {
     /**
      * 
      */
-    private void setupRecipeCardsDetailsAction() {
-
+    private void setupRecipeCardsDetailsAction() throws 
+    IOException, InterruptedException, URISyntaxException {
+        final String username = this.view.getAppFrame().getHeader().getUsername();
         //Returns a list of titles of each recipe in database;
-        List<String> titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername()); //TODO
+        List<String> titles = getAllTitles(username);
+        // JSONArray titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername());
         //System.out.println(titles.get(0));
 
         //A JSONObject to store title, ingredients, and step by step recipe.
-        JSONObject response;
+        JSONObject recipeJSON;
 
         for(String title : titles){
             //Generate the recipe detail page.
-            response = model.getDatabase().get(title); //TODO
-            Instant oldTime = Instant.parse(response.getString("ImageTime"));
-            if(!Helper._checkImageValid(Instant.now(), oldTime)){
-                String newURL = this.model.getNewImage(title);
-                response.put("Image", newURL);
-                response.put("ImageTime", Instant.now().toString());
-                model.getDatabase().updateImage(title, newURL);
-                model.getDatabase().updateImageTime(title, response.getString("ImageTime"));
+            recipeJSON = getRecipe(title, username);
+            Instant oldTime;
+            try {
+                oldTime = Instant.parse(recipeJSON.getString("ImageTime"));
             }
-            RecipeDetailPage deet = new RecipeDetailPage(response);
-            deet.disableRefresh();
+            catch (Exception e) {
+                log.error(e.toString());
+                oldTime = Instant.MIN;
+            }
+            if(!Helper._checkImageValid(Instant.now(), oldTime)){
+                String newURL = getNewImageURL(title);
+                System.out.println("Stale image. new url: " + newURL);
+                recipeJSON.put("Image", newURL);
+                recipeJSON.put("ImageTime", Instant.now().toString());
+                updateImageURL(title, newURL);
+                updateImageTimestamp(title, recipeJSON.getString("ImageTime"));
+            }
+            RecipeDetailPage deet = new RecipeDetailPage(recipeJSON);
 
-            RecipeCard newRecipe = new RecipeCard(title, deet.getResponse().getString("MealType"), deet.getResponse().getString("Time"));
-            newRecipe.setImage(deet.getResponse().getString("Image"));
+            RecipeCard newRecipe = new RecipeCard(title, recipeJSON.getString("MealType"), recipeJSON.getString("Time"));
+            newRecipe.setImage(recipeJSON.getString("Image"));
             newRecipe.addRecipeDetail(deet);
             this.view.getAppFrame().getRecipeList().addRecipeCard(newRecipe);
             newRecipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
@@ -239,12 +461,14 @@ public class Controller {
             deet.getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
             deet.getDetailFooter().getSaveButton().setOnAction(
                 e ->    {
-                        model.getDatabase().updateSteps(title, deet.getSteps()); //TODO
+                        try { updateSteps(title, deet.getSteps()); }
+                        catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getDeleteButton().setOnAction(
                 e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCard(title);
-                        model.getDatabase().delete(title); //TODO
+                        try { deleteRecipe(title); }
+                        catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -282,7 +506,8 @@ public class Controller {
     private void MealTypeStopRecord(MouseEvent event){
         this.view.getCreateFrame().getRecordButton().setEffect(null);
         this.model.stopRecording();
-        mealType = model.audioToText();
+        try { mealType = audioToText(); }
+        catch (Exception e) { e.printStackTrace(); }
         this.view.getCreateFrame().setMealType(mealType);
         
         if(this.view.getCreateFrame().getMealType().equals("TryAgain")){
@@ -323,24 +548,38 @@ public class Controller {
     private void IngredientStopRecord(MouseEvent event){
          this.view.getVoiceInputFrame().getRecordButton().setEffect(null);
          this.model.stopRecording();
-         ingredients = model.audioToText();
+         try { ingredients = audioToText(); }
+         catch (Exception e) { e.printStackTrace(); }
          this.view.getVoiceInputFrame().updatePrompt("Prompt received: " + ingredients);
          this.view.getVoiceInputFrame().updateNextButton();
     }    
 
     //If next is clicked, switches from voice input frame to recipe genati
     //And update the next frame to display what meal type you selected.
-    private void IngredientNextButton(ActionEvent event){
+    private void IngredientNextButton(ActionEvent event) {
         this.view.getVoiceInputFrame().updatePrompt("Please list the ingredients you wish to cook with.");
         this.view.getVoiceInputFrame().setIngredients(null);
         this.view.getVoiceInputFrame().updateNextButton();
 
         //System.out.println(prompt);
         //response = {Title, Ingredients, Step 1, Step2, Step3, .....}
-        JSONObject response = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
+        JSONObject response = new JSONObject();
+        try {
+            response = getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); 
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());// HANDLE SERVER TIMEOUT
+        }
         response.put("User", this.view.getAppFrame().getHeader().getUsername());
         response.put("Time", Instant.now().toString());
-        response.put("Image", this.model.getNewImage(response.getString("Title")));
+        try {
+            response.put("Image", getNewImageURL(response.getString("Title")));
+        }
+        catch (Exception e) { // HANDLE SERVER TIMEOUT
+            e.printStackTrace();
+            log.error(e.toString());
+        }
         response.put("ImageTime", Instant.now().toString());
         RecipeDetailPage deet = new RecipeDetailPage(response);
         deet.enableRefresh();
@@ -354,16 +593,19 @@ public class Controller {
                     recipe.getDetailButton().setOnAction(e1 -> {this.view.switchScene(deet);});
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(deet.getResponse().getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
-                        model.getDatabase().insert(deet.getResponse()); //TODO
+                        try { insertRecipe(deet.getResponse()); }
+                        catch (Exception ex) { ex.printStackTrace(); } // HANDLE SERVER TIMEOUT
                     } else {
-                        model.getDatabase().updateSteps(deet.getResponse().getString("Title"), deet.getSteps()); //TODO
+                        try { updateSteps(deet.getResponse().getString("Title"), deet.getSteps()); }
+                        catch (Exception ex) { ex.printStackTrace(); } // HANDLE SERVER TIMEOUT
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getDeleteButton().setOnAction(
             e ->    {
                     this.view.getAppFrame().getRecipeList().deleteRecipeCard(deet.getResponse().getString("Title"));
-                    model.getDatabase().delete(deet.getResponse().getString("Title")); //TODO
+                    try { deleteRecipe(deet.getResponse().getString("Title")); }
+                    catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -382,10 +624,17 @@ public class Controller {
                     });
         deet.getRefreshButton().setOnAction(
             e ->    {
-                    JSONObject newResponse = this.model.getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1)); //TODO
+                    JSONObject newResponse = new JSONObject();
+                    try {
+                        newResponse = getNewRecipe(mealType, ingredients.substring(0, ingredients.length() - 1));
+                    } catch (Exception ex) { // HANDLE SERVER TIMEOUT
+                        ex.printStackTrace();
+                        log.error(ex.toString());
+                    }
                     newResponse.put("User", this.view.getAppFrame().getHeader().getUsername());
                     newResponse.put("Time", Instant.now().toString());
-                    newResponse.put("Image", this.model.getNewImage(newResponse.getString("Title")));
+                    try { newResponse.put("Image", getNewImageURL(newResponse.getString("Title"))); }
+                    catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
                     newResponse.put("ImageTime", Instant.now().toString());
                     deet.updateResponse(newResponse);
                     deet.update();
