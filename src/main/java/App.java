@@ -28,10 +28,15 @@ public class App extends Application {
         View view = new View();
         Controller controller = new Controller(model, view);
         **/
-        this.model = new Model();
-        this.restController = new RestController(model);
-        this.view = new View(primaryStage);
-        this.controller = new Controller(view, model);
+        try {
+            this.model = new Model();
+            this.restController = new RestController(model);
+            this.view = new View(primaryStage);
+            this.controller = new Controller(view, model);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
         
     }
 
@@ -45,7 +50,12 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        try {
+            launch(args);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
