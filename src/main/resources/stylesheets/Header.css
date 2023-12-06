@@ -25,4 +25,198 @@
     -fx-border-color: transparent; 
     border-color: transparent; 
     -fx-text-fill: #fff;
+    
+}
+
+.filter-label {
+    -fx-font-family: 'Arial'; 
+    font-family: 'Arial'; 
+    -fx-font-size: 20px;
+    font-size: 20px;
+    -fx-text-fill: #fff;
+}
+
+.sorting-label {
+    -fx-font-family: 'Arial'; 
+    font-family: 'Arial'; 
+    -fx-font-size: 20px;
+    font-size: 20px;
+    -fx-text-fill: #fff;
+}
+
+.logout-button{
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-cursor: hand;
+    cursor: hand;
+    -fx-border-color: #dedbdb;
+    border-color: #dedbdb;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 30px;
+    border-radius: 30px;
+    -fx-text-fill: #dedbdb;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-font-size: 14px; 
+    font-size: 14px; 
+    -fx-letter-spacing: 4px; 
+    letter-spacing: 4px; 
+    -fx-background-radius: 30px;
+    -fx-padding: 10;
+    padding: 10;
+}
+
+.logout-button:hover {
+    -fx-border-color: transparent;
+    border-color: transparent;
+    -fx-background-color: #23a2f6;
+    background-color: #23a2f6;
+    -fx-text-fill: #fff;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
+}
+
+.refresh-button{
+    -fx-pref-height: 50px;
+    -fx-pref-width: 100px;
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-cursor: hand;
+    cursor: hand;
+    -fx-border-color: #dedbdb;
+    border-color: #dedbdb;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 30px;
+    border-radius: 30px;
+    -fx-text-fill: #dedbdb;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-font-size: 14px; 
+    font-size: 14px; 
+    -fx-letter-spacing: 4px; 
+    letter-spacing: 4px; 
+    -fx-background-radius: 30px;
+    -fx-padding: 10;
+    padding: 10;
+}
+
+.refresh-button:hover {
+    -fx-border-color: transparent;
+    border-color: transparent;
+    -fx-background-color: #23a2f6;
+    background-color: #23a2f6;
+    -fx-text-fill: #fff;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
+}
+
+
+/* Style for ComboBox with class 'filter-box' */
+.filter-box {
+    -fx-font-size: 14px;
+    -fx-font-family: "Arial";
+    -fx-background-color: transparent;
+    -fx-border-color: #dedbdb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 30px;
+    -fx-padding: 5 10 5 10;
+    -fx-cursor: hand;
+}
+
+/* Style for the drop-down of the ComboBox */
+.filter-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 4px;
+}
+
+/* Style for the drop-down when hovered */
+.filter-box .list-cell:hover {
+    -fx-background-color: #1845ad;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
+}
+
+.filter-box .list-cell:selected {
+    -fx-text-fill: #23a2f6;
+}
+
+/* Style for the arrow button of the ComboBox */
+.filter-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.filter-box .arrow-button:hover {
+    -fx-background-color: transparent !important; 
+}
+
+/* Style for the arrow shape */
+.filter-box .arrow {
+    -fx-background-color: #dedbdb;
+}
+
+/* Additional style for arrow button when hovered */
+.filter-box .arrow-button:hover {
+    -fx-background-color: #23a2f6;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
+}
+
+/* Style for ComboBox with class 'sorting-box' */
+.sorting-box {
+    -fx-font-size: 14px;
+    -fx-font-family: "Arial";
+    -fx-background-color: transparent;
+    -fx-border-color: #dedbdb;
+    -fx-border-width: 1px;
+    -fx-border-radius: 30px;
+    -fx-padding: 5 10 5 10;
+    -fx-cursor: hand;
+}
+
+/* Style for the drop-down of the ComboBox */
+.sorting-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 4px;
+}
+
+/* Style for the drop-down when hovered */
+.sorting-box .list-cell:hover {
+    -fx-background-color: #1845ad;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
+}
+
+.sorting-box .list-cell:selected {
+    -fx-text-fill: #23a2f6;
+}
+
+/* Style for the arrow button of the ComboBox */
+.sorting-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.sorting-box .arrow-button:hover {
+    -fx-background-color: transparent !important; 
+}
+
+/* Style for the arrow shape */
+.sorting-box .arrow {
+    -fx-background-color: #dedbdb;
+}
+
+/* Additional style for arrow button when hovered */
+.sorting-box .arrow-button:hover {
+    -fx-background-color: #23a2f6;
+    -fx-effect: dropshadow(gaussian, rgba(130, 174, 245, 0.6), 30, 0.0, 0, 0);
 }

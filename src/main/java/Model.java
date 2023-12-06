@@ -100,6 +100,16 @@ public class Model {
         response.put("MealType", mealType);
         return response;
     }
+
+    public String getNewImage(String prompt) {
+        String url = "";
+        try {
+            url = ChatGPT.generateImage(prompt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
     
     public Database getDatabase(){
         return db;
@@ -109,12 +119,36 @@ public class Model {
         return audioRecorder;
     }
 
+    public String skipLogin(){
+        return authManager.SkipLoginIfRemembered();
+    }
+
+    public UserSession login(String username, String password) {
+        return authManager.login(username, password);
+    }
+
+    public void markAutoLogin(String username) {
+        authManager.markAutoLoginStatus(username);
+    }
+
+    public boolean checkUserExist(String username) {
+        return authManager.checkUserExists(username);
+    }
+
+    public boolean createUser(String username, String password, String firstName, String lastName, String phone) {
+        return authManager.createUser(username, password, firstName, lastName, phone);
+    }
+
 }
 
 class ChatGPT {
     private static final String API_ENDPOINT = "https://api.openai.com/v1/chat/completions";
+    private static final String DALLE_ENDPOINT = "https://api.openai.com/v1/images/generations";
     private static final String API_KEY = "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";
     private static final String MODEL = "gpt-3.5-turbo";
+    private static final String DALLE_MODEL = "dall-e-3";
+
+    private static Logger log = LoggerFactory.getLogger(ChatGPT.class);
 
     public static String generate(String prompt) throws
     IOException, InterruptedException, URISyntaxException {
@@ -161,6 +195,33 @@ class ChatGPT {
         return generatedText;
     }
 
+    public static String generateImage(String prompt) throws
+    IOException, InterruptedException, URISyntaxException {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("model", DALLE_MODEL);
+        requestBody.put("prompt", prompt);
+        requestBody.put("n", 1);
+        requestBody.put("size", "1024x1024");
+        requestBody.put("response_format", "url");
+
+        HttpRequest request = HttpRequest
+            .newBuilder()
+            .uri(URI.create(DALLE_ENDPOINT))
+            .header("Content-Type", "application/json")
+            .header("Authorization", String.format("Bearer %s", API_KEY))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        JSONObject responseJson = new JSONObject(response.body());
+        JSONArray dataArray = responseJson.getJSONArray("data");
+        JSONObject firstItem = dataArray.getJSONObject(0);
+        return firstItem.getString("url");
+    }
+
     public static String formPrompt(String mealType, String ingredients) {
         String prompt = "What is a step-by-step " + mealType + " recipe I can make using " + ingredients + "? Please provide a Title, ingredients, and steps.";
         return prompt;
@@ -183,7 +244,7 @@ class ChatGPT {
             }
             response.put("numSteps", steps.length);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString());
         }
     
         return response;
@@ -227,6 +288,7 @@ class AudioRecorder {
 
     private static AudioFormat audioFormat = new AudioFormat(44100, 16, 2, true, true);
     TargetDataLine targetDataLine;
+    boolean isRecording = true;
 
     public void startRecording() {
         Thread t = new Thread(
@@ -237,7 +299,7 @@ class AudioRecorder {
                         // the format of the TargetDataLine
                         DataLine.Info dataLineInfo = new DataLine.Info(
                             TargetDataLine.class, audioFormat);
-
+                        isRecording = true;
                         // the TargetDataLine used to capture audio data from the microphone
                         targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                         targetDataLine.open(audioFormat);
@@ -253,20 +315,25 @@ class AudioRecorder {
                                 audioInputStream,
                                 AudioFileFormat.Type.WAVE,
                                 audioFile);
-
+                        
                     } catch (Exception ex) {
                         ex.printStackTrace();
+                        isRecording = false;
                     }
                 }
             }
         );
-
+        isRecording = true;
         t.start();
     }
 
     public void stopRecording() {
         targetDataLine.stop();
         targetDataLine.close();
+    }
+
+    public boolean isRecording(){
+        return isRecording;
     }
     
 }
@@ -418,12 +485,12 @@ class Database {
 
     public Database(){
         this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
-
+        
         // Initialize MongoClient without try-with-resources
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
         this.recipeCollection = database.getCollection("Recipe");
-        System.out.println("Successfully connected to MongoDB! :)");
+        // System.out.println("Successfully connected to MongoDB! :)");
     }
 
     public void close() {
@@ -443,7 +510,10 @@ class Database {
               .append("Ingredients", recipeJSON.getString("Ingredients"))
               .append("Steps", stepList)
               .append("MealType", recipeJSON.getString("MealType"))
-              .append("User", recipeJSON.getString("User"));
+              .append("User", recipeJSON.getString("User"))
+              .append("Time", recipeJSON.getString("Time"))
+              .append("Image", recipeJSON.getString("Image"))
+              .append("ImageTime", recipeJSON.getString("ImageTime"));
 
         recipeCollection.insertOne(recipe);
     }
@@ -462,7 +532,10 @@ class Database {
             }
             recipeJSON.put("MealType", recipe.getString("MealType"));
             recipeJSON.put("User", recipe.getString("User"));
+            recipeJSON.put("Time", recipe.getString("Time"));
             recipeJSON.put("numSteps", stepList.size());
+            recipeJSON.put("Image", recipe.getString("Image"));
+            recipeJSON.put("ImageTime", recipe.getString("ImageTime"));
         }
         else {
             log.error(String.format("Title '%s' not found in database", title));
@@ -488,18 +561,32 @@ class Database {
         System.out.println(updateResult);
     }
 
+    public void updateImage(String title, String newURL) {
+        Bson filter = eq("Title", title);
+        Bson updateOperation = set("Image", newURL);
+        UpdateResult updateResult = recipeCollection.updateMany(filter, updateOperation);
+        System.out.println(updateResult);
+    }
+
+    public void updateImageTime(String title, String newTime) {
+        Bson filter = eq("Title", title);
+        Bson updateOperation = set("ImageTime", newTime);
+        UpdateResult updateResult = recipeCollection.updateMany(filter, updateOperation);
+        System.out.println(updateResult);
+    }
+
     public void delete(String title) {
         Bson filter = eq("Title", title);
         DeleteResult result = recipeCollection.deleteMany(filter);
         System.out.println(result);
     }
 
-    public List<String> getAllTitles(String username) {
-        List<String> recipes = new ArrayList<>();
+    public JSONArray getAllTitles(String username) {
+        JSONArray recipes = new JSONArray();
         Bson filter = eq("User", username);
         try (MongoCursor<Document> cursor = recipeCollection.find(filter).iterator()) {
             while (cursor.hasNext()) {
-                recipes.add(cursor.next().getString("Title"));
+                recipes.put(cursor.next().getString("Title"));
             }
         }
         return recipes;
@@ -519,7 +606,7 @@ class Authentication{
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
         this.userCollection = database.getCollection("Users");
-        System.out.println("Successfully connected to MongoDB! :)");
+        // System.out.println("Successfully connected to MongoDB! :)");
     }
 
     public Authentication(MongoClient client, MongoDatabase database, MongoCollection<Document> userCollection){
@@ -616,7 +703,7 @@ class Authentication{
         userCollection.updateOne(filter, updateOperation);
 
         try{
-            FileWriter file = new FileWriter("Device Identifyer");
+            FileWriter file = new FileWriter("Device Identifier");
             file.write(uniqueToken);
             file.close();
 
@@ -626,7 +713,7 @@ class Authentication{
     }
 
     public String SkipLoginIfRemembered(){
-         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifyer"))) {
+         try (BufferedReader reader = new BufferedReader(new FileReader("Device Identifier"))) {
                 String line;
                 if((line = reader.readLine() ) != null){
                     Bson filter = eq("token", line);
@@ -668,27 +755,3 @@ class UserSession {
     }
 }
 
-// class UserSessionService {
-//     private static UserSessionService instance;
-//     private UserSession currentUserSession;
-
-//     private UserSessionService() {
-//         // Private constructor to enforce singleton pattern
-//     }
-
-//     public static UserSessionService getInstance() {
-//         if (instance == null) {
-//             System.out.println
-//             instance = new UserSessionService();
-//         }
-//         return instance;
-//     }
-
-//     public UserSession getCurrentUserSession() {
-//         return currentUserSession;
-//     }
-
-//     public void setCurrentUserSession(UserSession userSession) {
-//         currentUserSession = userSession;
-//     }
-// }
