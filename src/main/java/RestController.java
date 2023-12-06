@@ -36,6 +36,9 @@ public class RestController {
         Logger log = LoggerFactory.getLogger(RestController.class);
         Model model = new Model();
         app.routes(() -> {
+            get(ctx -> {
+                ctx.status(200).result("Server is up");
+            });
             path("recipe", () -> {
 
                 post(ctx -> {

@@ -397,6 +397,25 @@ public class Controller {
         return Boolean.parseBoolean(result);
     }
 
+    private boolean checkConnection() throws
+    IOException, InterruptedException, URISyntaxException {
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/"))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            return true;
+        }
+        return false;
+    }
+
     public void handleLogoutButtonClick(ActionEvent event){
         this.view.getAppFrame().getRecipeList().deleteAll();
         view.switchScene(this.view.getLoginPage());
@@ -475,7 +494,7 @@ public class Controller {
         String password = this.view.getLoginPage().getPassword();
         boolean exist = false;
         try{ exist = login(username, password); }
-        catch (Exception ex) {ex.printStackTrace(); serverDown();}
+        catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
         // try{ exist = sessionExist(username); }
         // catch (Exception ex) {ex.printStackTrace(); serverDown();}
 
@@ -484,7 +503,7 @@ public class Controller {
             //If user selected remeber me, then we leave a mark in the database to remember. 
             if(view.getLoginPage().getAutoLoginStatus() == true){
                 try { markAuto(username); }
-                catch (Exception ex) {ex.printStackTrace(); serverDown();}
+                catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
             }
             view.switchScene(this.view.getAppFrame());
             view.getAppFrame().getHeader().setUsername(username);
@@ -518,7 +537,7 @@ public class Controller {
         }
         boolean exist = true;
         try { exist = checkUserExist(username); }
-        catch (Exception ex) {ex.printStackTrace(); serverDown();}
+        catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
         if (exist){
             this.view.getCreateAccountPage().showAlert("Username already exists");
             return;
@@ -526,7 +545,7 @@ public class Controller {
         JSONObject info = new JSONObject().put("username", username).put("confirmPassword", confirmPassword).put("firstName", firstName).put("lastName", lastName).put("phone", phone);
         boolean created = false;
         try { created = createUser(info); }
-        catch (Exception ex) {ex.printStackTrace(); serverDown();}
+        catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
         if (created){
             this.view.switchScene(this.view.getLoginPage());
             return;
@@ -595,13 +614,13 @@ public class Controller {
             deet.getDetailFooter().getSaveButton().setOnAction(
                 e ->    {
                         try { updateSteps(title, deet.getSteps()); }
-                        catch (Exception ex) { ex.printStackTrace(); serverDown(); } // ADD SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // ADD SERVER TIMEOUT
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getDeleteButton().setOnAction(
                 e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCard(title);
                         try { deleteRecipe(title); }
-                        catch (Exception ex) { ex.printStackTrace(); serverDown(); } // ADD SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // ADD SERVER TIMEOUT
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -712,6 +731,7 @@ public class Controller {
             e.printStackTrace();
             log.error(e.toString());// HANDLE SERVER TIMEOUT
             serverDown();
+            return;
         }
         response.put("User", this.view.getAppFrame().getHeader().getUsername());
         response.put("Time", Instant.now().toString());
@@ -722,6 +742,7 @@ public class Controller {
             e.printStackTrace();
             log.error(e.toString());
             serverDown();
+            return;
         }
         response.put("ImageTime", Instant.now().toString());
         RecipeDetailPage deet = new RecipeDetailPage(response);
@@ -737,10 +758,10 @@ public class Controller {
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(deet.getResponse().getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
                         try { insertRecipe(deet.getResponse()); }
-                        catch (Exception ex) { ex.printStackTrace(); serverDown(); } // HANDLE SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // HANDLE SERVER TIMEOUT
                     } else {
                         try { updateSteps(deet.getResponse().getString("Title"), deet.getSteps()); }
-                        catch (Exception ex) { ex.printStackTrace(); serverDown(); } // HANDLE SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // HANDLE SERVER TIMEOUT
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
@@ -748,7 +769,7 @@ public class Controller {
             e ->    {
                     this.view.getAppFrame().getRecipeList().deleteRecipeCard(deet.getResponse().getString("Title"));
                     try { deleteRecipe(deet.getResponse().getString("Title")); }
-                    catch (Exception ex) { ex.printStackTrace(); serverDown(); } // ADD SERVER TIMEOUT
+                    catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // ADD SERVER TIMEOUT
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -790,6 +811,20 @@ public class Controller {
     }
 
     void serverDown() {
-        //this.view.switchScene();
+        this.view.switchScene(this.view.getServerDownPage());
+        // while(true){
+        //     boolean status = false;
+        //     try {
+        //         Thread.sleep(5000);
+        //         status = checkConnection();
+        //     }
+        //     catch (Exception e) {
+        //         e.printStackTrace();
+        //     }
+        //     if (status) {
+        //         this.view.switchScene(this.view.getAppFrame());
+        //         break;
+        //     }
+        // }
     }
 }

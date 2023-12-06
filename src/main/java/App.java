@@ -1,16 +1,5 @@
-
-import org.bson.Document;
-
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-
-
 import javafx.application.Application;
 import javafx.stage.Stage;
-import java.util.List;
-import java.util.ArrayList;
 
 public class App extends Application {
 
@@ -29,8 +18,6 @@ public class App extends Application {
         Controller controller = new Controller(model, view);
         **/
         try {
-            this.model = new Model();
-            this.restController = new RestController(model);
             this.view = new View(primaryStage);
             this.controller = new Controller(view);
         }
@@ -43,9 +30,9 @@ public class App extends Application {
     @Override
     public void stop() {
         // Called when JavaFX application is closing
-        if (model.getDatabase() != null) {
-            model.getDatabase().close();
-        }
+        // if (model.getDatabase() != null) {
+        //     model.getDatabase().close();
+        // }
         System.exit(0);
     }
 

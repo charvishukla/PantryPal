@@ -11,7 +11,7 @@ PantryPal uses audio input for meal types and a list of available ingredients, t
 
 Make sure you have Java 21 set up on your system since this project uses a toolchain for Java 21. 
 
-Begin by forking and cloning the repository from [https://github.com/ucsd-cse110-fa23/cse-110-project-team-13.git](https://github.co m/ucsd-cse110-fa23/cse-110-project-team-13.git). 
+Begin by forking and cloning the repository from !(https://github.com/ucsd-cse110-fa23/cse-110-project-team-13.git)[https://github.co m/ucsd-cse110-fa23/cse-110-project-team-13.git]. 
 
 You can install the dependencies using Gradle:
 
