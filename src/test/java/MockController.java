@@ -1,42 +1,67 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.json.JSONObject;
 
+import javafx.stage.Stage;
 
-/**
- * MockController is a mock implementation of the Controller class.
- * It is used for unit testing the Controller's functionality without
- * needing actual implementations of dependent classes and UI elements.
- */
-public class MockController extends Controller {
+class MockRecipeCard {
+    String title;
+    String mealType;
+    String time;
 
-    private Boolean loggedout;
-    private List<RecipeCard> mockRecipeCards;
+    public MockRecipeCard(String title, String mealType, String time) {
+        this.title = title;
+        this.mealType = mealType;
+        this.time = time;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public String getMealType() {
+        return this.mealType;
+    }
+
+    public String getTime() {
+        return this.time;
+    }
+
+}
+
+public class MockController {
+
+    private Boolean loggedout = false;
+    private List<MockRecipeCard> mockRecipeCards;
+    private List<MockRecipeCard> emptyRecipeCard;
 
     /**
      * Constructor for MockController. Initializes mock recipe cards.
      */
     public MockController() {
-        super(null, null); 
+        emptyRecipeCard = new ArrayList<>();
+        // Initialize mockRecipeCards similar to how Controller would have done.
         mockRecipeCards = new ArrayList<>();
-        mockRecipeCards.add(new RecipeCard("Recipe 1", "MealType1", "2023-01-01T00:00:00Z"));
-        mockRecipeCards.add(new RecipeCard("Recipe 2", "MealType2", "2023-01-02T00:00:00Z"));
-        mockRecipeCards.add(new RecipeCard("Recipe 3", "MealType1", "2023-01-02T00:00:00Z"));
-        mockRecipeCards.add(new RecipeCard("Recipe 4", "MealType3", "2023-01-02T00:00:00Z"));
-        mockRecipeCards.add(new RecipeCard("Recipe 5", "MealType1", "2023-01-02T00:00:00Z"));
+        mockRecipeCards.add(new MockRecipeCard("Recipe 1", "MealType1", "2023-01-01T00:00:00Z"));
+        mockRecipeCards.add(new MockRecipeCard("Recipe 2", "MealType2", "2023-02-02T00:00:00Z"));
+        mockRecipeCards.add(new MockRecipeCard("Recipe 3", "MealType1", "2023-03-02T00:00:00Z"));
+        mockRecipeCards.add(new MockRecipeCard("Recipe 4", "MealType3", "2023-04-02T00:00:00Z"));
+        mockRecipeCards.add(new MockRecipeCard("Recipe 5", "MealType1", "2023-05-02T00:00:00Z"));
     }
 
-
     /**
-     * Mock implementation of handleFilterBoxClick. Filters recipe cards based on the provided filter.
+     * Mock implementation of handleFilterBoxClick. Filters recipe cards based on
+     * the provided filter.
      * 
      * @param clickedFilter The filter to be applied on recipe cards.
      * @return List of filtered RecipeCard objects.
      */
-    public List<RecipeCard> handleFilterBoxClick(String clickedFilter) {
-        List<RecipeCard> filteredCards = new ArrayList<>();
-        for (RecipeCard card : mockRecipeCards) {
+    public List<MockRecipeCard> handleFilterBoxClick(String clickedFilter) {
+        List<MockRecipeCard> filteredCards = new ArrayList<>();
+        for (MockRecipeCard card : mockRecipeCards) {
             if (card.getMealType().equals(clickedFilter)) {
                 filteredCards.add(card);
             }
@@ -45,15 +70,17 @@ public class MockController extends Controller {
         return filteredCards;
     }
 
-
     /**
-     * Mock implementation of handleSortingBoxClick. Sorts recipe cards based on the provided sorting method.
+     * Mock implementation of handleSortingBoxClick. Sorts recipe cards based on the
+     * provided sorting method.
      * 
-     * @param sortingMethod The sorting method to be applied (e.g., "Alphabetically").
-     *                      This is the sorting method that the user actually selected in the real implementation
+     * @param sortingMethod The sorting method to be applied (e.g.,
+     *                      "Alphabetically").
+     *                      This is the sorting method that the user actually
+     *                      selected in the real implementation
      * @return List of sorted RecipeCard objects.
      */
-    public List<RecipeCard> handleSortingBoxClick(String sortingMethod) {
+    public List<MockRecipeCard> handleSortingBoxClick(String sortingMethod) {
         System.out.println("Sorting RecipeCards based on " + sortingMethod);
 
         if (sortingMethod.equals("Alphabetically")) {
@@ -67,9 +94,9 @@ public class MockController extends Controller {
         return new ArrayList<>(mockRecipeCards); // Return the sorted list
     }
 
-
     /**
-     * Mock implementation of handleLogoutButtonClick. Clears the recipe cards and sets the logout status.
+     * Mock implementation of handleLogoutButtonClick. Clears the recipe cards and
+     * sets the logout status.
      * 
      * @return The logout status after the operation.
      */
@@ -79,8 +106,7 @@ public class MockController extends Controller {
         return loggedout = true;
     }
 
-
-     /**
+    /**
      * Mock implementation of handleLoginButtonClick. Simulates user login.
      * 
      * @param username The username for login.
@@ -93,16 +119,37 @@ public class MockController extends Controller {
         return username.equals("validUser") && password.equals("validPass");
     }
 
-
-        // Getters for unit testing
-        public Boolean getLoggedOutStatus() {
-            return loggedout;
+    public List<String> getAllTitles() {
+        System.out.println("Getting all titles.");
+        List<String> res = new ArrayList<>();
+        for (MockRecipeCard card : mockRecipeCards) {
+            res.add(card.getTitle());
         }
-    
-        public List<RecipeCard> getMockRecipeCards() {
-            return mockRecipeCards;
+        return res;
+    }
+
+    // mock delete
+    public boolean deleteRecipe(String title) {
+        System.out.println("Deleting recipe with title: " + title);
+        return mockRecipeCards.removeIf(card -> card.getTitle().equals(title));
+    }
+
+    public boolean insertRecipe(MockRecipeCard recipeCard) {
+        if (mockRecipeCards.contains(recipeCard)) {
+            return false;
         }
+        System.out.println("Inserting" + recipeCard.getMealType() + "recipe with title: " + recipeCard.getTitle()
+                + "at time" + recipeCard.getTime());
+        return mockRecipeCards.add(recipeCard);
+    }
 
+    // Getters for unit testing
+    public Boolean getLoggedOutStatus() {
+        return loggedout;
+    }
 
+    public List<MockRecipeCard> getMockRecipeCards() {
+        return mockRecipeCards;
+    }
 
 }
