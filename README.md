@@ -27,8 +27,8 @@ To run the application, first make a clean build using the following command.
 ./gradlew clean build
 ```
 
-Then, run using:
-
+To run, start the server by compiling and running Server.java.
+Next, start the client by using:
 ```
 ./gradlew run
 ```
