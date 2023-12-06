@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import javax.faces.event.SystemEvent;
 
 import org.json.JSONObject;
+
+import com.google.gson.JsonObject;
+
 import java.time.Instant;
 
 // Event Handling
@@ -236,7 +239,7 @@ class CreateAccountPage extends HBox {
         password2 = new TextField();
         password2.getStyleClass().add("text-field");
         createAccount = new Button("Create Account");
-        createAccount.getStyleClass().add("button-create;");
+        createAccount.getStyleClass().add("button-create");
         loginPageButton = new Button("Aleady have an account?");
         loginPageButton.getStyleClass().add("link-button-style");
 
@@ -482,7 +485,6 @@ class Header extends HBox {
     Button homeButton;
     Button profileButton;
     Button logoutButton;
-    Button savedRecipesButton;
     String username;
     ComboBox<String> filterBox;
     ComboBox<String> sortingBox;
@@ -501,19 +503,23 @@ class Header extends HBox {
         profileButton.getStyleClass().add("my-profile-button");
         profileButton.setTranslateY(25);
 
-        this.savedRecipesButton = new Button("Saved");
-        savedRecipesButton.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
-
-        //Filter setup and style
         Label filterLabel = new Label("Filter:");
-        filterLabel.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-font-family: 'Verdana';  -fx-background-color: transparent; -fx-border-color: transparent; fx-text-fill: 616161; -fx-translate-y: 8;");
+        filterLabel.getStyleClass().add("filter-label");
+        filterLabel.setTranslateY(25);
+        filterLabel.setTranslateX(-45);
+        
+        
         String[] filter = {"all", "breakfast", "lunch", "dinner"};
         this.filterBox = new ComboBox<String>(FXCollections.observableArrayList(filter));
-        filterBox.setStyle(
-                "-fx-padding: 10 20 10 20; -fx-translate-y: 8;");
+        filterBox.getStyleClass().add("filter-box");
         filterBox.getSelectionModel().selectFirst();
+        filterBox.setTranslateY(15);
+        filterLabel.setTranslateX(-35);
+    
+        logoutButton = new Button("Sign Out");
+        logoutButton.getStyleClass().add("logout-button");
+        logoutButton.setTranslateY(15);
+        
 
         //Sorting setup and style
         Label sortingLabel = new Label("Sorting:");
@@ -530,7 +536,8 @@ class Header extends HBox {
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
         // add all childeren
-        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox, sortingLabel, sortingBox, savedRecipesButton, profileButton);
+        this.getChildren().addAll(homeButton, spacer, filterLabel, filterBox,sortingLabel, sortingBox, logoutButton, profileButton);
+
     }
 
     public void setProfileButtonOnAction(EventHandler<ActionEvent> eventHandler) {
@@ -553,6 +560,11 @@ class Header extends HBox {
     public void setFilterBoxOnAction (EventHandler<ActionEvent> eventHandler) {
         filterBox.setOnAction(eventHandler);
     }
+
+    public void setLogoutButtonOnAction(EventHandler<ActionEvent> eventHandler){
+        logoutButton.setOnAction(eventHandler);
+    }
+
 
     public ComboBox<String> getSortingBox(){
         return this.sortingBox;
@@ -793,6 +805,11 @@ class DetailFooter extends HBox {
         this.gridPane.getChildren().clear();
     }
 
+    public void deleteAll(){
+        deleteAllOnScene();
+        this.recipeCards.clear();
+    }
+
     public boolean checkRecipeExists(String title) {
         for (int i = 0; i < getRecipeCards().size(); i++) {
             RecipeCard currentCard = getRecipeCards().get(i);
@@ -896,6 +913,14 @@ class DetailList extends VBox {
         this.setPrefSize(1280, 545);
         this.setStyle("-fx-background-color: black;");
     }
+
+    public void deleteAllSteps() {
+        for(int i = this.getChildren().size() - 1; i >= 0; i--){
+            if(this.getChildren().get(i) instanceof TextField) {
+                this.getChildren().remove(i);
+            }
+        }
+    }
 }
 
 
@@ -909,6 +934,8 @@ class RecipeDetailPage extends BorderPane {
     private int ingredientsSize;
     private ImageView imageView;
     private Image image;
+    private Button refresh;
+    private JSONObject response;
 
     RecipeDetailPage() {
         // Initialize the header and footer
@@ -925,8 +952,9 @@ class RecipeDetailPage extends BorderPane {
 
 
        
-        // initializing 
+    // initializing 
     RecipeDetailPage(JSONObject json){
+        this.response = json;
         Font.loadFont(getClass().getResourceAsStream("/fonts/Chillight-EaVR9.ttf"), 32);
         this.getStyleClass().add("recipe-detail-page");
         this.getStylesheets().add(getClass().getResource("/stylesheets/RecipeDetailPage.css").toExternalForm());
@@ -953,6 +981,12 @@ class RecipeDetailPage extends BorderPane {
         title.getStyleClass().add("recipe-detail-title");
         title.setTranslateX(100);
         detailList.getChildren().add(title);
+
+        //Refresh recipe
+        refresh = new Button("Refresh");
+        refresh.getStyleClass().add("button");
+        refresh.setStyle("-fx-padding: 10 20 10 20");
+        header.getChildren().add(refresh);
 
         String[] ingredList = json.getString("Ingredients").replaceAll("\n+", "\n").split("\n");
         ingredientsSize = 0;
@@ -1002,6 +1036,40 @@ class RecipeDetailPage extends BorderPane {
             }
         }
         return steps;
+    }
+
+    public Button getRefreshButton(){
+        return refresh;
+    }
+
+    public JSONObject getResponse(){
+        return this.response;
+    }
+
+    public void updateResponse(JSONObject response){
+        this.response = response;
+    }
+
+    public void update(){
+        this.detailList.deleteAllSteps();
+        for(int i = 1; i <= this.response.getInt("numSteps"); i++) {
+            TextField step = new TextField(this.response.getString(String.valueOf(i)));
+            step.getStyleClass().add("step");
+            step.setTranslateX(100);
+            detailList.getChildren().add(step);
+        }
+        this.image = new Image(this.response.getString("Image"));
+        this.imageView.setImage(this.image);
+    }
+
+    public void enableRefresh(){
+        refresh.setVisible(true);
+        refresh.setDisable(false);
+    }
+
+    public void disableRefresh(){
+        refresh.setVisible(false);
+        refresh.setDisable(true);
     }
 }
 

@@ -268,6 +268,7 @@ class AudioRecorder {
 
     private static AudioFormat audioFormat = new AudioFormat(44100, 16, 2, true, true);
     TargetDataLine targetDataLine;
+    boolean isRecording = true;
 
     public void startRecording() {
         Thread t = new Thread(
@@ -278,7 +279,7 @@ class AudioRecorder {
                         // the format of the TargetDataLine
                         DataLine.Info dataLineInfo = new DataLine.Info(
                             TargetDataLine.class, audioFormat);
-
+                        isRecording = true;
                         // the TargetDataLine used to capture audio data from the microphone
                         targetDataLine = (TargetDataLine) AudioSystem.getLine(dataLineInfo);
                         targetDataLine.open(audioFormat);
@@ -294,20 +295,25 @@ class AudioRecorder {
                                 audioInputStream,
                                 AudioFileFormat.Type.WAVE,
                                 audioFile);
-
+                        
                     } catch (Exception ex) {
                         ex.printStackTrace();
+                        isRecording = false;
                     }
                 }
             }
         );
-
+        isRecording = true;
         t.start();
     }
 
     public void stopRecording() {
         targetDataLine.stop();
         targetDataLine.close();
+    }
+
+    public boolean isRecording(){
+        return isRecording;
     }
     
 }
@@ -459,7 +465,7 @@ class Database {
 
     public Database(){
         this.uri = "mongodb+srv://team13:CohNSwNGemiYmOOI@cluster0.1nejphw.mongodb.net/?retryWrites=true&w=majority";
-
+        
         // Initialize MongoClient without try-with-resources
         this.client = MongoClients.create(uri);
         this.database = client.getDatabase("PantryPal");
@@ -729,27 +735,3 @@ class UserSession {
     }
 }
 
-// class UserSessionService {
-//     private static UserSessionService instance;
-//     private UserSession currentUserSession;
-
-//     private UserSessionService() {
-//         // Private constructor to enforce singleton pattern
-//     }
-
-//     public static UserSessionService getInstance() {
-//         if (instance == null) {
-//             System.out.println
-//             instance = new UserSessionService();
-//         }
-//         return instance;
-//     }
-
-//     public UserSession getCurrentUserSession() {
-//         return currentUserSession;
-//     }
-
-//     public void setCurrentUserSession(UserSession userSession) {
-//         currentUserSession = userSession;
-//     }
-// }
