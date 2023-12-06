@@ -119,6 +119,26 @@ public class Model {
         return audioRecorder;
     }
 
+    public String skipLogin(){
+        return authManager.SkipLoginIfRemembered();
+    }
+
+    public UserSession login(String username, String password) {
+        return authManager.login(username, password);
+    }
+
+    public void markAutoLogin(String username) {
+        authManager.markAutoLoginStatus(username);
+    }
+
+    public boolean checkUserExist(String username) {
+        return authManager.checkUserExists(username);
+    }
+
+    public boolean createUser(String username, String password, String firstName, String lastName, String phone) {
+        return authManager.createUser(username, password, firstName, lastName, phone);
+    }
+
 }
 
 class ChatGPT {

@@ -71,8 +71,7 @@ public class Controller {
          * Determines if the app has to automatically log in
          * a user.
          */
-        Authentication authManager = new Authentication();
-        String username = authManager.SkipLoginIfRemembered();
+        String username = this.model.skipLogin();
         if(username != null){
             view.getAppFrame().getHeader().setUsername(username);
             try {
@@ -347,16 +346,15 @@ public class Controller {
     }
 
     private void handleLoginButtonClick(ActionEvent event) {
-        Authentication authManager = new Authentication();
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
-        UserSession loginDetails = authManager.login(username, password);
+        UserSession loginDetails = this.model.login(username, password);
 
         if (loginDetails != null){
 
             //If user selected remeber me, then we leave a mark in the database to remember. 
             if(view.getLoginPage().getAutoLoginStatus() == true){
-                authManager.markAutoLoginStatus(username);
+                this.model.markAutoLogin(username);
             }
             view.switchScene(this.view.getAppFrame());
             view.getAppFrame().getHeader().setUsername(username);
@@ -377,7 +375,6 @@ public class Controller {
      * @param event
      */
     private void handleCreateAccountClick(ActionEvent event) {
-        Authentication authManager = new Authentication();
         String username = this.view.getCreateAccountPage().getUsername();
         String password = this.view.getCreateAccountPage().getPassword();
         String confirmPassword = this.view.getCreateAccountPage().getConfirmPassword();
@@ -390,12 +387,12 @@ public class Controller {
             return;
         }
         
-        if (authManager.checkUserExists(username)){
+        if (this.model.checkUserExist(username)){
             this.view.getCreateAccountPage().showAlert("Username already exists");
             return;
         }
 
-        if (authManager.createUser(username, confirmPassword, firstName, lastName, phone)){
+        if (this.model.createUser(username, confirmPassword, firstName, lastName, phone)){
             this.view.switchScene(this.view.getLoginPage());
             return;
         }else{

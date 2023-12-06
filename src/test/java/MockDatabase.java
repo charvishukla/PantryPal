@@ -1,3 +1,4 @@
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,11 +61,11 @@ public class MockDatabase extends Database {
     }
 
     @Override
-    public List<String> getAllTitles(String username) {
-        List<String> recipes = new ArrayList<>();
+    public JSONArray getAllTitles(String username) {
+        JSONArray recipes = new JSONArray();
         for (JSONObject recipeJSON : mockRecipeDatabase.values()) {
             if (recipeJSON.getString("User").equals(username)) {
-                recipes.add(recipeJSON.getString("Title"));
+                recipes.put(recipeJSON.getString("Title"));
             }
         }
         //log.info("Retrieved all titles for user: {}", username);
