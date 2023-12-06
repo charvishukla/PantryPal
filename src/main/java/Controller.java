@@ -27,7 +27,8 @@ import org.slf4j.LoggerFactory;
 
 public class Controller {
     private View view;
-    private Model model;
+    //private Model model;
+    private AudioRecorder audioRecorder;
     private String mealType;
     private String ingredients;
     private HttpClient client;
@@ -35,12 +36,14 @@ public class Controller {
 
     private static final String API_ENDPOINT = "http://127.0.0.1:7000";
 
-    public Controller(View view, Model model) {
+    public Controller(View view) {
         this.view = view;
-        this.model = model;
+        //this.model = model;
+        this.audioRecorder = new AudioRecorder();
         this.client = HttpClient.newHttpClient();
 
         this.view.getAppFrame().getDetailFooter().setBackButtonAction(this::handleBackButtonClick);
+        this.view.getAppFrame().getDetailFooter().setShareButtonAction(this::handleShareButtonClick);
 
         this.view.getAppFrame().getFooter().setCreateButtonAction(this::handleCreateButtonClick);
         this.view.getAppFrame().getHeader().setLogoutButtonOnAction(this::handleLogoutButtonClick);
@@ -71,9 +74,15 @@ public class Controller {
          * Determines if the app has to automatically log in
          * a user.
          */
-        String username = this.model.skipLogin();
-        if(username != null){
-            view.getAppFrame().getHeader().setUsername(username);
+        JSONObject userAndExist = new JSONObject();
+        try{ userAndExist = skipLogin(); }
+        catch (Exception e) {
+                log.error(e.toString());
+                e.printStackTrace();
+        }
+        boolean exist = Boolean.parseBoolean(userAndExist.getString("exist"));
+        if(exist){
+            view.getAppFrame().getHeader().setUsername(userAndExist.getString("username"));
             try {
                 setupRecipeCardsDetailsAction();
             }
@@ -83,6 +92,23 @@ public class Controller {
             }
             view.switchScene(this.view.getAppFrame());
         }
+    }
+
+    private JSONObject skipLogin() throws
+    IOException, InterruptedException, URISyntaxException {
+
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/auth/skip"))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject responseJSON = new JSONObject(response.body());
+        return responseJSON;
     }
 
     private List<String> getAllTitles(String username) throws
@@ -119,6 +145,24 @@ public class Controller {
         HttpRequest request = HttpRequest
         .newBuilder()
         .uri(URI.create(API_ENDPOINT + "/recipe?title=" + title + "&user=" + username))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        
+        JSONObject responseJSON = new JSONObject(response.body());
+        return responseJSON;
+    }
+
+    private JSONObject getRecipeByID(String id) throws
+    IOException, InterruptedException, URISyntaxException {
+        // Create the request object
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/recipe?id=" + id))
         .header("Content-Type", "application/json")
         .GET()
         .build();
@@ -269,7 +313,107 @@ public class Controller {
         HttpResponse.BodyHandlers.ofString());
 
         return response.body();
+    }
 
+    private boolean login(String username, String password) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("username", username).put("password", password);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/auth/login"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        String result = response.body();
+        return Boolean.parseBoolean(result);
+    }
+
+    private boolean sessionExist(String username) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("username", username);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/auth/session"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        String result = response.body();
+        return Boolean.parseBoolean(result);
+    }
+
+    private void markAuto(String username) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("username", username);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/auth/auto"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    private boolean checkUserExist(String username) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = new JSONObject().put("username", username);
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/auth/check"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        String result = response.body();
+        return Boolean.parseBoolean(result);
+    }
+
+    private boolean createUser(JSONObject info) throws 
+    IOException, InterruptedException, URISyntaxException {
+        JSONObject requestBody = info;
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/auth/create"))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(requestBody.toString()))
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+        String result = response.body();
+        return Boolean.parseBoolean(result);
+    }
+
+    private boolean checkConnection() throws
+    IOException, InterruptedException, URISyntaxException {
+        HttpRequest request = HttpRequest
+        .newBuilder()
+        .uri(URI.create(API_ENDPOINT + "/"))
+        .header("Content-Type", "application/json")
+        .GET()
+        .build();
+
+        // Send the request and receive the response
+        HttpResponse<String> response = client.send(request,
+        HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            return true;
+        }
+        return false;
     }
 
     public void handleLogoutButtonClick(ActionEvent event){
@@ -348,13 +492,18 @@ public class Controller {
     private void handleLoginButtonClick(ActionEvent event) {
         String username = this.view.getLoginPage().getUsername();
         String password = this.view.getLoginPage().getPassword();
-        UserSession loginDetails = this.model.login(username, password);
+        boolean exist = false;
+        try{ exist = login(username, password); }
+        catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
+        // try{ exist = sessionExist(username); }
+        // catch (Exception ex) {ex.printStackTrace(); serverDown();}
 
-        if (loginDetails != null){
+        if (exist){
 
             //If user selected remeber me, then we leave a mark in the database to remember. 
             if(view.getLoginPage().getAutoLoginStatus() == true){
-                this.model.markAutoLogin(username);
+                try { markAuto(username); }
+                catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
             }
             view.switchScene(this.view.getAppFrame());
             view.getAppFrame().getHeader().setUsername(username);
@@ -386,13 +535,18 @@ public class Controller {
             this.view.getCreateAccountPage().showAlert("Passwords do not match");
             return;
         }
-        
-        if (this.model.checkUserExist(username)){
+        boolean exist = true;
+        try { exist = checkUserExist(username); }
+        catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
+        if (exist){
             this.view.getCreateAccountPage().showAlert("Username already exists");
             return;
         }
-
-        if (this.model.createUser(username, confirmPassword, firstName, lastName, phone)){
+        JSONObject info = new JSONObject().put("username", username).put("confirmPassword", confirmPassword).put("firstName", firstName).put("lastName", lastName).put("phone", phone);
+        boolean created = false;
+        try { created = createUser(info); }
+        catch (Exception ex) {ex.printStackTrace(); serverDown(); return;}
+        if (created){
             this.view.switchScene(this.view.getLoginPage());
             return;
         }else{
@@ -425,8 +579,6 @@ public class Controller {
         final String username = this.view.getAppFrame().getHeader().getUsername();
         //Returns a list of titles of each recipe in database;
         List<String> titles = getAllTitles(username);
-        // JSONArray titles = model.getDatabase().getAllTitles(this.view.getAppFrame().getHeader().getUsername());
-        //System.out.println(titles.get(0));
 
         //A JSONObject to store title, ingredients, and step by step recipe.
         JSONObject recipeJSON;
@@ -462,13 +614,13 @@ public class Controller {
             deet.getDetailFooter().getSaveButton().setOnAction(
                 e ->    {
                         try { updateSteps(title, deet.getSteps()); }
-                        catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // ADD SERVER TIMEOUT
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getDeleteButton().setOnAction(
                 e ->    {this.view.getAppFrame().getRecipeList().deleteRecipeCard(title);
                         try { deleteRecipe(title); }
-                        catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // ADD SERVER TIMEOUT
                         this.view.switchScene(this.view.getAppFrame());
                         });
             deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -485,6 +637,10 @@ public class Controller {
                             deet.getDetailList().getChildren().remove(last);
                         }
                         });
+            deet.getDetailFooter().getShareButton().setOnAction(
+                e ->    {
+                        deet.showAlert("http://127.0.0.1:7000/share?id=" + deet.getResponse().getString("id"));
+                        });
         }
     }
     
@@ -498,14 +654,14 @@ public class Controller {
         this.view.getCreateFrame().getRecordButton().setEffect(new Glow(50));
         this.view.getCreateFrame().setMealType(null);
         this.view.getCreateFrame().updateNextButton();
-        this.model.startRecording(); 
+        this.audioRecorder.startRecording(); 
     }
 
     //If the recording is stopped, Stop recording and 
     //call on whisper to convert audio to text.
     private void MealTypeStopRecord(MouseEvent event){
         this.view.getCreateFrame().getRecordButton().setEffect(null);
-        this.model.stopRecording();
+        this.audioRecorder.stopRecording();
         try { mealType = audioToText(); }
         catch (Exception e) { e.printStackTrace(); }
         this.view.getCreateFrame().setMealType(mealType);
@@ -535,10 +691,14 @@ public class Controller {
         this.view.switchScene(this.view.getCreateFrame());
     }
 
+    public void handleShareButtonClick(ActionEvent event) {
+        // this.view.getRecipeDetailPage.showAlert();
+    }
+
     //If the record button is clicked. 
     private void IngredientRecord(MouseEvent event) {
         this.view.getVoiceInputFrame().getRecordButton().setEffect(new Glow(50));
-        this.model.startRecording();
+        this.audioRecorder.startRecording();
         this.view.getVoiceInputFrame().setIngredients(null); 
         this.view.getVoiceInputFrame().updateNextButton();
     }
@@ -547,7 +707,7 @@ public class Controller {
     //call on whisper to convert audio to text.
     private void IngredientStopRecord(MouseEvent event){
          this.view.getVoiceInputFrame().getRecordButton().setEffect(null);
-         this.model.stopRecording();
+         this.audioRecorder.stopRecording();
          try { ingredients = audioToText(); }
          catch (Exception e) { e.printStackTrace(); }
          this.view.getVoiceInputFrame().updatePrompt("Prompt received: " + ingredients);
@@ -570,6 +730,8 @@ public class Controller {
         catch (Exception e) {
             e.printStackTrace();
             log.error(e.toString());// HANDLE SERVER TIMEOUT
+            serverDown();
+            return;
         }
         response.put("User", this.view.getAppFrame().getHeader().getUsername());
         response.put("Time", Instant.now().toString());
@@ -579,6 +741,8 @@ public class Controller {
         catch (Exception e) { // HANDLE SERVER TIMEOUT
             e.printStackTrace();
             log.error(e.toString());
+            serverDown();
+            return;
         }
         response.put("ImageTime", Instant.now().toString());
         RecipeDetailPage deet = new RecipeDetailPage(response);
@@ -594,10 +758,10 @@ public class Controller {
                     if(!this.view.getAppFrame().getRecipeList().checkRecipeExists(deet.getResponse().getString("Title"))) {
                         this.view.getAppFrame().getRecipeList().addRecipeCard(recipe);
                         try { insertRecipe(deet.getResponse()); }
-                        catch (Exception ex) { ex.printStackTrace(); } // HANDLE SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // HANDLE SERVER TIMEOUT
                     } else {
                         try { updateSteps(deet.getResponse().getString("Title"), deet.getSteps()); }
-                        catch (Exception ex) { ex.printStackTrace(); } // HANDLE SERVER TIMEOUT
+                        catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // HANDLE SERVER TIMEOUT
                     }
                     this.view.switchScene(this.view.getAppFrame());
                     });
@@ -605,7 +769,7 @@ public class Controller {
             e ->    {
                     this.view.getAppFrame().getRecipeList().deleteRecipeCard(deet.getResponse().getString("Title"));
                     try { deleteRecipe(deet.getResponse().getString("Title")); }
-                    catch (Exception ex) { ex.printStackTrace(); } // ADD SERVER TIMEOUT
+                    catch (Exception ex) { ex.printStackTrace(); serverDown(); return;} // ADD SERVER TIMEOUT
                     this.view.switchScene(this.view.getAppFrame());
                     });
         deet.getDetailFooter().getAddStepButton().setOnAction(
@@ -639,6 +803,28 @@ public class Controller {
                     deet.updateResponse(newResponse);
                     deet.update();
                     });
+        deet.getDetailFooter().getShareButton().setOnAction(
+            e ->    {
+                    deet.showAlert("http://127.0.0.1/share?id=" + deet.getResponse().getString("id"));
+                    });
         this.view.switchScene(deet);
+    }
+
+    void serverDown() {
+        this.view.switchScene(this.view.getServerDownPage());
+        // while(true){
+        //     boolean status = false;
+        //     try {
+        //         Thread.sleep(5000);
+        //         status = checkConnection();
+        //     }
+        //     catch (Exception e) {
+        //         e.printStackTrace();
+        //     }
+        //     if (status) {
+        //         this.view.switchScene(this.view.getAppFrame());
+        //         break;
+        //     }
+        // }
     }
 }

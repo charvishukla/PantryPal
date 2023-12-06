@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.faces.event.SystemEvent;
 
+import org.eclipse.jetty.server.Server;
 import org.json.JSONObject;
 
 import com.google.gson.JsonObject;
@@ -64,6 +65,7 @@ public class View {
     private Scene currentScene;
     private LoginPage loginPage;
     private CreateAccountPage createAccountPage;
+    private ServerDownPage serverDownPage;
 
     /**
      * Initializes various frames and pages, sets up the primary stage and the
@@ -80,6 +82,7 @@ public class View {
         this.voiceInputFrame = new VoiceInputFrame();
         this.loginPage = new LoginPage();
         this.createAccountPage = new CreateAccountPage();
+        this.serverDownPage = new ServerDownPage();
         this.mainStage = primaryStage;
 
 
@@ -114,6 +117,10 @@ public class View {
 
     public VoiceInputFrame getVoiceInputFrame() {
         return this.voiceInputFrame;
+    }
+
+    public ServerDownPage getServerDownPage() {
+        return this.serverDownPage;
     }
 
     /**
@@ -954,7 +961,7 @@ class ServerDownPage extends VBox {
         this.setPadding(new Insets(10, 10, 10, 10));
         label1 = new Label("Whoops!"); 
         label1.getStyleClass().add("label-common");
-        image = new Image("/resources/cat.jpg");
+        // image = new Image("/resources/cat.jpg");
         imageView = new ImageView(image);
         label2 = new Label("Looks like this page went on Vacation!");
         label2.getStyleClass().add("label-common");
@@ -1114,6 +1121,19 @@ class RecipeDetailPage extends BorderPane {
         refresh.setVisible(false);
         refresh.setDisable(true);
     }
+
+    /**
+     * 
+     * @param message
+     */
+    public void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Share URL");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }
 
 class AppFrame extends BorderPane {
