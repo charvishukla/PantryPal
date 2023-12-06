@@ -5,6 +5,7 @@ Fall 2023 CSE110 Group 13.
 
 ## Description
 
+PantryPal uses audio input for meal types and a list of available ingredients, the app employs the ChatGPT API to generate bespoke recipes. Each recipe is complemented with a unique image, meticulously rendered by the Dall-E API. enhancing the visual appeal. PantryPal allows the user to modify these AI generated recipe to fit their needs, and share URLs of the generaed recipes with friends! 
 
 ## Getting Started + Installation
 
@@ -14,7 +15,7 @@ Make sure you have Java 21 set up on your system since this project uses a toolc
 ./gradlew build
 ```
 
-## Running the Applicattion
+## Executing the program
 
 To run the application, first make a clean build using the following command.
 
@@ -46,12 +47,16 @@ Then, run using:
 - **Mockito (3.12.4) & PowerMock (2.0.9)**: For mocking in tests.
 - **OpenJFX Monocle (jdk-12.0.1+2)**: For testing JavaFX applications.
 
+## Version History
+
+Please look at the [commit history](https://github.com/ucsd-cse110-fa23/cse-110-project-team-13/commits/main).
+
+
+## Authors 
 
 
 
 
 
-### Executing program
 
-- How to run the program
-- Step-by-step bullets
+
