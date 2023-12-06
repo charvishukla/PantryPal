@@ -6,14 +6,14 @@ public class MockAudioRecorder extends AudioRecorder {
     public void startRecording() {
         // Mock implementation
         isRecording = true;
-        System.out.println("Mock startRecording called");
+        System.out.print("Mock startRecording called");
     }
 
     @Override
     public void stopRecording() {
         // Mock implementation
         isRecording = false;
-        System.out.println("Mock stopRecording called");
+        System.out.print("Mock stopRecording called");
     }
 
     public boolean isRecording() {

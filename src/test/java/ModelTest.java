@@ -147,7 +147,7 @@ class ModelTest {
         System.setOut(new PrintStream(outContent));
 
         mockAudioRecorder.startRecording();
-        assertEquals("Mock startRecording called\n", outContent.toString());
+        assertEquals("Mock startRecording called", outContent.toString());
 
         System.setOut(System.out);
     }
@@ -164,7 +164,7 @@ class ModelTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         mockAudioRecorder.stopRecording();
-        assertEquals("Mock stopRecording called\n", outContent.toString());
+        assertEquals("Mock stopRecording called", outContent.toString());
         System.setOut(System.out);
     }
 
