@@ -19,6 +19,9 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 class ModelTest {
     private AudioRecorder mockAudioRecorder;
     private ChatGPT chatGPT;
@@ -364,14 +367,22 @@ class ModelTest {
     @Test
     void getAllTitles_ShouldReturnTitlesForUser() {
         database.insert(testRecipe);
-        List<String> titles = database.getAllTitles("TestUser");
+        JSONArray titlesJSON = database.getAllTitles("TestUser");
+        List<String> titles = new ArrayList<String>();
+        for (int i = 0; i < titlesJSON.length(); i++) {
+            titles.add(titlesJSON.getString(i));
+        }
         assertNotNull(titles);
         assertTrue(titles.contains("Test Recipe"));
     }
 
     @Test
     void getAllTitles_ShouldReturnEmptyListForNonExistingUser() {
-        List<String> titles = database.getAllTitles("Non Existing User");
+        JSONArray titlesJSON = database.getAllTitles("Non Existing User");
+        List<String> titles = new ArrayList<String>();
+        for (int i = 0; i < titlesJSON.length(); i++) {
+            titles.add(titlesJSON.getString(i));
+        }
         assertTrue(titles.isEmpty());
     }
 }
