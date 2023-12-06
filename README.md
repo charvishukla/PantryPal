@@ -1,7 +1,7 @@
 # PantryPal
 
 Fall 2023 CSE110 Group 13.
-
+Github link: https://github.com/ucsd-cse110-fa23/cse-110-project-team-13.git
 
 ## Description
 
@@ -9,7 +9,11 @@ PantryPal uses audio input for meal types and a list of available ingredients, t
 
 ## Getting Started + Installation
 
-Make sure you have Java 21 set up on your system since this project uses a toolchain for Java 21. You can install the dependencies using Gradle:
+Make sure you have Java 21 set up on your system since this project uses a toolchain for Java 21. 
+
+Begin by forking and cloning the repository from [https://github.com/ucsd-cse110-fa23/cse-110-project-team-13.git](https://github.co m/ucsd-cse110-fa23/cse-110-project-team-13.git). 
+
+You can install the dependencies using Gradle:
 
 ```
 ./gradlew build
